@@ -1,4 +1,3 @@
-import { Header } from '@/components/site'
-import { contact } from '@/data/site'
+import { Contact } from '@/components/contact'
 export const metadata = { title: 'Contact | Bond Safari' }
-export default function Page(){return <main><Header/><section className="contact-page section"><p className="eyebrow">Come say hello</p><h1>Let&apos;s talk<br/><i>about the sea.</i></h1><div className="contact-grid"><div><p className="eyebrow">Find us</p><p>{contact.address.map(l=><span key={l}>{l}<br/></span>)}<a className="text-link" href={contact.mapUrl} target="_blank" rel="noreferrer">Open in Maps</a></p><p className="eyebrow">Call or write</p><p>{contact.phones.map(n=><span key={n}><a href={`tel:${n.replace(/\s/g,'')}`}>{n}</a><br/></span>)}<a href={`mailto:${contact.email}`}>{contact.email}</a></p><p className="eyebrow">Opening hours</p><p>{contact.hours}</p></div><form action={`mailto:${contact.email}`} method="post" encType="text/plain"><label>Your name<input name="name" placeholder="Name"/></label><label>Your email<input name="email" type="email" placeholder="Email"/></label><label>How can we help?<textarea name="message" placeholder="Tell us a little about your plans" rows={5}/></label><button className="pill pill-dark" type="submit">Send enquiry</button></form></div></section></main>}
+export default function Page(){return <Contact/>}
