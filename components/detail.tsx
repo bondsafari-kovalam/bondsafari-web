@@ -14,7 +14,7 @@ const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 36 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }
 
 export type DetailItem = { title: string; category: string; duration: string; price?: string; image: string; imagePosition?: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; section: { label: string; href: string } }
-export type RelatedItem = { title: string; category: string; image: string; href: string; imagePosition?: string }
+export type RelatedItem = { title: string; category: string; image: string; href: string; imagePosition?: string; price?: string; duration?: string; tagline?: string }
 
 function Mask({ children, delay = 0, play = true }: { children: React.ReactNode; delay?: number; play?: boolean }) {
   return <span className="mask"><motion.span className="mask-inner" initial={{ y: '105%' }} animate={play ? { y: 0 } : undefined} transition={{ duration: 1.5, ease, delay }}>{children}</motion.span></span>
@@ -27,6 +27,8 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
   // Go back within the site when we came from it, otherwise land on the listing page
   const goBack = () => { if (document.referrer.startsWith(location.origin) && history.length > 1) router.back(); else router.push(item.section.href) }
   const hero = useRef<HTMLElement>(null)
+  const track = useRef<HTMLDivElement>(null)
+  const slide = (dir: number) => { const t = track.current; if (t) t.scrollBy({ left: dir * t.clientWidth * 0.8, behavior: reduce ? 'auto' : 'smooth' }) }
   const { scrollYProgress } = useScroll({ target: hero, offset: ['start start', 'end start'] })
   const scale = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 1.15])
   const y = useTransform(scrollYProgress, [0, 1], ['0%', reduce ? '0%' : '25%'])
@@ -81,9 +83,19 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
     </section>
 
     {related.length > 0 && <section className="dt-related section">
-      <motion.div className="dt-related-head" initial="hidden" whileInView="show" viewport={{ once: true }}><motion.p className="eyebrow" variants={rise}>Keep exploring</motion.p><motion.h2 variants={rise} custom={1}>More ways<br /><i>beneath the waves.</i></motion.h2></motion.div>
-      <div className="dt-related-grid">{related.map((r, i) => <motion.div key={r.href} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i}>
-        <Link className="dt-related-card" href={r.href}><div className="dt-related-img"><Image src={r.image} alt={r.title} fill sizes="(max-width: 800px) 100vw, 33vw" style={{ objectPosition: r.imagePosition }} /></div><div className="dt-related-info"><span>{r.category}</span><h3>{r.title}</h3><i><ArrowUpRight /></i></div></Link>
+      <div className="dt-related-head">
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true }}><motion.p className="eyebrow" variants={rise}>Keep exploring · {related.length} more</motion.p><motion.h2 variants={rise} custom={1}>You might<br /><i>also love.</i></motion.h2></motion.div>
+        <div className="dt-related-nav">
+          <button type="button" aria-label="Previous suggestions" onClick={() => slide(-1)}><ArrowLeft /></button>
+          <button type="button" aria-label="Next suggestions" onClick={() => slide(1)}><ArrowRight /></button>
+        </div>
+      </div>
+      <div ref={track} className="dt-related-track">{related.map((r, i) => <motion.div key={r.href} className="dt-related-slide" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={Math.min(i, 3)}>
+        <Link className="dt-related-card" href={r.href}>
+          <div className="dt-related-img"><Image src={r.image} alt={r.title} fill sizes="(max-width: 800px) 80vw, 26vw" style={{ objectPosition: r.imagePosition }} />{r.price && <span className="dt-related-price">{r.price.replace(' per person', '')}</span>}</div>
+          <div className="dt-related-info"><span>{r.category}{r.duration && ` · ${r.duration}`}</span><h3>{r.title}</h3>{r.tagline && <p>{r.tagline}</p>}<i><ArrowUpRight /></i></div>
+        </Link>
+        <Link className="dt-related-book" href={`/booking?activity=${encodeURIComponent(r.title)}`}>Book {r.title} <ArrowRight /></Link>
       </motion.div>)}</div>
     </section>}
 

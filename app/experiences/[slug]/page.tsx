@@ -15,9 +15,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const { slug } = await params
   const e = experiences.find(x => x.slug === slug)
   if (!e) notFound()
+  // Suggest every other experience, then the swimming course
   const related = [
-    ...experiences.filter(x => x.slug !== slug).map(x => ({ title: x.title, category: x.category, image: x.image, imagePosition: x.imagePosition, href: `/experiences/${x.slug}` })),
-    ...courses.filter(c => c.slug === 'swimming-course').map(c => ({ title: c.title, category: 'Course', image: c.image, href: `/courses/${c.slug}` })),
-  ].slice(0, 3)
+    ...experiences.filter(x => x.slug !== slug).map(x => ({ title: x.title, category: x.category, image: x.image, imagePosition: x.imagePosition, price: x.price, duration: x.duration, tagline: x.tagline, href: `/experiences/${x.slug}` })),
+    ...courses.filter(c => c.slug === 'swimming-course').map(c => ({ title: c.title, category: 'Course', image: c.image, duration: c.duration, href: `/courses/${c.slug}` })),
+  ]
   return <Detail item={{ ...e, section: { label: 'Experiences', href: '/experiences' } }} related={related} />
 }

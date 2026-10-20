@@ -1,3 +1,3 @@
-import { ExperiencesPage } from '@/components/pages'
+import { Experiences } from '@/components/experiences'
 export const metadata = { title: 'Experiences | Bond Safari' }
-export default function Page(){return <ExperiencesPage/>}
+export default function Page(){return <Experiences/>}
