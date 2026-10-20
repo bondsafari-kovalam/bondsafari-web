@@ -173,3 +173,22 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,b
 .bp-fields .ct-select{border-color:var(--line)}.bp-fields .ct-select:focus-within,.bp-fields .ct-select.is-open{border-color:var(--teal)}.bp-fields .ct-select.is-open{z-index:4}
 .ct-select-list{min-width:max(100%,190px)}.ct-select-list [role=option]{white-space:nowrap}.ct-select-list li[role=presentation]{position:static}.ct-select-list ul{position:static}.bp-fields .ct-select:not(.bp-wide) .ct-select-list{left:auto;right:0}
 .hero-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Current page in the nav: full strength with a gold underline; the rest sit back slightly */
+.desktop-nav a{position:relative;padding:6px 0;opacity:.78}.desktop-nav a:after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;border-radius:2px;background:#f2a93b;transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.19,1,.22,1)}.desktop-nav a:hover{opacity:1}.desktop-nav a:hover:after{transform:scaleX(.4)}.desktop-nav a.is-active{opacity:1}.desktop-nav a.is-active:after{transform:scaleX(1)}
+.mobile-nav a.is-active:not(.pill){color:var(--teal);font-style:italic;border-bottom-color:#f2a93b}.mobile-nav a.is-active:not(.pill):before{content:"";width:8px;height:8px;margin:auto 12px auto 0;border-radius:50%;background:#f2a93b;flex:none}.mobile-nav a.is-active:not(.pill) svg{margin-left:auto}
+/* Sticky header: transparent over each hero, a frosted ocean bar once the page scrolls */
+.site-header{position:fixed;transition:background .45s,padding .45s,box-shadow .45s,color .45s}.site-header .brand-logo img{transition:height .45s}
+.site-header.is-scrolled{padding-top:12px;padding-bottom:12px;color:white;background:rgba(8,45,58,.86);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);box-shadow:0 10px 30px -12px rgba(3,24,31,.5)}.site-header.is-scrolled .brand-logo img{height:44px}
+.booking-page .site-header{position:sticky;top:0}
+.xp-filter{top:82px}
+@media(max-width:800px){.site-header.is-scrolled{padding-top:10px;padding-bottom:10px}.site-header.is-scrolled .brand-logo img{height:36px}.site-header.is-scrolled .mobile-nav{top:64px}.xp-filter{top:66px}}
+@media(prefers-reduced-motion:reduce){.site-header,.site-header .brand-logo img{transition:none}}
+/* The pinned hero is its own stacking context; lift it so the fixed header inside stays above later sections */
+.hero-scene .hero{z-index:30}
+/* Clear the sticky header */
+.stack-count{top:96px}@media(max-width:800px){.stack-count{top:72px}.stack-view{top:104px}}
+/* Header hides while scrolling and returns when scrolling stops */
+.site-header{transition:background .45s,padding .45s,box-shadow .45s,color .45s,transform .45s cubic-bezier(.19,1,.22,1)}.site-header.is-hidden{transform:translateY(-110%)}
+.xp-filter{transition:top .45s cubic-bezier(.19,1,.22,1)}html[data-header-hidden] .xp-filter{top:14px}
+@media(max-width:800px){html[data-header-hidden] .xp-filter{top:10px}}
+@media(prefers-reduced-motion:reduce){.site-header,.xp-filter{transition:none}}

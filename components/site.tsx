@@ -75,7 +75,8 @@ export function Hero() {
       {playVideo && <video ref={video} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source media="(max-width: 800px)" src="/videos/scuba-540.mp4" type="video/mp4" /><source src="/videos/scuba-720.mp4" type="video/mp4" /></video>}
     </m.div></m.div>
     <m.div className="hero-shade" style={{ opacity: shadeOpacity }} />
-    <m.div className="hero-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 1.2 }}><Header /></m.div>
+    {/* Fade only: a transform here would trap the fixed header inside the hero */}
+    <m.div className="hero-header" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease, delay: 1.2 }}><Header /></m.div>
     <div className="hero-center">
       <m.span className="hero-mark" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 0.4 }}>BS</m.span>
       <h1><Mask delay={0.6}>Bond Safari</Mask></h1>
