@@ -12,13 +12,13 @@ import { Picker } from './picker'
 
 const KEY = 'bs-booking-popup-seen'
 const ease = [0.19, 1, 0.22, 1] as const
-const activityGroups = [{ label: 'Experiences', options: experiences.map(e => ({ value: e.title })) }, { label: 'Courses', options: courses.map(c => ({ value: c.title })) }]
+const activityGroups = [{ label: 'Activities', options: experiences.map(e => ({ value: e.title })) }, { label: 'Courses', options: courses.map(c => ({ value: c.title })) }]
 const guestGroups = [{ options: [1, 2, 3, 4].map(n => ({ value: String(n), label: `${n} ${n === 1 ? 'guest' : 'guests'}` })) }]
 
 // Detail pages map to the item they show, so the popup can open with it preselected
 const detailTitle = (path: string) => {
   const [, section, slug] = path.split('/')
-  if (section === 'experiences') return experiences.find(e => e.slug === slug)?.title
+  if (section === 'activities') return experiences.find(e => e.slug === slug)?.title
   if (section === 'courses') return courses.find(c => c.slug === slug)?.title
 }
 
@@ -106,7 +106,7 @@ export function BookingPopup() {
             <p className="bp-sub">No diving experience needed. Choose an adventure and we’ll take care of the rest.</p>
           </m.div>
           <m.div className="bp-fields" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease, delay: 0.4 }}>
-            <Picker className="bp-wide" label="Experience" name="activity" groups={activityGroups} defaultValue={preset ?? experiences[0].title} />
+            <Picker className="bp-wide" label="Activity" name="activity" groups={activityGroups} defaultValue={preset ?? experiences[0].title} />
             <label>Date<input name="date" type="date" min={today} defaultValue={today} /></label>
             <Picker label="Guests" name="guests" groups={guestGroups} defaultValue="2" />
           </m.div>

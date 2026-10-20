@@ -27,19 +27,19 @@ function Mask({ children, delay = 0 }: { children: React.ReactNode; delay?: numb
 
 function Card({ e, index, featured }: { e: Experience; index: number; featured: boolean }) {
   return <m.article layout className={`xp-card${featured ? ' is-featured' : ''}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.8, ease, delay: Math.min(index, 6) * 0.06 }}>
-    <Link className="xp-card-media" href={`/experiences/${e.slug}`} aria-label={`${e.title} — view details`}>
+    <Link className="xp-card-media" href={`/activities/${e.slug}`} aria-label={`${e.title} — view details`}>
       <Image src={e.image} alt="" fill sizes={featured ? '(max-width: 800px) 100vw, 66vw' : '(max-width: 800px) 100vw, 33vw'} style={{ objectPosition: e.imagePosition }} />
       <span className="xp-card-num">{String(index + 1).padStart(2, '0')}</span>
-      {featured && <span className="xp-card-flag"><Sparkles /> Signature experience</span>}
+      {featured && <span className="xp-card-flag"><Sparkles /> Signature activity</span>}
       <span className="xp-card-price">{e.price ? e.price.replace(' per person', '') : 'Price on request'}{e.price && <small>/ person</small>}</span>
     </Link>
     <div className="xp-card-body">
       <p className="xp-card-meta"><span>{e.category}</span><span><Clock /> {e.duration}</span></p>
-      <h3><Link href={`/experiences/${e.slug}`}>{e.title}</Link></h3>
+      <h3><Link href={`/activities/${e.slug}`}>{e.title}</Link></h3>
       <p className="xp-card-tag">{e.tagline}</p>
       <div className="xp-card-actions">
         <Link className="book-cta book-cta-sm" href={bookHref(e.title)}><span className="book-cta-label"><strong>Book now</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
-        <Link className="xp-card-more" href={`/experiences/${e.slug}`}>Details <ArrowUpRight /></Link>
+        <Link className="xp-card-more" href={`/activities/${e.slug}`}>Details <ArrowUpRight /></Link>
       </div>
     </div>
   </m.article>
@@ -60,7 +60,7 @@ export function Experiences() {
   const shown = group === 'All' ? experiences : experiences.filter(e => groupOf(e) === group)
 
   const stats = [
-    { icon: Compass, value: String(experiences.length), label: 'Experiences' },
+    { icon: Compass, value: String(experiences.length), label: 'Activities' },
     { icon: Sparkles, value: `₹${fromPrice}`, label: 'Starting from' },
     { icon: Users, value: '10+', label: 'Min. age, no experience needed' },
     { icon: ShieldCheck, value: 'PADI', label: 'Certified instructors' },
@@ -73,12 +73,12 @@ export function Experiences() {
       <m.div className="xp-hero-media" style={{ scale: heroScale, y: heroY }}><Image src="/images/bond-safari.webp" alt="" fill sizes="100vw" priority /></m.div>
       <div className="xp-hero-shade" />
       <m.div className="xp-hero-content" style={{ opacity: heroFade }}>
-        <m.p className="eyebrow light" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>Experiences · Kovalam, Kerala</m.p>
+        <m.p className="eyebrow light" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>Activities · Kovalam, Kerala</m.p>
         <h1><Mask delay={0.3}>Choose your</Mask><br /><Mask delay={0.45}><i>adventure.</i></Mask></h1>
         <m.p className="xp-hero-sub" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease, delay: 0.7 }}>Underwater scooters, guided dives, snorkelling, kayaking and coracle rides — for every age and ability, with all equipment included.</m.p>
         <m.div className="xp-hero-actions" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease, delay: 0.85 }}>
           <Link className="book-cta" href="/booking"><span className="book-cta-label"><strong>Book an adventure</strong><small>From ₹{fromPrice} per person</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
-          <a className="text-link light" href="#all-experiences">Browse all {experiences.length} <ArrowRight /></a>
+          <a className="text-link light" href="#all-activities">Browse all {experiences.length} <ArrowRight /></a>
         </m.div>
       </m.div>
     </section>
@@ -90,17 +90,17 @@ export function Experiences() {
       </m.div>)}
     </section>
 
-    <section id="all-experiences" className="xp-list">
+    <section id="all-activities" className="xp-list">
       <div className="xp-list-head">
         <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
-          <m.p className="eyebrow" variants={rise}>01 — All experiences</m.p>
+          <m.p className="eyebrow" variants={rise}>01 — All activities</m.p>
           <m.h2 variants={rise} custom={1}>Find the one<br /><i>that moves you.</i></m.h2>
         </m.div>
         <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Every activity is guided by our team, includes all the gear you need, and can be booked in under a minute.</m.p>
       </div>
 
       <LayoutMotion>
-      <div className="xp-filter" role="toolbar" aria-label="Filter experiences">
+      <div className="xp-filter" role="toolbar" aria-label="Filter activities">
         <div className="xp-filter-chips">
           {groups.filter(g => counts[g]).map(g => <button key={g} type="button" aria-pressed={group === g} className={group === g ? 'is-on' : ''} onClick={() => setGroup(g)}>
             {group === g && <m.span layoutId="xp-chip" className="xp-chip-bg" transition={{ duration: 0.5, ease }} />}
@@ -130,7 +130,7 @@ export function Experiences() {
         </m.div>
         <ol className="xp-steps">
           {[
-            { icon: Compass, title: 'Pick an experience', text: 'Choose from underwater, on-the-water or combo adventures.' },
+            { icon: Compass, title: 'Pick an activity', text: 'Choose from underwater, on-the-water or combo adventures.' },
             { icon: CalendarCheck, title: 'Choose date & guests', text: 'Open every day, 9:00 – 19:00 — Sundays too.' },
             { icon: ShieldCheck, title: 'We take care of the rest', text: 'Briefing, gear and certified guides are all included.' },
           ].map((s, i) => <m.li key={s.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i}>
@@ -142,6 +142,6 @@ export function Experiences() {
       </div>
     </section>
 
-    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{experiences.length} experiences</b><span>From ₹{fromPrice} per person</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Book</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
+    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{experiences.length} activities</b><span>From ₹{fromPrice} per person</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Book</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
   </main>
 }

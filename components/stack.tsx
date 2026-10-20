@@ -14,10 +14,10 @@ const find = (slug: string) => experiences.find(e => e.slug === slug)!
 const swim = courses.find(c => c.slug === 'swimming-course')!
 
 const items = [
-  { ...find('scuba-diving'), href: '/experiences/scuba-diving', short: 'Scuba diving is a mode of underwater diving in which a scuba diver uses a self-contained underwater breathing apparatus (scuba) to breathe underwater.', tagline: 'Discover the unknown world in a day!' },
-  { ...find('dive-safari'), href: '/experiences/dive-safari', short: 'Dive along with professional Cool Divers and experience the unique species of aquatic life in just one day!', tagline: 'Be cool, dive cool!' },
+  { ...find('scuba-diving'), href: '/activities/scuba-diving', short: 'Scuba diving is a mode of underwater diving in which a scuba diver uses a self-contained underwater breathing apparatus (scuba) to breathe underwater.', tagline: 'Discover the unknown world in a day!' },
+  { ...find('dive-safari'), href: '/activities/dive-safari', short: 'Dive along with professional Cool Divers and experience the unique species of aquatic life in just one day!', tagline: 'Be cool, dive cool!' },
   { ...swim, title: 'Swimming Courses', bookAs: swim.title, category: 'Course', price: undefined, href: '/courses/swimming-course', short: 'Bond Safari Kovalam offers swim lessons. Class timings are designed around your convenience. All classes are half an hour long and are held Monday to Sunday.', tagline: 'Swim well, live well!' },
-  { ...find('sea-life-safari'), href: '/experiences/sea-life-safari', short: 'Sea Life Safari is one of the most beautiful journeys under water. Explore and experience sea birds and other marine life — if you’re lucky you’ll see all this and much more, as your guide narrates the scenic ride.', tagline: 'The most beautiful journey under water.' },
+  { ...find('sea-life-safari'), href: '/activities/sea-life-safari', short: 'Sea Life Safari is one of the most beautiful journeys under water. Explore and experience sea birds and other marine life — if you’re lucky you’ll see all this and much more, as your guide narrates the scenic ride.', tagline: 'The most beautiful journey under water.' },
 ]
 
 function StackCard({ item, index, last }: { item: typeof items[number]; index: number; last: boolean }) {
@@ -58,8 +58,8 @@ function StackCard({ item, index, last }: { item: typeof items[number]; index: n
 }
 
 export function ExperienceStack() {
-  return <section className="stack" aria-label="Experiences">
-    <div className="stack-intro"><p className="eyebrow">Choose your horizon</p><h2>Experiences<br /><i>worth booking.</i></h2></div>
+  return <section className="stack" aria-label="Activities">
+    <div className="stack-intro"><p className="eyebrow">Choose your horizon</p><h2>Activities<br /><i>worth booking.</i></h2></div>
     {items.map((item, i) => <StackCard key={item.slug} item={item} index={i} last={i === items.length - 1} />)}
   </section>
 }

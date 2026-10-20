@@ -192,3 +192,8 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,b
 .xp-filter{transition:top .45s cubic-bezier(.19,1,.22,1)}html[data-header-hidden] .xp-filter{top:14px}
 @media(max-width:800px){html[data-header-hidden] .xp-filter{top:10px}}
 @media(prefers-reduced-motion:reduce){.site-header,.xp-filter{transition:none}}
+/* Footer social icons */
+.footer-social{display:flex;flex-wrap:wrap;gap:10px;list-style:none;margin:0;padding:0}.footer-social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.25);color:white;transition:background .35s,color .35s,border-color .35s,transform .35s cubic-bezier(.19,1,.22,1)}.footer .footer-social a:hover{opacity:1;background:var(--sand);border-color:var(--sand);color:var(--ocean);transform:translateY(-3px)}.footer-social a:focus-visible{outline:2px solid var(--sand);outline-offset:3px}.footer-social svg{width:18px;height:18px}
+@media(prefers-reduced-motion:reduce){.footer-social a{transition:none}}
+.footer-social{gap:8px}.footer-social a{width:36px;height:36px}.footer-social svg{width:16px;height:16px}
+@media(max-width:800px){.footer>div:has(.footer-social){grid-column:1/-1}.footer-social{gap:10px}.footer-social a{width:42px;height:42px}}

@@ -13,7 +13,7 @@ import { Picker } from './picker'
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.12 } }) }
 const tel = (n: string) => `tel:${n.replace(/\s/g, '')}`
-const groups = [{ label: 'Experiences', options: experiences.map(e => ({ value: e.title })) }, { label: 'Courses', options: courses.map(c => ({ value: c.title })) }, { label: 'Other', options: [{ value: 'Something else' }] }]
+const groups = [{ label: 'Activities', options: experiences.map(e => ({ value: e.title })) }, { label: 'Courses', options: courses.map(c => ({ value: c.title })) }, { label: 'Other', options: [{ value: 'Something else' }] }]
 const mapEmbed = `https://www.google.com/maps?q=${encodeURIComponent('Bond Safari, Suseela Tower, Beach Road, Kovalam, Kerala 695527')}&z=16&output=embed`
 
 function Mask({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {

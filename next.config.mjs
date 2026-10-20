@@ -6,6 +6,13 @@ const nextConfig = {
     // Our photos are fixed assets, so let the optimised copies stay cached for a month
     minimumCacheTTL: 2678400,
   },
+  // The section was renamed from Experiences to Activities; keep old links and search results working
+  async redirects() {
+    return [
+      { source: '/experiences', destination: '/activities', permanent: true },
+      { source: '/experiences/:slug', destination: '/activities/:slug', permanent: true },
+    ]
+  },
 }
 
 export default nextConfig
