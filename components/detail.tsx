@@ -13,8 +13,8 @@ import { usePageRevealed } from './booking-popup'
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 36 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }
 
-export type DetailItem = { title: string; category: string; duration: string; price?: string; image: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; section: { label: string; href: string } }
-export type RelatedItem = { title: string; category: string; image: string; href: string }
+export type DetailItem = { title: string; category: string; duration: string; price?: string; image: string; imagePosition?: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; section: { label: string; href: string } }
+export type RelatedItem = { title: string; category: string; image: string; href: string; imagePosition?: string }
 
 function Mask({ children, delay = 0, play = true }: { children: React.ReactNode; delay?: number; play?: boolean }) {
   return <span className="mask"><motion.span className="mask-inner" initial={{ y: '105%' }} animate={play ? { y: 0 } : undefined} transition={{ duration: 1.5, ease, delay }}>{children}</motion.span></span>
@@ -39,7 +39,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
   return <main className="dt">
     <Header />
     <section ref={hero} className="dt-hero">
-      <motion.div className="dt-hero-media" style={{ scale, y }}><Image src={item.image} alt={item.title} fill sizes="100vw" priority /></motion.div>
+      <motion.div className="dt-hero-media" style={{ scale, y }}><Image src={item.image} alt={item.title} fill sizes="100vw" priority style={{ objectPosition: item.imagePosition }} /></motion.div>
       <div className="dt-hero-shade" />
       <motion.button type="button" className="dt-back" onClick={goBack} initial={{ opacity: 0, x: -16 }} animate={revealed ? { opacity: 1, x: 0 } : undefined} transition={{ duration: 1, ease, delay: 0.15 }}><span><ArrowLeft /></span>Back</motion.button>
       <motion.div className="dt-hero-content" style={{ opacity: fade }}>
@@ -83,7 +83,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
     {related.length > 0 && <section className="dt-related section">
       <motion.div className="dt-related-head" initial="hidden" whileInView="show" viewport={{ once: true }}><motion.p className="eyebrow" variants={rise}>Keep exploring</motion.p><motion.h2 variants={rise} custom={1}>More ways<br /><i>beneath the waves.</i></motion.h2></motion.div>
       <div className="dt-related-grid">{related.map((r, i) => <motion.div key={r.href} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i}>
-        <Link className="dt-related-card" href={r.href}><div className="dt-related-img"><Image src={r.image} alt={r.title} fill sizes="(max-width: 800px) 100vw, 33vw" /></div><div className="dt-related-info"><span>{r.category}</span><h3>{r.title}</h3><i><ArrowUpRight /></i></div></Link>
+        <Link className="dt-related-card" href={r.href}><div className="dt-related-img"><Image src={r.image} alt={r.title} fill sizes="(max-width: 800px) 100vw, 33vw" style={{ objectPosition: r.imagePosition }} /></div><div className="dt-related-info"><span>{r.category}</span><h3>{r.title}</h3><i><ArrowUpRight /></i></div></Link>
       </motion.div>)}</div>
     </section>}
 
