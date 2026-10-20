@@ -38,7 +38,7 @@ function StackCard({ item, index, last }: { item: typeof items[number]; index: n
   const book = `/booking?activity=${encodeURIComponent('bookAs' in item && item.bookAs ? item.bookAs : item.title)}`
   return <div ref={ref} className="stack-item">
     <m.article className="stack-card" style={{ scale: cardScale, clipPath: clip }}>
-      <m.div className="stack-image" style={{ scale: imageScale, y: parallax }}><m.div className="stack-kenburns" animate={reduce ? undefined : { scale: [1, 1.1], x: ['0%', `${drift}%`], y: ['0%', '-2%'] }} transition={{ duration: 18, ease: 'easeInOut', repeat: Infinity, repeatType: 'mirror' }}><Image src={item.image} alt={item.title} fill sizes="100vw" priority={index === 0} /></m.div></m.div>
+      <m.div className="stack-image" style={{ scale: imageScale, y: parallax }}><m.div className="stack-kenburns" animate={reduce ? undefined : { scale: [1, 1.1], x: ['0%', `${drift}%`], y: ['0%', '-2%'] }} transition={{ duration: 18, ease: 'easeInOut', repeat: Infinity, repeatType: 'mirror' }}><Image src={item.image} alt={item.title} fill sizes="100vw" /></m.div></m.div>
       <div className="stack-shade" />
       {!reduce && <m.div className="stack-curtain" initial={{ scaleX: 1 }} whileInView={{ scaleX: 0 }} viewport={{ once: true, amount: 0.35 }} transition={{ duration: 1.4, ease }} />}
       <Link className="stack-hit" href={item.href} aria-label={`View ${item.title} details`}><span className="stack-view">View<br />details <ArrowUpRight /></span></Link>
