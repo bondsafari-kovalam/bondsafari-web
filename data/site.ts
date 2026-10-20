@@ -5,7 +5,6 @@ export const contact = {
   hours: 'Monday – Sunday · 9:00 – 19:00',
   mapUrl: 'https://www.google.com/maps/search/?api=1&query=Bond+Safari+Kovalam+Suseela+Tower+Beach+Road',
   bookingUrl: 'http://bookings.bondsafarikovalam.com/',
-  blogUrl: 'http://bookings.bondsafarikovalam.com/blogs',
 }
 
 export const socials = [

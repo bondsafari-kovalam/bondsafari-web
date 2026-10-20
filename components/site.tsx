@@ -2,26 +2,27 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { AnimatePresence, animate, motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
-import { ArrowDown, ArrowRight, Menu, X } from 'lucide-react'
+import { animate, m, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
+import { ArrowDown, ArrowRight } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { preload } from 'react-dom'
+import { Header, Reveal } from './header'
 import { experiences } from '@/data/experiences'
-import { contact, socials } from '@/data/site'
 
-const nav = [['Home','/'], ['Experiences','/experiences'], ['Courses','/courses'], ['About','/about'], ['Gallery','/gallery'], ['News','/news'], ['Contact','/contact']]
 
-export function Header() {
-  const [open, setOpen] = useState(false)
-  return <header className="site-header"><Link className="brand brand-logo" href="/" aria-label="Bond Safari home"><Image src="/images/logo.webp" alt="Bond Safari" width={333} height={200} priority /></Link><nav className="desktop-nav">{nav.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav><div className="header-actions"><Link className="pill pill-light" href="/booking">Book now <ArrowRight /></Link><button className="menu-button" onClick={() => setOpen(!open)} aria-label={open ? 'Close menu' : 'Open menu'}>{open ? <X /> : <Menu />}</button></div><AnimatePresence>{open && <motion.nav className="mobile-nav" initial={{opacity:0,y:-10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>{nav.map(([label, href]) => <Link onClick={() => setOpen(false)} key={href} href={href}>{label}<ArrowRight /></Link>)}<Link className="pill pill-dark" href="/booking">Book your adventure <ArrowRight /></Link></motion.nav>}</AnimatePresence></header>
+// Small local posters (the first thing painted) and a lighter video for phones
+const posterSrcSet = '/images/hero-poster-mobile.webp 800w, /images/hero-poster.webp 1280w'
+
+// Skip the video on data saver, slow connections and reduced motion: the poster stays instead
+type NetInfo = { saveData?: boolean; effectiveType?: string }
+const videoAllowed = () => {
+  const c = (navigator as Navigator & { connection?: NetInfo }).connection
+  return !(c?.saveData || ['slow-2g', '2g', '3g'].includes(c?.effectiveType ?? ''))
 }
-
-export function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <motion.div className={className} initial={{opacity:0,y:28}} whileInView={{opacity:1,y:0}} viewport={{once:true, margin:'-80px'}} transition={{duration:.7, ease:[.22,1,.36,1]}}>{children}</motion.div> }
-
-const heroPoster = 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=2200&q=90'
 
 const ease = [0.19, 1, 0.22, 1] as const
 
-function Mask({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) { return <span className={`mask ${className}`}><motion.span className="mask-inner" initial={{ y: '101%' }} animate={{ y: 0 }} transition={{ duration: 2, ease, delay }}>{children}</motion.span></span> }
+function Mask({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) { return <span className={`mask ${className}`}><m.span className="mask-inner" initial={{ y: '101%' }} animate={{ y: 0 }} transition={{ duration: 2, ease, delay }}>{children}</m.span></span> }
 
 export function Hero() {
   const video = useRef<HTMLVideoElement>(null)
@@ -41,7 +42,10 @@ export function Hero() {
   const videoSX = useTransform(() => Math.max(mediaSX.get(), mediaSY.get()) / mediaSX.get())
   const videoSY = useTransform(() => Math.max(mediaSX.get(), mediaSY.get()) / mediaSY.get())
   const shadeOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
-  useEffect(() => { if (reduce) video.current?.pause() }, [reduce])
+  // The video mounts only after hydration, so the poster paints first and the video never competes with it
+  const [playVideo, setPlayVideo] = useState(false)
+  useEffect(() => { setPlayVideo(!reduce && videoAllowed()) }, [reduce])
+  preload('/images/hero-poster.webp', { as: 'image', fetchPriority: 'high', imageSrcSet: posterSrcSet, imageSizes: '100vw' })
   // One scroll gesture glides the whole way: down from the top lands the video in the corner, up from there returns to full screen
   useEffect(() => {
     if (reduce) return
@@ -66,30 +70,33 @@ export function Hero() {
     return () => { window.removeEventListener('wheel', onWheel); window.removeEventListener('touchstart', onTouchStart); window.removeEventListener('touchmove', onTouchMove); window.removeEventListener('keydown', onKey) }
   }, [reduce])
   return <section ref={section} className="hero-scene"><div className="hero">
-    <motion.div className="hero-media" style={{ x: mediaX, y: mediaY, scaleX: mediaSX, scaleY: mediaSY }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 3, ease }}><motion.div className="hero-media-inner" style={{ scaleX: videoSX, scaleY: videoSY, backgroundImage: `url('${heroPoster}')` }}><video ref={video} autoPlay muted loop playsInline poster={heroPoster} aria-hidden="true"><source src="/videos/scuba.mp4" type="video/mp4" /></video></motion.div></motion.div>
-    <motion.div className="hero-shade" style={{ opacity: shadeOpacity }} />
-    <motion.div className="hero-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 1.2 }}><Header /></motion.div>
+    <m.div className="hero-media" style={{ x: mediaX, y: mediaY, scaleX: mediaSX, scaleY: mediaSY }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 3, ease }}><m.div className="hero-media-inner" style={{ scaleX: videoSX, scaleY: videoSY }}>
+      <img className="hero-poster" src="/images/hero-poster.webp" srcSet={posterSrcSet} sizes="100vw" alt="" fetchPriority="high" decoding="async" />
+      {playVideo && <video ref={video} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source media="(max-width: 800px)" src="/videos/scuba-540.mp4" type="video/mp4" /><source src="/videos/scuba-720.mp4" type="video/mp4" /></video>}
+    </m.div></m.div>
+    <m.div className="hero-shade" style={{ opacity: shadeOpacity }} />
+    <m.div className="hero-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 1.2 }}><Header /></m.div>
     <div className="hero-center">
-      <motion.span className="hero-mark" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 0.4 }}>BS</motion.span>
+      <m.span className="hero-mark" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 0.4 }}>BS</m.span>
       <h1><Mask delay={0.6}>Bond Safari</Mask></h1>
       <p className="hero-tagline"><Mask delay={0.85}>Discover a world beneath the waves</Mask></p>
     </div>
-    <motion.div className="hero-scroll" style={{ opacity: contentOpacity }}>
-      <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 1.4 }}><ArrowDown /></motion.span>
+    <m.div className="hero-scroll" style={{ opacity: contentOpacity }}>
+      <m.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 1.4 }}><ArrowDown /></m.span>
       <Mask delay={1.5}>Scroll down<br />to start the experience</Mask>
-    </motion.div>
+    </m.div>
   </div></section>
 }
 
-function Words({ text, delay = 0, step = 0.1, duration = 2 }: { text: string; delay?: number; step?: number; duration?: number }) { const words = text.split(' '); return <>{words.map((word, i) => <motion.span key={i} initial={{ y: '101%' }} whileInView={{ y: 0 }} viewport={{ amount: 0.5 }} transition={{ duration, ease, delay: delay + i * step }}>{word}{i < words.length - 1 ? '\u00a0' : ''}</motion.span>)}</> }
+function Words({ text, delay = 0, step = 0.1, duration = 2 }: { text: string; delay?: number; step?: number; duration?: number }) { const words = text.split(' '); return <>{words.map((word, i) => <m.span key={i} initial={{ y: '101%' }} whileInView={{ y: 0 }} viewport={{ amount: 0.5 }} transition={{ duration, ease, delay: delay + i * step }}>{word}{i < words.length - 1 ? '\u00a0' : ''}</m.span>)}</> }
 
 export function HeroStatement() {
   const strip = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: strip, offset: ['start end', 'end start'] })
   const y = useTransform(scrollYProgress, [0, 1], ['-12%', '12%'])
   return <section className="statement" aria-label="Dive beyond limits. Find another world.">
-    <div className="statement-look">{'DIVE'.split('').map((ch, i) => <motion.span key={i} initial={{ y: '101%' }} whileInView={{ y: 0 }} viewport={{ amount: 0.5 }} transition={{ duration: 2, ease, delay: i * 0.1 }}>{ch}</motion.span>)}<span className="statement-limits"><Words text="BEYOND LIMITS." delay={0.4} duration={3} /></span></div>
-    <div ref={strip} className="statement-strip"><motion.div style={{ y }} className="statement-strip-img"><Image src="https://images.unsplash.com/photo-1546500840-ae38253aba9b?auto=format&fit=crop&w=2200&q=85" alt="Coral reef in clear blue water" fill sizes="75vw" /></motion.div></div>
+    <div className="statement-look">{'DIVE'.split('').map((ch, i) => <m.span key={i} initial={{ y: '101%' }} whileInView={{ y: 0 }} viewport={{ amount: 0.5 }} transition={{ duration: 2, ease, delay: i * 0.1 }}>{ch}</m.span>)}<span className="statement-limits"><Words text="BEYOND LIMITS." delay={0.4} duration={3} /></span></div>
+    <div ref={strip} className="statement-strip"><m.div style={{ y }} className="statement-strip-img"><Image src="/images/coral-reef.webp" alt="Coral reef in clear blue water" fill sizes="75vw" /></m.div></div>
     <div className="statement-find"><Words text="FIND" /></div>
     <div className="statement-world"><Words text="ANOTHER WORLD." step={0.15} /></div>
   </section>
@@ -98,5 +105,3 @@ export function HeroStatement() {
 export function BookingBar() { return <section className="booking-bar"><div><span>01</span><label>Choose your experience<select defaultValue=""><option value="" disabled>Select an activity</option>{experiences.map(e => <option key={e.slug}>{e.title}</option>)}</select></label></div><div><span>02</span><label>When are you joining us?<input type="date" /></label></div><div><span>03</span><label>Guests<select defaultValue="2"><option>1 guest</option><option>2 guests</option><option>3 guests</option><option>4 guests</option></select></label></div><Link className="bar-submit" href="/booking">Continue <ArrowRight /></Link></section> }
 
 export function ExperienceCard({ experience, index = 0 }: { experience: typeof experiences[number]; index?: number }) { return <Reveal className={`experience-card card-${index}`}><Link href={`/experiences/${experience.slug}`}><div className="image-wrap"><Image src={experience.image} alt={experience.title} fill sizes="(max-width: 768px) 100vw, 50vw" /></div><div className="card-meta"><span>{experience.category}</span><span>{experience.duration}</span></div><h3>{experience.title}</h3><p>{experience.description}</p><span className="text-link">Discover more <ArrowRight /></span></Link></Reveal> }
-
-export function Footer() { return <footer className="footer"><div className="footer-brand"><div className="brand"><span className="brand-mark">BS</span><span>Bond Safari<small>Kovalam · Kerala</small></span></div><p className="footer-tagline">Enjoy the sea life with Bond Safari and feel the marvels hidden beneath.</p></div><div><p className="eyebrow">Find us</p><p>{contact.address.map(l => <span key={l}>{l}<br /></span>)}<a href={contact.mapUrl} target="_blank" rel="noreferrer">Open in Maps</a></p></div><div><p className="eyebrow">Say hello</p><p><a href={`mailto:${contact.email}`}>{contact.email}</a><br />{contact.phones.map(n => <span key={n}><a href={`tel:${n.replace(/\s/g,'')}`}>{n}</a><br /></span>)}{contact.hours}</p></div><div><p className="eyebrow">Follow along</p><p>{socials.map(([label, href]) => <span key={label}><a href={href} target="_blank" rel="noreferrer">{label}</a><br /></span>)}</p></div><div className="footer-bottom">© {new Date().getFullYear()} Bond Safari Kovalam <span>In partnership with Cool Divers SL, Spain</span></div></footer> }

@@ -1,4 +1,4 @@
 import Image from 'next/image'
-import { Header } from '@/components/site'
-const photos=[['Underwater light','https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1400&q=85'],['Coastal mornings','https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=85'],['Open water','https://images.unsplash.com/photo-1546500840-ae38253aba9b?auto=format&fit=crop&w=1400&q=85'],['The quiet blue','https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=1400&q=85']]
+import { Header } from '@/components/header'
+const photos=[['Underwater light','/images/underwater-light.webp'],['Coastal mornings','/images/coastal-morning.webp'],['Open water','/images/coral-reef.webp'],['The quiet blue','/images/quiet-blue.webp']]
 export default function Page(){return <main><Header/><section className="page-intro simple"><div><p className="eyebrow light">Postcards from Kovalam</p><h1>The world<br/><i>as we see it.</i></h1></div></section><section className="gallery-grid section">{photos.map(([alt,src],i)=><div className={`gallery-photo photo-${i}`} key={src}><Image src={src} alt={alt} fill sizes="(max-width:700px) 100vw, 50vw"/></div>)}</section></main>}

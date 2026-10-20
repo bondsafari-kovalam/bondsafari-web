@@ -1,6 +1,6 @@
 'use client'
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { ArrowUp, X } from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 
@@ -61,14 +61,14 @@ export function ChatBot() {
 
   return <>
     <AnimatePresence>
-      {open && <motion.section className="cb-panel" role="dialog" aria-label="Chat with Bond Safari" initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduce ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.96 }} transition={{ duration: 0.5, ease }}>
+      {open && <m.section className="cb-panel" role="dialog" aria-label="Chat with Bond Safari" initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduce ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.96 }} transition={{ duration: 0.5, ease }}>
         <header className="cb-head">
           <span className="cb-avatar"><RobotIcon /></span>
           <div><b>Bond Safari AI assistant</b><span><i /> AI powered · online</span></div>
           <button onClick={() => setOpen(false)} aria-label="Close chat"><X /></button>
         </header>
         <div ref={list} className="cb-list" aria-live="polite">
-          {messages.map((m, i) => <motion.p key={i} className={`cb-msg cb-${m.role}`} initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease }}>{m.text}</motion.p>)}
+          {messages.map((msg, i) => <m.p key={i} className={`cb-msg cb-${msg.role}`} initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease }}>{msg.text}</m.p>)}
           {typing && <p className="cb-msg cb-assistant cb-typing" aria-label="Assistant is typing"><i /><i /><i /></p>}
           {messages.length === 1 && <div className="cb-suggest">{suggestions.map(s => <button key={s} onClick={() => send(s)}>{s}</button>)}</div>}
         </div>
@@ -76,7 +76,7 @@ export function ChatBot() {
           <input ref={field} value={input} onChange={e => setInput(e.target.value)} placeholder="Type your message…" aria-label="Message" />
           <button type="submit" disabled={!input.trim() || typing} aria-label="Send"><ArrowUp /></button>
         </form>
-      </motion.section>}
+      </m.section>}
     </AnimatePresence>
     <button className={open ? 'cb-launcher open' : 'cb-launcher'} onClick={() => setOpen(o => !o)} aria-label={open ? 'Close AI assistant' : 'Chat with our AI assistant'} aria-expanded={open}>
       <span className="cb-icon cb-icon-chat"><RobotIcon /></span>

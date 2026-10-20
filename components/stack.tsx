@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { useRef } from 'react'
 import { experiences } from '@/data/experiences'
@@ -37,23 +37,23 @@ function StackCard({ item, index, last }: { item: typeof items[number]; index: n
   const drift = index % 2 ? -2.5 : 2.5
   const book = `/booking?activity=${encodeURIComponent('bookAs' in item && item.bookAs ? item.bookAs : item.title)}`
   return <div ref={ref} className="stack-item">
-    <motion.article className="stack-card" style={{ scale: cardScale, clipPath: clip }}>
-      <motion.div className="stack-image" style={{ scale: imageScale, y: parallax }}><motion.div className="stack-kenburns" animate={reduce ? undefined : { scale: [1, 1.1], x: ['0%', `${drift}%`], y: ['0%', '-2%'] }} transition={{ duration: 18, ease: 'easeInOut', repeat: Infinity, repeatType: 'mirror' }}><Image src={item.image} alt={item.title} fill sizes="100vw" priority={index === 0} /></motion.div></motion.div>
+    <m.article className="stack-card" style={{ scale: cardScale, clipPath: clip }}>
+      <m.div className="stack-image" style={{ scale: imageScale, y: parallax }}><m.div className="stack-kenburns" animate={reduce ? undefined : { scale: [1, 1.1], x: ['0%', `${drift}%`], y: ['0%', '-2%'] }} transition={{ duration: 18, ease: 'easeInOut', repeat: Infinity, repeatType: 'mirror' }}><Image src={item.image} alt={item.title} fill sizes="100vw" priority={index === 0} /></m.div></m.div>
       <div className="stack-shade" />
-      {!reduce && <motion.div className="stack-curtain" initial={{ scaleX: 1 }} whileInView={{ scaleX: 0 }} viewport={{ once: true, amount: 0.35 }} transition={{ duration: 1.4, ease }} />}
+      {!reduce && <m.div className="stack-curtain" initial={{ scaleX: 1 }} whileInView={{ scaleX: 0 }} viewport={{ once: true, amount: 0.35 }} transition={{ duration: 1.4, ease }} />}
       <Link className="stack-hit" href={item.href} aria-label={`View ${item.title} details`}><span className="stack-view">View<br />details <ArrowUpRight /></span></Link>
       <span className="stack-count">{String(index + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}</span>
       <div className="stack-content">
-        <motion.p className="eyebrow light" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.6 }} transition={{ duration: 1.2, ease }}>{item.category} · {item.duration}</motion.p>
-        <h2 className="stack-title"><motion.span initial={{ y: '101%' }} whileInView={{ y: 0 }} viewport={{ amount: 0.6 }} transition={{ duration: 1.6, ease, delay: 0.1 }}>{item.title}</motion.span></h2>
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.6 }} transition={{ duration: 1.2, ease, delay: 0.25 }}>
+        <m.p className="eyebrow light" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.6 }} transition={{ duration: 1.2, ease }}>{item.category} · {item.duration}</m.p>
+        <h2 className="stack-title"><m.span initial={{ y: '101%' }} whileInView={{ y: 0 }} viewport={{ amount: 0.6 }} transition={{ duration: 1.6, ease, delay: 0.1 }}>{item.title}</m.span></h2>
+        <m.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.6 }} transition={{ duration: 1.2, ease, delay: 0.25 }}>
           <p className="stack-text">{item.short}</p>
           <p className="stack-tagline">{item.tagline}</p>
           <div className="stack-actions"><Link className="book-cta" href={book} aria-label={`Book ${item.title}`}><span className="book-cta-label"><strong>Book now</strong>{item.price ? <small>{item.price}</small> : <small>Reserve your spot</small>}</span><span className="book-cta-icon"><ArrowRight /></span></Link><Link className="text-link light" href={item.href}>Learn more <ArrowRight /></Link></div>
-        </motion.div>
+        </m.div>
       </div>
-      <motion.div className="stack-dim" style={{ opacity: dim }} />
-    </motion.article>
+      <m.div className="stack-dim" style={{ opacity: dim }} />
+    </m.article>
   </div>
 }
 

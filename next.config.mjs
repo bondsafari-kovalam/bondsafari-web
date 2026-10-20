@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
-    unoptimized: true,
-    remotePatterns: [{ protocol: 'https', hostname: 'images.unsplash.com' }, { protocol: 'https', hostname: 'www.bondsafarikovalam.com' }],
+    // Serve resized AVIF/WebP per screen size instead of the full-size originals
+    formats: ['image/avif', 'image/webp'],
+    // Our photos are fixed assets, so let the optimised copies stay cached for a month
+    minimumCacheTTL: 2678400,
   },
 }
 

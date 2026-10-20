@@ -2,12 +2,12 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion'
+import { m, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 
 const cards = [
-  { title: 'Bond Safari', kind: 'Experience', bookAs: 'Bond Safari', href: '/experiences/bond-safari', image: 'https://www.bondsafarikovalam.com/wp-content/uploads/2023/05/3.jpg', text: 'A unique centre for scuba diving in Kerala, open to anyone without the rigours of typical diving. The self-propelled, eco-friendly electric scooter leads you effortlessly underwater so you can enjoy the magnificent marine life. All age groups can explore with BOND — no diving or scuba experience is necessary.', tagline: 'Sit down, submerge & drive off!' },
+  { title: 'Bond Safari', kind: 'Experience', bookAs: 'Bond Safari', href: '/experiences/bond-safari', image: '/images/bond-safari.webp', text: 'A unique centre for scuba diving in Kerala, open to anyone without the rigours of typical diving. The self-propelled, eco-friendly electric scooter leads you effortlessly underwater so you can enjoy the magnificent marine life. All age groups can explore with BOND — no diving or scuba experience is necessary.', tagline: 'Sit down, submerge & drive off!' },
   { title: 'Sea Life Safari', kind: 'Experience', bookAs: 'Sea Life Safari', href: '/experiences/sea-life-safari', image: '/images/sea-life.webp', text: 'This 2.5-hour Sea Life Safari takes you through fantastic moments in the ocean’s aquarium, accompanied by a marine biologist who dives at interesting places, explaining the facts and peculiarities of the mysterious world underwater — with spectacular photo opportunities.', tagline: 'Explore the beauty above and below the sea.' },
   { title: 'Dive Safari', kind: 'Experience', bookAs: 'Dive Safari', href: '/experiences/dive-safari', image: '/images/dive-safari.webp', text: 'An adrenaline-pumping way to experience the silence, the tranquillity, the weightlessness and the heart-touching beauty of the marine world. Plunge into the water for an unforgettable tour with safe, high-quality equipment.', tagline: 'Be cool, dive cool!' },
   { title: 'Swimming Course', kind: 'Course', bookAs: 'Swimming Course', href: '/courses/swimming-course', image: '/images/swimming.webp', text: 'Bond Safari Kids and Adults are unique programmes designed by national and international swim coaches. Our coordinators and instructors are trained to international standards, with a background in water safety in Trivandrum. Lessons are divided into six separate levels.', tagline: 'Swim well, live well!' },
@@ -33,9 +33,9 @@ function Card({ c, i, active, pos, reduce, onSelect }: { c: typeof cards[number]
   const d = useTransform(pos, v => v - i)
   const imgX = useTransform(d, v => reduce ? '0%' : `${Math.max(-1, Math.min(1, v)) * 10}%`)
   const cardY = useTransform(d, v => reduce ? 0 : Math.min(Math.abs(v), 1) * 26)
-  return <motion.li className={active ? 'explore-card active' : 'explore-card'} aria-hidden={!active} onClick={active ? undefined : onSelect} style={{ y: cardY }}>
+  return <m.li className={active ? 'explore-card active' : 'explore-card'} aria-hidden={!active} onClick={active ? undefined : onSelect} style={{ y: cardY }}>
     <div className="explore-image" onPointerMove={active && !reduce ? onMove : undefined} onPointerLeave={onLeave}>
-      <motion.div className="explore-parallax" style={{ x: imgX }}><Image src={c.image} alt={c.title} fill sizes="(max-width: 800px) 86vw, 62vw" /></motion.div>
+      <m.div className="explore-parallax" style={{ x: imgX }}><Image src={c.image} alt={c.title} fill sizes="(max-width: 800px) 86vw, 62vw" /></m.div>
       <span className="explore-shade" />
       <span className="explore-chip">{c.kind}</span>
       <span className="explore-num" aria-hidden="true">{pad(i + 1)}</span>
@@ -48,14 +48,14 @@ function Card({ c, i, active, pos, reduce, onSelect }: { c: typeof cards[number]
       <p className="explore-tagline">{c.tagline}</p>
       <div className="explore-actions"><Link className="book-cta book-cta-sm" href={`/booking?activity=${encodeURIComponent(c.bookAs)}`} tabIndex={active ? 0 : -1}><span className="book-cta-label"><strong>Book now</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link><Link className="explore-link" href={c.href} tabIndex={active ? 0 : -1}>Explore <ArrowRight /></Link></div>
     </div>
-  </motion.li>
+  </m.li>
 }
 
 function Segment({ i, pos, active, title, onSelect }: { i: number; pos: MotionValue<number>; active: boolean; title: string; onSelect: () => void }) {
   // Segment 0 is full on arrival; each later one fills as its card slides in
   const fill = useTransform(pos, v => i === 0 ? 1 : Math.max(0, Math.min(1, v - i + 1)))
   return <button onClick={onSelect} aria-label={`Show ${title}`} aria-current={active} className={active ? 'now' : ''}>
-    <span><motion.i style={{ scaleX: fill }} /></span>
+    <span><m.i style={{ scaleX: fill }} /></span>
     <em>{title}</em>
   </button>
 }
@@ -96,9 +96,9 @@ export function ExploreCarousel() {
         <div className="explore-controls"><button onClick={() => goTo(index - 1)} disabled={index === 0} aria-label="Previous"><ArrowLeft /></button><span className="explore-count" aria-live="polite"><b key={index}>{pad(index + 1)}</b> <i>/</i> {pad(n)}</span><button onClick={() => goTo(index + 1)} disabled={index === n - 1} aria-label="Next"><ArrowRight /></button></div>
       </div>
       <div className="explore-viewport">
-        <motion.ul ref={track} className="explore-track" style={{ x }}>
+        <m.ul ref={track} className="explore-track" style={{ x }}>
           {cards.map((c, i) => <Card key={c.title} c={c} i={i} active={i === index} pos={pos} reduce={reduce} onSelect={() => goTo(i)} />)}
-        </motion.ul>
+        </m.ul>
       </div>
       <div className="explore-progress">
         {cards.map((c, i) => <Segment key={c.title} i={i} pos={pos} active={i === index} title={c.title} onSelect={() => goTo(i)} />)}
