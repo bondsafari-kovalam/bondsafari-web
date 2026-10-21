@@ -1,13 +1,21 @@
 import { experiences, type Experience } from './experiences'
 import { courses, type Course } from './courses'
+import type { ProductBase } from './catalogue'
 
 // One lookup across activities and courses, used by booking, related links, the sitemap and structured data
 
-export type Product = ({ kind: 'activity' } & Experience) | ({ kind: 'course' } & Course)
+// Catalogue fields the booking API and structured data need, derived only from data the site already publishes
+type Derived = Pick<ProductBase, 'seller' | 'amount' | 'gst' | 'minAge'> & Partial<Pick<ProductBase, 'ageNote' | 'faqs' | 'medical' | 'related' | 'imagePending' | 'legacyBookingUrl'>>
+export type Product = (({ kind: 'activity' } & Experience) | ({ kind: 'course'; deposit?: number } & Omit<Course, 'minAge'>)) & Derived
+
+const amountOf = (price?: string) => Number(price?.replace(/[^\d]/g, '')) || undefined
+// "Taxes included" / "18% GST included" in the product's own details is the only basis for showing incl. GST
+const gstOf = (details: string[]) => details.some(d => /(tax(es)?|gst) included/i.test(d)) ? 'included' as const : undefined
+const ageOf = (s?: string) => (s ? Number.parseInt(s, 10) : NaN) || undefined
 
 export const products: Product[] = [
-  ...experiences.map(e => ({ kind: 'activity' as const, ...e })),
-  ...courses.map(c => ({ kind: 'course' as const, ...c })),
+  ...experiences.map(e => ({ kind: 'activity' as const, ...e, seller: 'Bond Safari Kovalam' as const, amount: amountOf(e.price), gst: gstOf(e.details), minAge: undefined })),
+  ...courses.map(c => ({ kind: 'course' as const, ...c, seller: 'Bond Academy' as const, amount: amountOf(c.price), gst: gstOf(c.details), minAge: ageOf(c.minAge) })),
 ]
 
 export const hrefOf = (p: Product) => `/${p.kind === 'activity' ? 'activities' : 'courses'}/${p.slug}`

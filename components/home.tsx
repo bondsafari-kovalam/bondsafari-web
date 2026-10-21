@@ -29,7 +29,7 @@ export function PathwayTeaser() {
       <Reveal><p className="eyebrow">Learn with Bond Academy</p><h2 id="path-title">From zero<br /><i>to instructor.</i></h2></Reveal>
       <Reveal><p className="ab-lead">Already tried diving? Your next step is Open Water. Every PADI course builds on the last.</p><Link className="text-link" href="/courses">All courses <ArrowRight /></Link></Reveal>
     </div>
-    <ol className="cs-steps">{pathway.map((c, i) => <li key={c.slug}><Link href={`/courses/${c.slug}`}><span className="cs-step-dot">{String(i + 1).padStart(2, '0')}</span><span className="cs-step-level">{c.level}</span><b>{c.title.replace('PADI ', '').replace(' (IDC)', '').replace('®', '')}</b><span className="cs-step-meta">{c.duration}{c.price ? ` · ${c.price}` : ''}{taxLabel(c) ? ` ${taxLabel(c)}` : ''}</span></Link></li>)}</ol>
+    <ol className="cs-steps">{pathway.map((c, i) => <li key={c.slug}><Link href={`/courses/${c.slug}`}><span className="cs-step-dot">{String(i + 1).padStart(2, '0')}</span><span className="cs-step-level">{c.level}</span><b>{c.title.replace('PADI ', '').replace(' (IDC)', '').replace('®', '')}</b><span className="cs-step-meta">{c.duration}{c.price ? ` · ${c.price}` : ''}{taxLabel(bySlug(c.slug) ?? {}) ? ` ${taxLabel(bySlug(c.slug) ?? {})}` : ''}</span></Link></li>)}</ol>
   </section>
 }
 

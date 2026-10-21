@@ -22,9 +22,8 @@ const detailTitle = (path: string) => {
   if (section === 'courses') return courses.find(c => c.slug === slug)?.title
 }
 
-// The page always shows first. On a detail page the popup follows once the visitor has engaged
-// (scrolled a little or stayed a while), preselected, once per page per session; elsewhere a general
-// promo shows once per session after a short delay.
+// Nothing pops up on arrival. On a detail page the popup follows once the visitor has engaged
+// (scrolled a little or stayed a while), preselected, once per page per session.
 const DETAIL_DELAY = 8000
 const shownKey = (path: string) => `bs-booking-popup:${path}`
 const wasShown = (key: string) => { try { return sessionStorage.getItem(key) === '1' } catch { return true } }
@@ -55,9 +54,9 @@ export function BookingPopup() {
       lastFocus.current = document.activeElement as HTMLElement
       setOpen(true); markShown(key); if (!preset) markShown(KEY)
     }
-    // On phones the general promo doesn't interrupt: the sticky Book bar is always in reach instead
-    const mobile = window.matchMedia('(max-width: 800px)').matches
-    const t = preset || !mobile ? setTimeout(show, preset ? DETAIL_DELAY : pathname === '/' ? 2600 : 1400) : undefined
+    // No popup on arrival: only a detail page offers it, once the visitor has engaged
+    if (!preset) return
+    const t = setTimeout(show, DETAIL_DELAY)
     // On detail pages, scrolling past the first screen means they're interested: offer to book
     const onScroll = () => { if (preset && window.scrollY > window.innerHeight * 0.6) show() }
     window.addEventListener('scroll', onScroll, { passive: true })

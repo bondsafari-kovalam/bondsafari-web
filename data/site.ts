@@ -14,7 +14,18 @@ export const business = {
   google: null as { rating: number; count: number; url: string } | null,
   since: null as number | null, // year Bond Safari started operating
   guestsServed: null as string | null, // e.g. '50,000+'
+  registration: null as string | null, // Kerala Tourism / KATPS operator registration, as it should appear publicly
+  tripadvisor: null as { rating: number; url: string } | null,
+  weatherPolicy: null as string | null, // sea-condition rescheduling policy
 }
+
+// Where guests report on the day. Arrival time stays null until the business confirms it
+export const meetingPoint = { name: 'Bond Safari Kovalam', address: contact.address.join(', '), arrival: null as string | null }
+
+// Optional extras offered at checkout (photo pack, pickup…). Empty until the business supplies them with prices;
+// `for` limits an add-on to some product slugs, `per` says whether it's charged per person or once per booking
+export type AddOn = { id: string; label: string; amount: number; per: 'person' | 'booking'; for?: string[] }
+export const addOns: AddOn[] = []
 
 export const whatsappLink =(message: string) => `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(message)}`
 
