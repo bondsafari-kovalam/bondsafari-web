@@ -31,7 +31,7 @@ const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart
 const fromIso = (s: string) => { const [y, mo, d] = s.split('-').map(Number); return new Date(y, mo - 1, d) }
 const longDate = (s: string) => fromIso(s).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
 const times = [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 7' }]
-const steps = ['Choose', 'Date & guests', 'Your details']
+const steps = ['Choose', 'Date & people', 'Your details']
 
 export function BookingFlow() {
   const reduce = useReducedMotion()
@@ -78,7 +78,7 @@ export function BookingFlow() {
     'Hello Bond Safari! I’d like to book:',
     `• ${chosen?.title}`,
     `• ${isCourse ? 'Preferred start' : 'Date'}: ${longDate(date)}${time ? ` (${time})` : ''}`,
-    `• ${isCourse ? 'Participants' : 'Guests'}: ${guests}`,
+    `• Number of people: ${guests}`,
     total ? `• Total: ${inr(total)} (${inr(amount(chosen))} × ${guests})` : '',
     `Name: ${name.trim()}`,
     `WhatsApp: ${phone.trim()}`,
@@ -151,7 +151,7 @@ export function BookingFlow() {
 
         {step === 2 && <m.section key="s2" className="bk-step" {...fade}>
           <h2>{isCourse ? 'When would you like to start?' : 'When are you coming?'}</h2>
-          <p className="bk-label"><CalendarDays /> {isCourse ? 'Preferred start date' : 'Choose a date'}</p>
+          {isCourse && <p className="bk-label"><CalendarDays /> Preferred start date</p>}
           <div className="bk-days" ref={dayRow}>
             {days.map((d, i) => { const dt = fromIso(d); return <button key={d} type="button" className={date === d ? 'bk-day is-on' : 'bk-day'} onClick={() => setDate(d)} aria-pressed={date === d}>
               <small>{i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : dt.toLocaleDateString('en-IN', { weekday: 'short' })}</small>
@@ -159,7 +159,7 @@ export function BookingFlow() {
               <small>{dt.toLocaleDateString('en-IN', { month: 'short' })}</small>
             </button> })}
           </div>
-          <label className="bk-other">Other date <input type="date" min={days[0]} value={date && !days.includes(date) ? date : ''} onChange={e => setDate(e.target.value)} /></label>
+          <label className="bk-other">Need a later date? <input type="date" min={days[0]} value={date && !days.includes(date) ? date : ''} onChange={e => setDate(e.target.value)} /></label>
           {tried && !date && <p className="bk-error">Please choose a date.</p>}
 
           {!isCourse && <>
@@ -170,11 +170,11 @@ export function BookingFlow() {
           </>}
 
           <div className="bk-guests">
-            <div><b>{isCourse ? 'Participants' : 'Guests'}</b><small>{chosen?.price ? `${priceLabel(chosen)} per person` : 'Price confirmed on WhatsApp'}{chosen?.minAge && ` · Min. age ${chosen.minAge}`}</small></div>
+            <div><b>Number of people</b><small>{chosen?.price ? `${priceLabel(chosen)} per person` : 'Price confirmed on WhatsApp'}{chosen?.minAge && ` · Min. age ${chosen.minAge}`}</small></div>
             <div className="bk-stepper">
-              <button type="button" onClick={() => setGuests(g => Math.max(1, g - 1))} disabled={guests <= 1} aria-label="One less"><Minus /></button>
+              <button type="button" onClick={() => setGuests(g => Math.max(1, g - 1))} disabled={guests <= 1} aria-label="Remove a person"><Minus /></button>
               <output aria-live="polite">{guests}</output>
-              <button type="button" onClick={() => setGuests(g => Math.min(20, g + 1))} disabled={guests >= 20} aria-label="One more"><Plus /></button>
+              <button type="button" onClick={() => setGuests(g => Math.min(20, g + 1))} disabled={guests >= 20} aria-label="Add a person"><Plus /></button>
             </div>
           </div>
         </m.section>}

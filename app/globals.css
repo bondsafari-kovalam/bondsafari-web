@@ -256,3 +256,32 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,b
 @media(min-width:801px){.bk-shell{padding-top:48px}.bk-actions{margin:32px 0 24px;padding:14px 14px 14px 20px;border:1px solid var(--line);border-radius:100px;box-shadow:0 18px 40px -24px rgba(8,45,58,.45)}.bk-days{margin:0;padding:2px 0 6px;scroll-padding-left:0}}
 @media(max-width:800px){body:has(.bk-actions) .cb-launcher{display:none}}
 @media(prefers-reduced-motion:reduce){.bk-option,.bk-day,.bk-times button,.bk-progress li{transition:none}}
+/* Home: press and "firsts" (two feature stories + compact list) */
+.pr{max-width:1380px;margin:0 auto;padding:110px 8vw 120px}.pr-more{margin-top:22px}
+.pr-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.pr-grid>div{min-width:0}.pr-feature{position:relative;display:flex;flex-direction:column;height:100%;padding:32px 32px 28px;border-radius:24px;background:radial-gradient(120% 140% at 0% 0%,#126b70 0%,var(--ocean) 60%);color:white;box-shadow:0 30px 60px -34px rgba(8,45,58,.7);transition:transform .35s cubic-bezier(.19,1,.22,1)}.pr-feature:hover{transform:translateY(-3px)}
+.pr-topic{display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}.pr-topic svg{width:14px;height:14px}.pr-feature .pr-topic{color:var(--sand)}
+.pr-feature h3{margin:16px 48px 28px 0;font:400 clamp(26px,2.6vw,36px)/1.1 Georgia,serif;letter-spacing:-.02em}.pr-outlets{margin:auto 0 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.2);font:italic 15px/1.6 Georgia,serif;color:rgba(255,255,255,.82)}.pr-outlets small{display:block;margin-bottom:6px;font:10px Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--sand)}
+.pr-arrow{position:absolute;top:26px;right:26px;width:34px;height:34px;padding:8px;border-radius:50%;background:linear-gradient(135deg,#ffd27a,#f2a93b);color:var(--ocean);transition:transform .35s cubic-bezier(.19,1,.22,1)}.pr-feature:hover .pr-arrow{transform:rotate(45deg)}
+.pr-list{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;list-style:none;margin:24px 0 0;padding:0}.pr-list a{display:flex;flex-direction:column;gap:6px;padding:20px 0;border-bottom:1px solid var(--line);transition:opacity .3s}.pr-list a:hover{opacity:.65}.pr-list b{font:400 20px/1.25 Georgia,serif;color:var(--ocean)}.pr-list small{font-size:12px;color:#647071}
+.pr-feature:focus-visible,.pr-list a:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+@media(max-width:800px){.pr{padding:80px 16px 72px}.pr-grid,.pr-list{grid-template-columns:1fr}.pr-grid{gap:12px}.pr-feature{padding:24px 22px 22px}.pr-feature h3{font-size:24px;margin-bottom:22px}.pr-arrow{top:20px;right:20px}.pr-list{margin-top:12px}.pr-list b{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.pr-feature,.pr-arrow,.pr-list a{transition:none}}
+/* Detail page: brochure download under the booking button */
+.dt-card-brochure{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:48px;margin-top:12px;border-radius:100px;border:1px solid rgba(255,255,255,.3);color:white;font-size:12px;letter-spacing:.12em;text-transform:uppercase;transition:background .3s,border-color .3s}.dt-card-brochure:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.6)}.dt-card-brochure svg{width:17px;height:17px;color:#ffd27a}.dt-card-brochure small{font-size:10px;opacity:.6}
+/* Home hero: the video stays fixed in place while the page content (on a solid background) slides up over it */
+.hero-scene{height:auto}.hero-scene .hero{position:relative;z-index:auto}.hero-scene .hero-media,.hero-scene .hero-shade{position:fixed;inset:0;z-index:0}.hero-scene.is-covered .hero-media,.hero-scene.is-covered .hero-shade{visibility:hidden}
+.footer{position:relative;z-index:1}.home-body{position:relative;z-index:2;background:var(--ivory)}
+/* Home hero: the white Book pill gets a soft pulse ring, and its arrow nudges forward in time with it */
+.hero-ctas{align-items:center}.hero-book,.hero-wa{font-size:12px;font-weight:600}.hero-wa{color:var(--ocean)}.hero-book{color:var(--teal);animation:hero-book-pulse 2.8s ease-out infinite}.hero-book svg{animation:hero-book-nudge 2.8s cubic-bezier(.19,1,.22,1) infinite}.hero-book:hover svg{animation:none;transform:translateX(4px);transition:transform .3s}
+@keyframes hero-book-pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.5)}70%,100%{box-shadow:0 0 0 12px rgba(255,255,255,0)}}
+@keyframes hero-book-nudge{0%,20%,100%{transform:translateX(0)}8%{transform:translateX(4px)}}
+@media(prefers-reduced-motion:reduce){.hero-book,.hero-book svg{animation:none}}
+/* Home: the trust strip overlaps the bottom of the hero (like the Activities page); the hero buttons sit above it */
+.home-body{margin-top:-40px;background:linear-gradient(to bottom,transparent 40px,var(--ivory) 40px)}.xp-stats.home-trust{margin:0 8vw}
+@media(max-width:800px){.home-body{margin-top:-48px;background:linear-gradient(to bottom,transparent 48px,var(--ivory) 48px)}.xp-stats.home-trust{margin:0 16px}}
+/* Home bestseller cards: flat corner ribbon + plain price text (labels, not buttons) */
+.hs-ribbon{position:absolute;top:0;left:0;z-index:1;display:inline-flex;align-items:center;gap:7px;padding:9px 16px 9px 18px;border-radius:24px 0 16px 0;background:linear-gradient(135deg,#ffd27a,#f2a93b);color:var(--ocean);font-size:10px;letter-spacing:.16em;text-transform:uppercase;pointer-events:none}.hs-ribbon svg{width:12px;height:12px}
+.hs-best-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}.hs-price-text{margin:0;text-align:right;line-height:1.15}.hs-price-text b{display:block;font:400 24px Georgia,serif;color:#ffd27a}.hs-price-text small{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+/* Footer: the real logo in place of the "BS" monogram */
+.footer-logo{display:inline-block}.footer-logo img{display:block;height:64px;width:auto;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))}.footer-place{margin:10px 0 0;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--sand)}
+@media(max-width:800px){.footer-logo img{height:54px}}

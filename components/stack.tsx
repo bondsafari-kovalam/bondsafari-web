@@ -24,13 +24,16 @@ function Bestseller({ e, i }: { e: Experience; i: number }) {
     <Link className="hs-best-media" href={`/activities/${e.slug}`} aria-label={`${e.title}, view details`}>
       <Image src={e.image} alt="" fill sizes="(max-width: 800px) 100vw, 33vw" style={{ objectPosition: e.imagePosition }} />
     </Link>
-    <span className="xp-card-flag hs-flag"><Sparkles /> Bestseller</span>
-    <span className="xp-card-price hs-price">{priceOf(e)}{e.price && <small>/ person</small>}</span>
+    {/* Flat corner ribbon and plain-text price, so the only thing that looks tappable is the Book button */}
+    <span className="hs-ribbon"><Sparkles /> Bestseller</span>
     <div className="hs-best-body">
       <p className="hs-meta"><span>{e.category}</span><span><Clock /> {e.duration}</span></p>
       <h3><Link href={`/activities/${e.slug}`}>{e.title}</Link></h3>
       <p className="hs-tag">{e.tagline}</p>
-      <Link className="book-cta book-cta-sm" href={bookHref(e)} aria-label={`Book ${e.title}`}><span className="book-cta-label"><strong>Book now</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+      <div className="hs-best-foot">
+        <Link className="book-cta book-cta-sm" href={bookHref(e)} aria-label={`Book ${e.title}`}><span className="book-cta-label"><strong>Book now</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+        <p className="hs-price-text">{e.price ? <><b>{priceOf(e)}</b><small>per person</small></> : <small>Price on request</small>}</p>
+      </div>
     </div>
   </m.article>
 }

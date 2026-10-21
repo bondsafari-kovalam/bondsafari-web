@@ -2,7 +2,7 @@
 export const levels = ['Start here', 'Level up', 'Go pro', 'Specialty'] as const
 export type Level = typeof levels[number]
 
-export type Course = { slug: string; title: string; level: Level; eyebrow: string; tagline: string; description: string; overview: string[]; duration: string; minAge?: string; prerequisite: string; price?: string; image: string; imagePosition?: string; details: string[]; step?: number }
+export type Course = { slug: string; title: string; level: Level; eyebrow: string; tagline: string; description: string; overview: string[]; duration: string; minAge?: string; prerequisite: string; price?: string; image: string; imagePosition?: string; details: string[]; step?: number; brochure?: string }
 
 export const courses: Course[] = [
   { slug: 'swimming-course', level: 'Start here', eyebrow: 'For kids and adults', tagline: 'Swim well, live well!', overview: ["Bond Safari Kids and Adults are unique programmes designed by national and international swim coaches. Our coordinators and instructors are trained to international standards, with a background in water safety in Trivandrum. Lessons are divided into six separate levels.", "Class timings are designed around your convenience. All classes are half an hour long and are held Monday to Sunday."], title: 'Swimming Course', description: 'Lessons for kids and adults with national and international coaches, structured across six levels.', duration: '30-minute classes', prerequisite: 'None — all ages welcome', image: '/images/swimming.webp', details: ['For kids and adults', 'Six progressive levels', '30-minute classes', 'Classes Monday to Sunday', 'National and international coaches'] },

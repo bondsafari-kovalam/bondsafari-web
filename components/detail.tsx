@@ -4,15 +4,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, Clock, Phone } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, Clock, FileDown, Phone } from 'lucide-react'
 import { useRef } from 'react'
-import { contact } from '@/data/site'
+import { contact, whatsappLink } from '@/data/site'
 import { Header } from './header'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 36 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }
 
-export type DetailItem = { title: string; category: string; duration: string; price?: string; image: string; imagePosition?: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; section: { label: string; href: string } }
+export type DetailItem = { title: string; category: string; duration: string; price?: string; image: string; imagePosition?: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; brochure?: string; section: { label: string; href: string } }
 export type RelatedItem = { title: string; category: string; image: string; href: string; imagePosition?: string; price?: string; duration?: string; tagline?: string }
 
 function Mask({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -75,6 +75,10 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
           <p className="dt-card-price">{item.price ?? 'Price on request'}</p>
           <ul className="dt-card-meta"><li><Clock /> {item.duration}</li>{item.eyebrow && <li><Check /> {item.eyebrow}</li>}</ul>
           <Link className="book-cta dt-card-cta" href={book}><span className="book-cta-label"><strong>Book now</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          {/* Downloads the PDF once one is placed in public/brochures and named in the catalogue; until then it asks for it on WhatsApp */}
+          {item.brochure
+            ? <a className="dt-card-brochure" href={item.brochure} target="_blank" rel="noreferrer" download><FileDown /> Download brochure <small>PDF</small></a>
+            : <a className="dt-card-brochure" href={whatsappLink(`Hello Bond Safari! Please send me the brochure (PDF) for ${item.title}.`)} target="_blank" rel="noreferrer"><FileDown /> Get brochure <small>PDF</small></a>}
           <div className="dt-card-call"><p>Prefer to talk? We’re open {contact.hours.replace('Monday – Sunday · ', 'daily, ')}.</p>{contact.phones.map(n => <a key={n} href={`tel:${n.replace(/\s/g, '')}`}><Phone /> {n}</a>)}</div>
         </m.div>
       </aside>

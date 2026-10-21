@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { animate, m, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
+import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { preload } from 'react-dom'
@@ -27,56 +27,29 @@ const ease = [0.19, 1, 0.22, 1] as const
 function Mask({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) { return <span className={`mask ${className}`}><m.span className="mask-inner" initial={{ y: '101%' }} animate={{ y: 0 }} transition={{ duration: 2, ease, delay }}>{children}</m.span></span> }
 
 export function Hero() {
-  const video = useRef<HTMLVideoElement>(null)
-  const section = useRef<HTMLElement>(null)
   const reduce = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] })
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0])
-  // The hero stays pinned while the video shrinks into its bottom-right corner (as on casangelina.com)
-  const [mobile, setMobile] = useState(false)
-  useEffect(() => { const mq = window.matchMedia('(max-width: 800px)'); const update = () => setMobile(mq.matches); update(); mq.addEventListener('change', update); return () => mq.removeEventListener('change', update) }, [])
-  const corner = reduce ? { sx: 1, sy: 1, x: 0, y: 0 } : mobile ? { sx: 0.44, sy: 0.2, x: 52, y: 66 } : { sx: 0.26, sy: 0.26, x: 69, y: 66 }
-  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.4 })
-  const mediaX = useTransform(progress, p => `${corner.x * p}vw`)
-  const mediaY = useTransform(progress, p => `${corner.y * p}vh`)
-  const mediaSX = useTransform(progress, p => 1 + (corner.sx - 1) * p)
-  const mediaSY = useTransform(progress, p => 1 + (corner.sy - 1) * p)
-  const videoSX = useTransform(() => Math.max(mediaSX.get(), mediaSY.get()) / mediaSX.get())
-  const videoSY = useTransform(() => Math.max(mediaSX.get(), mediaSY.get()) / mediaSY.get())
-  const shadeOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
   // The video mounts only after hydration, so the poster paints first and the video never competes with it
   const [playVideo, setPlayVideo] = useState(false)
   useEffect(() => { setPlayVideo(!reduce && videoAllowed()) }, [reduce])
   preload('/images/hero-poster.webp', { as: 'image', fetchPriority: 'high', imageSrcSet: posterSrcSet, imageSizes: '100vw' })
-  // One scroll gesture glides the whole way: down from the top lands the video in the corner, up from there returns to full screen
+  // The video stays fixed behind the page while the content slides over it; once covered it pauses and stops painting
+  const scene = useRef<HTMLElement>(null)
+  const video = useRef<HTMLVideoElement>(null)
+  const [covered, setCovered] = useState(false)
   useEffect(() => {
-    if (reduce) return
-    let busy = false, touchY = 0
-    const end = () => (section.current?.offsetHeight ?? window.innerHeight * 2) - window.innerHeight
-    const glide = (dir: number) => {
-      const y = window.scrollY, stop = end()
-      const target = dir > 0 && y < stop - 2 ? stop : dir < 0 && y > 0 && y <= stop + 2 ? 0 : null
-      if (target === null) return false
-      busy = true
-      animate(y, target, { duration: 1.4, ease, onUpdate: v => window.scrollTo({ top: v, behavior: 'instant' }), onComplete: () => { busy = false } })
-      return true
-    }
-    const onWheel = (e: WheelEvent) => { if (busy || (Math.abs(e.deltaY) > 1 && glide(Math.sign(e.deltaY)))) e.preventDefault() }
-    const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY }
-    const onTouchMove = (e: TouchEvent) => { const d = touchY - e.touches[0].clientY; if (busy || (Math.abs(d) > 8 && glide(Math.sign(d)))) e.preventDefault() }
-    const onKey = (e: KeyboardEvent) => { if ((e.target as HTMLElement).closest('input, select, textarea, button, a')) return; const dir = ['ArrowDown', 'PageDown', ' '].includes(e.key) && !e.shiftKey ? 1 : ['ArrowUp', 'PageUp'].includes(e.key) ? -1 : 0; if (dir && (busy || glide(dir))) e.preventDefault() }
-    window.addEventListener('wheel', onWheel, { passive: false })
-    window.addEventListener('touchstart', onTouchStart, { passive: true })
-    window.addEventListener('touchmove', onTouchMove, { passive: false })
-    window.addEventListener('keydown', onKey)
-    return () => { window.removeEventListener('wheel', onWheel); window.removeEventListener('touchstart', onTouchStart); window.removeEventListener('touchmove', onTouchMove); window.removeEventListener('keydown', onKey) }
-  }, [reduce])
-  return <section ref={section} className="hero-scene"><div className="hero">
-    <m.div className="hero-media" style={{ x: mediaX, y: mediaY, scaleX: mediaSX, scaleY: mediaSY }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 3, ease }}><m.div className="hero-media-inner" style={{ scaleX: videoSX, scaleY: videoSY }}>
+    const el = scene.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setCovered(!e.isIntersecting))
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  useEffect(() => { const v = video.current; if (!v) return; if (covered) v.pause(); else v.play().catch(() => {}) }, [covered, playVideo])
+  return <section ref={scene} className={covered ? 'hero-scene is-covered' : 'hero-scene'}><div className="hero">
+    <m.div className="hero-media" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 3, ease }}><div className="hero-media-inner">
       <img className="hero-poster" src="/images/hero-poster.webp" srcSet={posterSrcSet} sizes="100vw" alt="" fetchPriority="high" decoding="async" />
       {playVideo && <video ref={video} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source media="(max-width: 800px)" src="/videos/scuba-540.mp4" type="video/mp4" /><source src="/videos/scuba-720.mp4" type="video/mp4" /></video>}
-    </m.div></m.div>
-    <m.div className="hero-shade" style={{ opacity: shadeOpacity }} />
+    </div></m.div>
+    <div className="hero-shade" />
     {/* Fade only: a transform here would trap the fixed header inside the hero */}
     <m.div className="hero-header" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease, delay: 1.2 }}><Header /></m.div>
     <div className="hero-center">
@@ -84,12 +57,12 @@ export function Hero() {
       {/* The tagline sits inside the h1 so the heading carries "scuba diving in Kerala" for search, without changing the look */}
       <h1><span className="hero-title"><Mask delay={0.6}>Bond Safari</Mask></span><span className="hero-tagline"><Mask delay={0.85}>Underwater scooter rides &amp; scuba diving in Kerala</Mask></span></h1>
     </div>
-    <m.div className="hero-scroll" style={{ opacity: contentOpacity }}>
+    <div className="hero-scroll">
       <m.span className="hero-ctas" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 1.4 }}>
-        <Link className="pill pill-light" href="/booking">Book now <ArrowRight /></Link>
-        <a className="pill pill-sand" href={whatsappLink('Hello Bond Safari! I’d like to book an adventure in Kovalam.')} target="_blank" rel="noreferrer"><WhatsAppIcon /> WhatsApp</a>
+        <Link className="pill pill-light hero-book" href="/booking">Book now <ArrowRight /></Link>
+        <a className="pill pill-sand hero-wa" href={whatsappLink('Hello Bond Safari! I’d like to book an adventure in Kovalam.')} target="_blank" rel="noreferrer"><WhatsAppIcon /> WhatsApp</a>
       </m.span>
-    </m.div>
+    </div>
   </div></section>
 }
 
