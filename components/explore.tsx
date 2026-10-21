@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { m, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion'
+import { m, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 
@@ -67,10 +67,16 @@ export function ExploreCarousel() {
   const [step, setStep] = useState(0)
   const [index, setIndex] = useState(0)
   const reduce = !!useReducedMotion()
+  // Phones swipe the track sideways (native scroll-snap); larger screens pin the section and scroll it
+  const [mobile, setMobile] = useState(false)
+  useEffect(() => { const mq = window.matchMedia('(max-width: 800px)'); const update = () => setMobile(mq.matches); update(); mq.addEventListener('change', update); return () => mq.removeEventListener('change', update) }, [])
   const { scrollYProgress } = useScroll({ target: scene, offset: ['start start', 'end end'] })
   const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.35 })
   const progress = reduce ? scrollYProgress : smooth
-  const pos = useTransform(progress, v => v * (n - 1))
+  // Card position (0 = first card in focus), fed by page scroll on desktop and by the swipe on phones
+  const pos = useMotionValue(0)
+  useMotionValueEvent(progress, 'change', v => { if (!mobile) pos.set(v * (n - 1)) })
+  const onSwipe = () => { const el = track.current; if (el && step) pos.set(Math.max(0, Math.min(n - 1, el.scrollLeft / step))) }
   const x = useTransform(pos, v => -v * step)
 
   useEffect(() => {
@@ -84,19 +90,20 @@ export function ExploreCarousel() {
   useMotionValueEvent(pos, 'change', v => setIndex(Math.round(Math.max(0, Math.min(n - 1, v)))))
 
   const goTo = (i: number) => {
+    if (mobile) { track.current?.scrollTo({ left: Math.max(0, Math.min(n - 1, i)) * step, behavior: reduce ? 'auto' : 'smooth' }); return }
     const el = scene.current
     if (!el) return
     const top = el.getBoundingClientRect().top + window.scrollY
     window.scrollTo({ top: top + (el.offsetHeight - window.innerHeight) * (Math.max(0, Math.min(n - 1, i)) / (n - 1)), behavior: reduce ? 'auto' : 'smooth' })
   }
 
-  return <section ref={scene} className="explore-scene" style={{ height: `calc(100vh + ${(n - 1) * 75}vh)` }} aria-roledescription="carousel" aria-label="Explore our adventures">
+  return <section ref={scene} className="explore-scene" style={{ '--steps': n - 1 } as React.CSSProperties} aria-roledescription="carousel" aria-label="Explore our adventures">
     <div className="explore section">
       <div className="explore-head"><div><p className="eyebrow">Explore</p><h2>Adventures<br /><i>above &amp; below.</i></h2></div>
         <div className="explore-controls"><button onClick={() => goTo(index - 1)} disabled={index === 0} aria-label="Previous"><ArrowLeft /></button><span className="explore-count" aria-live="polite"><b key={index}>{pad(index + 1)}</b> <i>/</i> {pad(n)}</span><button onClick={() => goTo(index + 1)} disabled={index === n - 1} aria-label="Next"><ArrowRight /></button></div>
       </div>
       <div className="explore-viewport">
-        <m.ul ref={track} className="explore-track" style={{ x }}>
+        <m.ul ref={track} className="explore-track" style={mobile ? undefined : { x }} onScroll={mobile ? onSwipe : undefined}>
           {cards.map((c, i) => <Card key={c.title} c={c} i={i} active={i === index} pos={pos} reduce={reduce} onSelect={() => goTo(i)} />)}
         </m.ul>
       </div>

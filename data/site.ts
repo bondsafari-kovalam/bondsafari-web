@@ -5,7 +5,18 @@ export const contact = {
   hours: 'Monday – Sunday · 9:00 – 19:00',
   mapUrl: 'https://www.google.com/maps/search/?api=1&query=Bond+Safari+Kovalam+Suseela+Tower+Beach+Road',
   bookingUrl: 'http://bookings.bondsafarikovalam.com/',
+  whatsapp: '918448448846',
 }
+
+// Trust facts for the home page strip. Leave a value null until it's confirmed from a real source:
+// the strip shows only what's filled in (e.g. google: { rating: 4.8, count: 1200, url: 'https://g.page/…' })
+export const business = {
+  google: null as { rating: number; count: number; url: string } | null,
+  since: null as number | null, // year Bond Safari started operating
+  guestsServed: null as string | null, // e.g. '50,000+'
+}
+
+export const whatsappLink =(message: string) => `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(message)}`
 
 export const socials = [
   ['Instagram', 'https://www.instagram.com/bondsafarikovalaam'],
@@ -15,7 +26,10 @@ export const socials = [
   ['Twitter', 'https://www.twitter.com/bskovalam'],
 ]
 
-export const reviews = [
+// From the old homepage (no date or source). Replace with dated Google / TripAdvisor reviews: source and date show when set
+export type Review = { name: string; title: string; text: string; source?: 'Google' | 'TripAdvisor'; date?: string; url?: string }
+
+export const reviews: Review[] = [
   { name: 'Anjali Gopan', title: 'A must do', text: 'The experience was surreal. It’s a must do in Kovalam. Amazing people, amazing sea, amazing experience!' },
   { name: 'Athira Srijith', title: 'It’s amazing', text: 'It’s amazing and such a different experience… it’s another world. Thank you so much Jackson and his team for giving me such a wonderful experience.' },
   { name: 'Clara', title: 'Friendly and professional', text: 'Staff and owner Jackson super friendly and professional — it’s a cool brand new dive shop!' },

@@ -9,6 +9,7 @@ import { courses, levels, pathway, type Course } from '@/data/courses'
 import { contact } from '@/data/site'
 import { Header } from './header'
 import { LayoutMotion } from './motion-provider'
+import { PadiPathway } from './pathway'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
@@ -16,7 +17,6 @@ const tel = contact.phones[0].replace(/\s/g, '')
 const bookHref = (title: string) => `/booking?activity=${encodeURIComponent(title)}`
 const filters = ['All', ...levels] as const
 const hero = courses.find(c => c.slug === 'zero-to-hero')!
-const short = (t: string) => t.replace('PADI ', '').replace(' (IDC)', '').replace('®', '')
 
 function Mask({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return <span className="mask"><m.span className="mask-inner" initial={{ y: '105%' }} animate={{ y: 0 }} transition={{ duration: 1.6, ease, delay }}>{children}</m.span></span>
@@ -89,25 +89,7 @@ export function Courses() {
       </m.div>)}
     </section>
 
-    <section id="pathway" className="cs-path">
-      <div className="xp-list-head">
-        <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
-          <m.p className="eyebrow" variants={rise}>01 — The PADI pathway</m.p>
-          <m.h2 variants={rise} custom={1}>From zero<br /><i>to instructor.</i></m.h2>
-        </m.div>
-        <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Every course builds on the last. Start wherever you are today — each step unlocks the next.</m.p>
-      </div>
-      <ol className="cs-steps">
-        {pathway.map((c, i) => <m.li key={c.slug} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i}>
-          <Link href={`/courses/${c.slug}`}>
-            <span className="cs-step-dot">{String(i + 1).padStart(2, '0')}</span>
-            <span className="cs-step-level">{c.level}</span>
-            <b>{short(c.title)}</b>
-            <span className="cs-step-meta">{c.duration} · {c.price}</span>
-          </Link>
-        </m.li>)}
-      </ol>
-    </section>
+    <PadiPathway id="pathway" eyebrow="01 — The PADI pathway" />
 
     <section className="cs-hero-course">
       <m.div className="cs-feature" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={rise}>

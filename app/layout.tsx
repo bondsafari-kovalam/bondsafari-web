@@ -6,7 +6,7 @@ import { Footer } from '@/components/footer'
 import { Widgets } from '@/components/widgets'
 import { MotionProvider } from '@/components/motion-provider'
 
-export const metadata: Metadata = { title: 'Bond Safari | Ocean adventures in Kovalam', description: 'Bond Safari underwater scooter rides, scuba diving, sea life safaris and swimming courses in Kovalam, Kerala.', generator: 'v0.app' }
+export const metadata: Metadata = { title: 'Bond Safari | Ocean adventures in Kovalam', description: 'Bond Safari underwater scooter rides, scuba diving, sea life safaris and swimming courses in Kovalam, Kerala.' }
 export const viewport: Viewport = { colorScheme: 'light', themeColor: '#082D3A', width: 'device-width', initialScale: 1 }
 const display = Jost({ subsets: ['latin'], weight: ['300', '400'], variable: '--font-display' })
 

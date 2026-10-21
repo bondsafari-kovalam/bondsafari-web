@@ -3,11 +3,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { animate, m, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
-import { ArrowDown, ArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { preload } from 'react-dom'
 import { Header, Reveal } from './header'
 import { experiences } from '@/data/experiences'
+import { whatsappLink } from '@/data/site'
+import { WhatsAppIcon } from './whatsapp'
 
 
 // Small local posters (the first thing painted) and a lighter video for phones
@@ -79,12 +81,14 @@ export function Hero() {
     <m.div className="hero-header" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease, delay: 1.2 }}><Header /></m.div>
     <div className="hero-center">
       <m.span className="hero-mark" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 0.4 }}>BS</m.span>
-      <h1><Mask delay={0.6}>Bond Safari</Mask></h1>
-      <p className="hero-tagline"><Mask delay={0.85}>Discover a world beneath the waves</Mask></p>
+      {/* The tagline sits inside the h1 so the heading carries "scuba diving in Kerala" for search, without changing the look */}
+      <h1><span className="hero-title"><Mask delay={0.6}>Bond Safari</Mask></span><span className="hero-tagline"><Mask delay={0.85}>Underwater scooter rides &amp; scuba diving in Kerala</Mask></span></h1>
     </div>
     <m.div className="hero-scroll" style={{ opacity: contentOpacity }}>
-      <m.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 1.4 }}><ArrowDown /></m.span>
-      <Mask delay={1.5}>Scroll down<br />to start the experience</Mask>
+      <m.span className="hero-ctas" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 1.4 }}>
+        <Link className="pill pill-light" href="/booking">Book now <ArrowRight /></Link>
+        <a className="pill pill-sand" href={whatsappLink('Hello Bond Safari! I’d like to book an adventure in Kovalam.')} target="_blank" rel="noreferrer"><WhatsAppIcon /> WhatsApp</a>
+      </m.span>
     </m.div>
   </div></section>
 }

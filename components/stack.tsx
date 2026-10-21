@@ -2,64 +2,64 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
-import { useRef } from 'react'
-import { experiences } from '@/data/experiences'
-import { courses } from '@/data/courses'
+import { m } from 'framer-motion'
+import { ArrowRight, ArrowUpRight, Clock, Sparkles } from 'lucide-react'
+import { experiences, type Experience } from '@/data/experiences'
 
 const ease = [0.19, 1, 0.22, 1] as const
+const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }
 
-const find = (slug: string) => experiences.find(e => e.slug === slug)!
-const swim = courses.find(c => c.slug === 'swimming-course')!
+// The three most-booked activities lead; every other activity follows as a compact, priced card
+const bestsellerSlugs = ['bond-safari', 'scuba-diving', 'snorkeling']
+const bestsellers = bestsellerSlugs.map(s => experiences.find(e => e.slug === s)!)
+const others = experiences.filter(e => !bestsellerSlugs.includes(e.slug))
 
-const items = [
-  { ...find('scuba-diving'), href: '/activities/scuba-diving', short: 'Scuba diving is a mode of underwater diving in which a scuba diver uses a self-contained underwater breathing apparatus (scuba) to breathe underwater.', tagline: 'Discover the unknown world in a day!' },
-  { ...find('dive-safari'), href: '/activities/dive-safari', short: 'Dive along with professional Cool Divers and experience the unique species of aquatic life in just one day!', tagline: 'Be cool, dive cool!' },
-  { ...swim, title: 'Swimming Courses', bookAs: swim.title, category: 'Course', price: undefined, href: '/courses/swimming-course', short: 'Bond Safari Kovalam offers swim lessons. Class timings are designed around your convenience. All classes are half an hour long and are held Monday to Sunday.', tagline: 'Swim well, live well!' },
-  { ...find('sea-life-safari'), href: '/activities/sea-life-safari', short: 'Sea Life Safari is one of the most beautiful journeys under water. Explore and experience sea birds and other marine life — if you’re lucky you’ll see all this and much more, as your guide narrates the scenic ride.', tagline: 'The most beautiful journey under water.' },
-]
+const amount = (e: Experience) => Number(e.price?.replace(/[^\d]/g, '') || 0)
+const fromPrice = Math.min(...experiences.map(amount).filter(Boolean)).toLocaleString('en-IN')
+const priceOf = (e: Experience) => e.price ? e.price.replace(' per person', '') : 'Price on request'
+const bookHref = (e: Experience) => `/booking?activity=${encodeURIComponent(e.title)}`
 
-function StackCard({ item, index, last }: { item: typeof items[number]; index: number; last: boolean }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const reduce = useReducedMotion()
-  // Entering: the image settles from a zoomed, inset frame to full bleed
-  const enter = useScroll({ target: ref, offset: ['start end', 'start start'] }).scrollYProgress
-  const imageScale = useTransform(enter, [0, 1], [reduce ? 1 : 1.25, 1])
-  const clip = useTransform(enter, p => reduce ? 'inset(0% 0% 0% 0%)' : `inset(${(1 - p) * 6}% ${(1 - p) * 6}% 0% ${(1 - p) * 6}%)`)
-  // Leaving: the card recedes and dims as the next one slides over it
-  const leave = useScroll({ target: ref, offset: ['start start', 'end start'] }).scrollYProgress
-  const cardScale = useTransform(leave, [0, 1], [1, last || reduce ? 1 : 0.88])
-  const dim = useTransform(leave, [0, 1], [0, last ? 0 : 0.65])
-  // Parallax: the photo travels slower than the page, entering from below and lifting as the next card covers it
-  const parallax = useTransform(() => reduce ? '0%' : `${(1 - enter.get()) * 10 - leave.get() * 8}%`)
-  // Slow zoom + drift, alternating direction per card
-  const drift = index % 2 ? -2.5 : 2.5
-  const book = `/booking?activity=${encodeURIComponent('bookAs' in item && item.bookAs ? item.bookAs : item.title)}`
-  return <div ref={ref} className="stack-item">
-    <m.article className="stack-card" style={{ scale: cardScale, clipPath: clip }}>
-      <m.div className="stack-image" style={{ scale: imageScale, y: parallax }}><m.div className="stack-kenburns" animate={reduce ? undefined : { scale: [1, 1.1], x: ['0%', `${drift}%`], y: ['0%', '-2%'] }} transition={{ duration: 18, ease: 'easeInOut', repeat: Infinity, repeatType: 'mirror' }}><Image src={item.image} alt={item.title} fill sizes="100vw" /></m.div></m.div>
-      <div className="stack-shade" />
-      {!reduce && <m.div className="stack-curtain" initial={{ scaleX: 1 }} whileInView={{ scaleX: 0 }} viewport={{ once: true, amount: 0.35 }} transition={{ duration: 1.4, ease }} />}
-      <Link className="stack-hit" href={item.href} aria-label={`View ${item.title} details`}><span className="stack-view">View<br />details <ArrowUpRight /></span></Link>
-      <span className="stack-count">{String(index + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}</span>
-      <div className="stack-content">
-        <m.p className="eyebrow light" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.6 }} transition={{ duration: 1.2, ease }}>{item.category} · {item.duration}</m.p>
-        <h2 className="stack-title"><m.span initial={{ y: '101%' }} whileInView={{ y: 0 }} viewport={{ amount: 0.6 }} transition={{ duration: 1.6, ease, delay: 0.1 }}>{item.title}</m.span></h2>
-        <m.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.6 }} transition={{ duration: 1.2, ease, delay: 0.25 }}>
-          <p className="stack-text">{item.short}</p>
-          <p className="stack-tagline">{item.tagline}</p>
-          <div className="stack-actions"><Link className="book-cta" href={book} aria-label={`Book ${item.title}`}><span className="book-cta-label"><strong>Book now</strong>{item.price ? <small>{item.price}</small> : <small>Reserve your spot</small>}</span><span className="book-cta-icon"><ArrowRight /></span></Link><Link className="text-link light" href={item.href}>Learn more <ArrowRight /></Link></div>
-        </m.div>
-      </div>
-      <m.div className="stack-dim" style={{ opacity: dim }} />
-    </m.article>
-  </div>
+function Bestseller({ e, i }: { e: Experience; i: number }) {
+  return <m.article className="hs-best" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={rise} custom={i}>
+    <Link className="hs-best-media" href={`/activities/${e.slug}`} aria-label={`${e.title}, view details`}>
+      <Image src={e.image} alt="" fill sizes="(max-width: 800px) 100vw, 33vw" style={{ objectPosition: e.imagePosition }} />
+    </Link>
+    <span className="xp-card-flag hs-flag"><Sparkles /> Bestseller</span>
+    <span className="xp-card-price hs-price">{priceOf(e)}{e.price && <small>/ person</small>}</span>
+    <div className="hs-best-body">
+      <p className="hs-meta"><span>{e.category}</span><span><Clock /> {e.duration}</span></p>
+      <h3><Link href={`/activities/${e.slug}`}>{e.title}</Link></h3>
+      <p className="hs-tag">{e.tagline}</p>
+      <Link className="book-cta book-cta-sm" href={bookHref(e)} aria-label={`Book ${e.title}`}><span className="book-cta-label"><strong>Book now</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+    </div>
+  </m.article>
+}
+
+function Compact({ e, i }: { e: Experience; i: number }) {
+  return <m.article className="hs-item" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.4 }} variants={rise} custom={i % 3}>
+    <Link className="hs-item-thumb" href={`/activities/${e.slug}`} tabIndex={-1} aria-hidden="true">
+      <Image src={e.image} alt="" fill sizes="104px" style={{ objectPosition: e.imagePosition }} />
+    </Link>
+    <div className="hs-item-body">
+      <h3><Link href={`/activities/${e.slug}`}>{e.title}</Link></h3>
+      <p><Clock /> {e.duration}</p>
+      <b>{priceOf(e)}{e.price && <small>/ person</small>}</b>
+    </div>
+    <Link className="hs-item-book" href={bookHref(e)} aria-label={`Book ${e.title}`}><ArrowUpRight /></Link>
+  </m.article>
 }
 
 export function ExperienceStack() {
-  return <section className="stack" aria-label="Activities">
-    <div className="stack-intro"><p className="eyebrow">Choose your horizon</p><h2>Activities<br /><i>worth booking.</i></h2></div>
-    {items.map((item, i) => <StackCard key={item.slug} item={item} index={i} last={i === items.length - 1} />)}
+  return <section className="hs" aria-label="Activities">
+    <m.div className="hs-head" initial="hidden" whileInView="show" viewport={{ once: true }}>
+      <div><m.p className="eyebrow" variants={rise}>Choose your horizon</m.p><m.h2 variants={rise} custom={1}>Activities<br /><i>worth booking.</i></m.h2></div>
+      <m.div className="hs-head-side" variants={rise} custom={2}>
+        <p>{experiences.length} activities on Kovalam beach, all gear included. From <b>₹{fromPrice}</b> per person.</p>
+        <Link className="text-link" href="/activities">View all activities <ArrowRight /></Link>
+      </m.div>
+    </m.div>
+    <div className="hs-best-grid">{bestsellers.map((e, i) => <Bestseller key={e.slug} e={e} i={i} />)}</div>
+    <div className="hs-list">{others.map((e, i) => <Compact key={e.slug} e={e} i={i} />)}</div>
+    <div className="hs-foot"><Link className="pill pill-dark" href="/activities">View all activities <ArrowRight /></Link></div>
   </section>
 }

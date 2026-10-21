@@ -55,7 +55,9 @@ export function BookingPopup() {
       lastFocus.current = document.activeElement as HTMLElement
       setOpen(true); markShown(key); if (!preset) markShown(KEY)
     }
-    const t = setTimeout(show, preset ? DETAIL_DELAY : pathname === '/' ? 2600 : 1400)
+    // On phones the general promo doesn't interrupt: the sticky Book bar is always in reach instead
+    const mobile = window.matchMedia('(max-width: 800px)').matches
+    const t = preset || !mobile ? setTimeout(show, preset ? DETAIL_DELAY : pathname === '/' ? 2600 : 1400) : undefined
     // On detail pages, scrolling past the first screen means they're interested: offer to book
     const onScroll = () => { if (preset && window.scrollY > window.innerHeight * 0.6) show() }
     window.addEventListener('scroll', onScroll, { passive: true })
