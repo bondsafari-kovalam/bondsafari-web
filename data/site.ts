@@ -1,5 +1,5 @@
 export const contact = {
-  phones: ['+91 84484 48846', '+91 96563 62265'],
+  phones: ['+91 84484 48846'],
   email: 'enquiry@bondsafarikovalam.com',
   address: ['Suseela Tower, Beach Road', 'VRP XIX/553-A, Kovalam P.O.', 'Kovalam, Kerala 695527'],
   hours: 'Monday – Sunday · 9:00 – 19:00',

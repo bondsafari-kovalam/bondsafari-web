@@ -1,15 +1,13 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, Clock, Minus, Phone, Plus, Users, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { contact, whatsappLink } from '@/data/site'
-import { MAX_GROUP, TIMES, addItem, clashes, inr, longDate, optionOf, options, peopleRange, priceLabel, problems, requestMessage, totals, unitPrice, type Cart, type Option } from '@/lib/booking/cart'
+import { MAX_GROUP, TIMES, addItem, clashes, inr, longDate, optionOf, options, peopleRange, priceLabel, problems, totals, unitPrice, type Cart, type Option } from '@/lib/booking/cart'
 import { Header } from './header'
-import { WhatsAppIcon } from './whatsapp'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const steps = ['When & who', 'Activities', 'Times & price', 'Your details']
@@ -43,7 +41,6 @@ export function BookingFlow() {
   const [customer, setCustomer] = useState({ name: '', phone: '', email: '' })
   const [tried, setTried] = useState(false)
   const [note, setNote] = useState('')
-  const [sent, setSent] = useState('')
 
   const today = useMemo(() => new Date(), [])
   const days = useMemo(() => Array.from({ length: 14 }, (_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); return iso(d) }), [today])
@@ -92,7 +89,7 @@ export function BookingFlow() {
     window.addEventListener('pagehide', left)
     return () => window.removeEventListener('pagehide', left)
   }, [])
-  useEffect(() => { if (ready && !sent) try { sessionStorage.setItem(STORE, JSON.stringify({ step, cart, customer })) } catch {} }, [ready, step, cart, customer, sent])
+  useEffect(() => { if (ready) try { sessionStorage.setItem(STORE, JSON.stringify({ step, cart, customer })) } catch {} }, [ready, step, cart, customer])
 
   const router = useRouter()
   // Top Back button: previous step, or (on the first step) the page the guest came from, else the home page
@@ -116,12 +113,7 @@ export function BookingFlow() {
   const next = () => {
     if (!canNext) { setTried(true); return }
     if (step < 4) return go(step + 1)
-    if (sent) return
-    const url = whatsappLink(requestMessage(cart, customer))
-    setSent(url)
-    window.open(url, '_blank', 'noopener')
-    try { sessionStorage.removeItem(STORE) } catch {}
-    top.current?.scrollIntoView({ block: 'start' })
+    // Book now: payment is taken here once Razorpay is integrated
   }
 
   // A preselected date may sit off-screen in the chip row: bring it into view
@@ -139,20 +131,6 @@ export function BookingFlow() {
     </div>
     {t.unpriced.length > 0 && t.total > 0 && <p className="bk-note">{t.unpriced.join(', ')}: price confirmed on WhatsApp, not included in the total.</p>}
   </div>
-
-  if (sent) return <main className="booking-page bk"><Header /><div className="bk-shell" ref={top}>
-    <m.section className="bk-done" {...fade}>
-      <span className="bk-done-icon"><Check /></span>
-      <p className="eyebrow">Request ready</p>
-      <h1>Send it on <i>WhatsApp.</i></h1>
-      <p>WhatsApp has opened with your booking details. Tap send, and our team will confirm your slots and how to pay.</p>
-      <div className="bk-done-sum">{summary}</div>
-      <div className="bk-done-actions">
-        <a className="book-cta" href={sent} target="_blank" rel="noreferrer"><span className="book-cta-label"><strong>Open WhatsApp</strong><small>If it didn’t open</small></span><span className="book-cta-icon"><WhatsAppIcon /></span></a>
-        <Link className="text-link" href="/">Back to home <ArrowRight /></Link>
-      </div>
-    </m.section>
-  </div></main>
 
   return <main className="booking-page bk">
     <Header />
@@ -260,9 +238,9 @@ export function BookingFlow() {
       <div className="bk-actions">
         {step > 1 ? <button type="button" className="bk-back" onClick={() => go(step - 1)} aria-label="Back"><ArrowLeft /></button> : <a className="bk-back" href={`tel:${contact.phones[0].replace(/\s/g, '')}`} aria-label="Call us"><Phone /></a>}
         <div className="bk-total">{cart.items.length ? <><b>{t.total ? inr(t.total) : 'On request'}</b><small>{people(cart.group)} · {t.places} {t.places === 1 ? 'place' : 'places'}</small></> : <><b>Group of {cart.group}</b><small>{cart.date ? longDate(cart.date) : 'Pick a date'}</small></>}</div>
-        <button type="button" className={`book-cta book-cta-sm${canNext ? '' : ' is-off'}`} onClick={next} disabled={!!sent}>
-          <span className="book-cta-label"><strong>{step === 4 ? 'Send request' : 'Continue'}</strong></span>
-          <span className="book-cta-icon">{step === 4 ? <WhatsAppIcon /> : <ArrowRight />}</span>
+        <button type="button" className={`book-cta book-cta-sm${canNext ? '' : ' is-off'}`} onClick={next}>
+          <span className="book-cta-label"><strong>{step === 4 ? 'Book now' : 'Continue'}</strong></span>
+          <span className="book-cta-icon"><ArrowRight /></span>
         </button>
       </div>
     </div>
