@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { landingPages } from '@/data/landing'
-import { LandingPage } from '@/components/landing'
+import { LandingPage } from '@/components/pages/landing'
 import { JsonLd, breadcrumbLd } from '@/lib/seo'
 
 // Search landing pages (/scuba-diving-in-kerala, /things-to-do-in-kovalam, …). Only the slugs listed in

@@ -8,7 +8,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
 import { contact } from '@/data/site'
-import { Picker } from './picker'
+import { Picker } from '@/components/booking/picker'
 
 const KEY = 'bs-booking-popup-seen'
 const ease = [0.19, 1, 0.22, 1] as const

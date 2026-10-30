@@ -1,3 +1,3 @@
-import { Contact } from '@/components/contact'
+import { Contact } from '@/components/pages/contact'
 export const metadata = { title: 'Contact | Bond Safari' }
 export default function Page(){return <Contact/>}

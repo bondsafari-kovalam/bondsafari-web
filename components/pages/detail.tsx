@@ -7,7 +7,7 @@ import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, Clock, FileDown, Phone } from 'lucide-react'
 import { useRef } from 'react'
 import { contact, whatsappLink } from '@/data/site'
-import { Header } from './header'
+import { Header } from '@/components/layout/header'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 36 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }

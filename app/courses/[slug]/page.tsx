@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
-import { Detail } from '@/components/detail'
+import { Detail } from '@/components/pages/detail'
 
 export const generateStaticParams = () => courses.map(c => ({ slug: c.slug }))
 

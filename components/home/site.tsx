@@ -6,10 +6,10 @@ import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { preload } from 'react-dom'
-import { Header, Reveal } from './header'
+import { Header, Reveal } from '@/components/layout/header'
 import { experiences } from '@/data/experiences'
 import { whatsappLink } from '@/data/site'
-import { WhatsAppIcon } from './whatsapp'
+import { WhatsAppIcon } from '@/components/layout/whatsapp'
 
 
 // Small local posters (the first thing painted) and a lighter video for phones

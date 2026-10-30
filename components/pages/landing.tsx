@@ -4,8 +4,8 @@ import { ArrowRight } from 'lucide-react'
 import { ageLabel, inr, taxLabel } from '@/data/catalogue'
 import { bySlug, hrefOf, type Product } from '@/data/products'
 import type { Landing } from '@/data/landing'
-import { PageIntro } from './pages'
-import { Reveal } from './header'
+import { PageIntro } from '@/components/pages/pages'
+import { Reveal } from '@/components/layout/header'
 
 const book = (p: Product) => `/booking?activity=${encodeURIComponent(p.title)}`
 

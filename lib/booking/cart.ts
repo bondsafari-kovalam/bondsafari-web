@@ -20,7 +20,16 @@ export const optionOf = (slug: string) => options.find(o => o.slug === slug)
 // Online requests cover up to this many guests; larger groups are better arranged with the team directly
 export const MAX_GROUP = 20
 // Preferred times until real slots come from a booking engine (opening hours are 9:00 – 19:00)
-export const TIMES = [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 7' }]
+export type TimeOption = { id: string; hint?: string }
+export const TIMES: TimeOption[] = [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 7' }]
+// Activities with fixed departures or an earlier last slot than the general opening hours
+const ACTIVITY_TIMES: Record<string, TimeOption[]> = {
+  'scuba-diving': ['8:30 AM', '9:30 AM', '10:30 AM', '11:30 AM', '12:30 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(id => ({ id })),
+  snorkeling: [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 5:30' }],
+}
+export const timesFor = (slug: string) => ACTIVITY_TIMES[slug] ?? TIMES
+// Reads naturally after "both": "in the morning" for a window, "at 8:30 AM" for a fixed slot
+export const timePhrase = (time: string) => TIMES.some(t => t.id === time) ? `in the ${time.toLowerCase()}` : `at ${time}`
 
 export const unitPrice = (o?: Option) => Number(o?.price?.replace(/[^\d]/g, '') || 0)
 export const inr = (n: number) => `₹${n.toLocaleString('en-IN')}`
@@ -66,7 +75,7 @@ export function problems(cart: Cart, step: number): string[] {
     const o = optionOf(i.slug); const r = peopleRange(o, cart.group)
     if (i.people < r.min || i.people > r.max) out.push(`${o?.title}: choose ${r.min === r.max ? r.min : `${r.min}–${r.max}`} ${r.max === 1 ? 'person' : 'people'}.`)
   }
-  if (step >= 3) for (const c of clashes(cart)) out.push(`${c.titles.join(' and ')} are both in the ${c.time.toLowerCase()}, but your group has ${cart.group} ${cart.group === 1 ? 'person' : 'people'}. Choose different times.`)
+  if (step >= 3) for (const c of clashes(cart)) out.push(`${c.titles.join(' and ')} are both ${timePhrase(c.time)}, but your group has ${cart.group} ${cart.group === 1 ? 'person' : 'people'}. Choose different times.`)
   return out
 }
 

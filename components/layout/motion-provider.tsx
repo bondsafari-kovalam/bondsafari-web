@@ -9,7 +9,7 @@ export function MotionProvider({ children }: { children: React.ReactNode }) {
 }
 
 // Layout animations (filter grids) need the larger feature set; it loads only where it is used
-const loadLayout = () => import('./motion-layout').then(r => r.default)
+const loadLayout = () => import('@/components/layout/motion-layout').then(r => r.default)
 export function LayoutMotion({ children }: { children: React.ReactNode }) {
   return <LazyMotion features={loadLayout}>{children}</LazyMotion>
 }

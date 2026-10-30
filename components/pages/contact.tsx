@@ -7,9 +7,9 @@ import { useRef, type FormEvent } from 'react'
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
 import { contact, socials } from '@/data/site'
-import { Header } from './header'
-import { MapSection } from './map'
-import { Picker } from './picker'
+import { Header } from '@/components/layout/header'
+import { MapSection } from '@/components/sections/map'
+import { Picker } from '@/components/booking/picker'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.12 } }) }

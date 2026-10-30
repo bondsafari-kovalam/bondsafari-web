@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { experiences } from '@/data/experiences'
 import { whatsappLink } from '@/data/site'
-import { WhatsAppIcon } from './whatsapp'
+import { WhatsAppIcon } from '@/components/layout/whatsapp'
 
 const fromPrice = Math.min(...experiences.map(e => Number(e.price?.replace(/[^\d]/g, '') || 0)).filter(Boolean)).toLocaleString('en-IN')
 

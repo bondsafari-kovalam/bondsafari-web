@@ -16,3 +16,6 @@ node_modules
 .DS_Store
 # Full-size source media, kept locally (optimised copies live in public/)
 /originals
+
+# TypeScript incremental build cache
+*.tsbuildinfo

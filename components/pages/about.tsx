@@ -6,7 +6,7 @@ import { m, useReducedMotion, useScroll, useTransform, type MotionValue } from '
 import { ArrowDown, ArrowRight, Backpack, Clock, Compass, Eye, Gauge, Glasses, MapPin, ShieldCheck, Shirt, Store, Target } from 'lucide-react'
 import { useRef } from 'react'
 import { contact } from '@/data/site'
-import { Header } from './header'
+import { Header } from '@/components/layout/header'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const teamPhoto = '/images/team.webp'

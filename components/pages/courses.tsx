@@ -7,9 +7,9 @@ import { ArrowRight, ArrowUpRight, Award, Briefcase, Clock, GraduationCap, Phone
 import { useRef, useState } from 'react'
 import { courses, levels, pathway, type Course } from '@/data/courses'
 import { contact } from '@/data/site'
-import { Header } from './header'
-import { LayoutMotion } from './motion-provider'
-import { PadiPathway } from './pathway'
+import { Header } from '@/components/layout/header'
+import { LayoutMotion } from '@/components/layout/motion-provider'
+import { PadiPathway } from '@/components/sections/pathway'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }

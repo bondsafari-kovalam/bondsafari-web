@@ -6,8 +6,8 @@ import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, Clock, Minus, Phone, Plus, Users, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { contact, whatsappLink } from '@/data/site'
-import { MAX_GROUP, TIMES, addItem, clashes, inr, longDate, optionOf, options, peopleRange, priceLabel, problems, totals, unitPrice, type Cart, type Option } from '@/lib/booking/cart'
-import { Header } from './header'
+import { MAX_GROUP, addItem, clashes, inr, longDate, optionOf, options, peopleRange, priceLabel, problems, timePhrase, timesFor, totals, unitPrice, type Cart, type Option } from '@/lib/booking/cart'
+import { Header } from '@/components/layout/header'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const steps = ['When & who', 'Activities', 'Times & price', 'Your details']
@@ -210,11 +210,11 @@ export function BookingFlow() {
                 <button type="button" onClick={() => setCart(c => ({ ...c, items: c.items.filter(i => i.slug !== l.item.slug) }))} aria-label={`Remove ${l.option?.title}`}><X /></button>
               </div>
               <div className="bk-times">
-                {TIMES.map(tm => <button key={tm.id} type="button" className={l.item.time === tm.id ? 'is-on' : ''} aria-pressed={l.item.time === tm.id} onClick={() => update(l.item.slug, { time: l.item.time === tm.id ? '' : tm.id })}><b>{tm.id}</b><small>{tm.hint}</small></button>)}
+                {timesFor(l.item.slug).map(tm => <button key={tm.id} type="button" className={l.item.time === tm.id ? 'is-on' : ''} aria-pressed={l.item.time === tm.id} onClick={() => update(l.item.slug, { time: l.item.time === tm.id ? '' : tm.id })}><b>{tm.id}</b>{tm.hint && <small>{tm.hint}</small>}</button>)}
               </div>
             </div>)}
           </div>}
-          {clashes(cart).map(c => <p key={c.time} className="bk-warn" role="alert"><AlertTriangle /> {c.titles.join(' and ')} are both in the {c.time.toLowerCase()}, but your group has {people(cart.group)}. Choose different times, or fewer people.</p>)}
+          {clashes(cart).map(c => <p key={c.time} className="bk-warn" role="alert"><AlertTriangle /> {c.titles.join(' and ')} are both {timePhrase(c.time)}, but your group has {people(cart.group)}. Choose different times, or fewer people.</p>)}
           {!cart.items.length && <p className="bk-error">Add at least one activity. <button type="button" className="bk-link" onClick={() => go(2)}>Choose activities</button></p>}
           {cart.items.length > 0 && <><h3 className="bk-h3">Your booking</h3>{summary}</>}
         </m.section>}

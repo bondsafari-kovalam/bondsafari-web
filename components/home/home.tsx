@@ -4,7 +4,7 @@ import { pathway } from '@/data/courses'
 import { inr, taxLabel } from '@/data/catalogue'
 import { bySlug } from '@/data/products'
 import { business, contact, meetingPoint, press, reviews, whatsappLink } from '@/data/site'
-import { Reveal } from './header'
+import { Reveal } from '@/components/layout/header'
 
 // Homepage sections below the hero, in the order the audit recommends. Server components: they ship no JS
 // beyond the shared Reveal animation.
