@@ -9,13 +9,14 @@ import { experiences, type Experience } from '@/data/experiences'
 import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
+import { CategoryStrip, TypeKey } from '@/components/pages/programmes'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
 const tel = contact.phones[0].replace(/\s/g, '')
 
 // Activities sort into three moods; the filter chips are built from these
-const groupOf = (e: Experience) => e.category === 'Combo' ? 'Combos' : ['Kayaking', 'Boating'].includes(e.category) ? 'On the water' : 'Underwater'
+const groupOf = (e: Experience) => e.category === 'Combo' ? 'Combos' : ['Kayaking', 'Boating', 'Parasailing'].includes(e.category) ? 'On the water' : 'Underwater'
 const groups = ['All', 'Underwater', 'On the water', 'Combos'] as const
 const amount = (e: Experience) => Number(e.price?.replace(/[^\d]/g, '') || 0)
 const fromPrice = Math.min(...experiences.map(amount).filter(Boolean)).toLocaleString('en-IN')
@@ -89,6 +90,9 @@ export function Experiences() {
         <div><b>{s.value}</b><span>{s.label}</span></div>
       </m.div>)}
     </section>
+
+    <section className="pg-info pg-key-wrap"><TypeKey links current="Activity" /></section>
+    <CategoryStrip />
 
     <section id="all-activities" className="xp-list">
       <div className="xp-list-head">

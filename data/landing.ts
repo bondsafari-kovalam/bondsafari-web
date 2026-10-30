@@ -27,7 +27,7 @@ export const landingPages: Landing[] = [
       'In the monsoon, when the sea is rough, we dive calm, rain-fed freshwater quarries instead. Want more than one dive? PADI courses run from Open Water to Instructor at our PADI 5 Star IDC.',
     ],
     image: '/images/scuba.webp',
-    products: ['scuba-diving', 'bond-safari', 'freshwater-scuba', 'scuba-in-the-rain', 'dive-safari', 'open-water-diver'],
+    products: ['scuba-diving', 'freshwater-scuba', 'scuba-in-the-rain', 'dive-safari', 'open-water-diver', 'bond-safari'],
     priceTable: true,
   },
   {
@@ -63,7 +63,7 @@ export const landingPages: Landing[] = [
     heading: ['Things to do', 'in Kovalam.'],
     intro: ['Visiting Kovalam? Here’s everything you can do on and under the water with Bond Safari, from a one-hour coracle ride to your first scuba dive. All activities include the equipment you need, and age limits are listed on each one.'],
     image: '/images/coracle-ride.webp',
-    products: ['bond-safari', 'scuba-diving', 'snorkeling', 'snorkel-kayak-cove', 'kayaking', 'stand-up-paddleboarding', 'coracle-rides', 'sea-life-safari', 'monsoon-combo'],
+    products: ['scuba-diving', 'snorkeling', 'parasailing', 'snorkel-kayak-cove', 'kayaking', 'stand-up-paddleboarding', 'coracle-rides', 'sea-life-safari', 'monsoon-combo', 'bond-safari'],
     priceTable: true,
   },
 ]

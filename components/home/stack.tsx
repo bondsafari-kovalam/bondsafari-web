@@ -9,8 +9,9 @@ import { experiences, type Experience } from '@/data/experiences'
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }
 
-// The three most-booked activities lead; every other activity follows as a compact, priced card
-const bestsellerSlugs = ['bond-safari', 'scuba-diving', 'snorkeling']
+// The most-booked activities lead; every other activity follows as a compact, priced card
+// Bond Safari (underwater scooter) is paused for now, so it sits at the end of the list instead
+const bestsellerSlugs = ['scuba-diving', 'snorkeling']
 const bestsellers = bestsellerSlugs.map(s => experiences.find(e => e.slug === s)!)
 const others = experiences.filter(e => !bestsellerSlugs.includes(e.slug))
 

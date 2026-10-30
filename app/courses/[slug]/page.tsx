@@ -1,24 +1,41 @@
 import { notFound } from 'next/navigation'
-import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
-import { Detail } from '@/components/pages/detail'
+import { courseNext, homeCategoryOf, listingOf, programmeOf, programmes, statusLabel, typeOfKind } from '@/data/programmes'
+import { Detail, type RelatedItem } from '@/components/pages/detail'
+import { JsonLd, breadcrumbLd, faqLd } from '@/lib/seo'
 
-export const generateStaticParams = () => courses.map(c => ({ slug: c.slug }))
+// Existing PADI courses and the freediving, mermaid and technical programmes share one /courses/[slug] route
+export const generateStaticParams = () => [...courses, ...programmes].map(c => ({ slug: c.slug }))
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const c = courses.find(x => x.slug === slug)
-  return { title: c ? `${c.title} | Bond Safari` : 'Course | Bond Safari', description: c?.description }
+  const c = courses.find(x => x.slug === slug) ?? programmeOf(slug)
+  return { title: c ? `${c.title} | Bond Safari` : 'Course | Bond Safari', description: c?.description, alternates: { canonical: `/courses/${slug}` } }
+}
+
+// The rest of the course's own category first (next level leading), then the remaining categories' courses
+function relatedFor(slug: string, next?: string): RelatedItem[] {
+  const cat = homeCategoryOf(slug)
+  const slugs = [...new Set([...(next ? [next] : []), ...(cat?.groups.flatMap(g => g.items) ?? [])])].filter(s => s !== slug)
+  return slugs.map(listingOf).filter(l => !!l).map(l => ({ title: l.title, category: l.status === 'bookable' ? l.type : `${l.type} · ${statusLabel[l.status]}`, image: l.image, imagePosition: l.imagePosition, price: l.price, duration: l.duration, tagline: l.summary, href: l.href, status: l.status }))
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const cat = homeCategoryOf(slug)
+  const section = cat ? { label: cat.title, href: `/programmes/${cat.slug}` } : { label: 'Courses', href: '/courses' }
+  const crumbs = breadcrumbLd([['Home', '/'], [section.label, section.href]])
   const c = courses.find(x => x.slug === slug)
-  if (!c) notFound()
-  // Suggest every other course first, then a few experiences
-  const related = [
-    ...courses.filter(x => x.slug !== slug).map(x => ({ title: x.title, category: x.level, image: x.image, imagePosition: x.imagePosition, price: x.price, duration: x.duration, tagline: x.tagline, href: `/courses/${x.slug}` })),
-    ...experiences.slice(0, 3).map(x => ({ title: x.title, category: x.category, image: x.image, imagePosition: x.imagePosition, price: x.price, duration: x.duration, tagline: x.tagline, href: `/activities/${x.slug}` })),
-  ]
-  return <Detail item={{ ...c, category: c.level, eyebrow: c.minAge ? `Min. age ${c.minAge}` : c.eyebrow, section: { label: 'Courses', href: '/courses' } }} related={related} />
+  if (c) {
+    const next = courseNext[slug] ? listingOf(courseNext[slug]) : undefined
+    const requirements = [...(c.minAge ? [['Minimum age', c.minAge] as [string, string]] : []), ['Prerequisite', c.prerequisite] as [string, string]]
+    return <><JsonLd data={crumbs} /><Detail item={{ ...c, type: 'Course', category: c.level, eyebrow: c.minAge ? `Min. age ${c.minAge}` : c.eyebrow, location: 'Kovalam', requirements, next: next && { title: next.title, href: next.href }, section }} related={relatedFor(slug, courseNext[slug])} /></>
+  }
+  const p = programmeOf(slug)
+  if (!p) notFound()
+  const next = p.next ? listingOf(p.next) : undefined
+  return <>
+    <JsonLd data={p.faqs?.length ? [crumbs, faqLd(p.faqs)] : crumbs} />
+    <Detail item={{ ...p, type: typeOfKind(p.kind), category: p.kind, duration: p.duration ?? 'Ask us', eyebrow: statusLabel[p.status], next: next && { title: next.title, href: next.href }, section }} related={relatedFor(slug, p.next)} />
+  </>
 }

@@ -23,9 +23,13 @@ export const MAX_GROUP = 20
 export type TimeOption = { id: string; hint?: string }
 export const TIMES: TimeOption[] = [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 7' }]
 // Activities with fixed departures or an earlier last slot than the general opening hours
+const DIVE_TIMES = ['8:30 AM', '9:30 AM', '10:30 AM', '11:30 AM', '12:30 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(id => ({ id }))
 const ACTIVITY_TIMES: Record<string, TimeOption[]> = {
-  'scuba-diving': ['8:30 AM', '9:30 AM', '10:30 AM', '11:30 AM', '12:30 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(id => ({ id })),
+  'scuba-diving': DIVE_TIMES,
+  'dive-safari': DIVE_TIMES,
+  'freshwater-scuba': DIVE_TIMES,
   snorkeling: [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 5:30' }],
+  parasailing: [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 5:30' }],
 }
 export const timesFor = (slug: string) => ACTIVITY_TIMES[slug] ?? TIMES
 // Reads naturally after "both": "in the morning" for a window, "at 8:30 AM" for a fixed slot
