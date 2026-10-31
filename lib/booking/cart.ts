@@ -21,9 +21,9 @@ export const optionOf = (slug: string) => options.find(o => o.slug === slug)
 
 // Online requests cover up to this many guests; larger groups are better arranged with the team directly
 export const MAX_GROUP = 20
-// Preferred times until real slots come from a booking engine (opening hours are 9:00 – 19:00)
+// Preferred times until real slots come from a booking engine (opening hours are 8:30 AM – 6:30 PM)
 export type TimeOption = { id: string; hint?: string }
-export const TIMES: TimeOption[] = [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 7' }]
+export const TIMES: TimeOption[] = [{ id: 'Morning', hint: '8:30 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 6:30' }]
 // Activities with fixed departures or an earlier last slot than the general opening hours
 const DIVE_TIMES = ['8:30 AM', '9:30 AM', '10:30 AM', '11:30 AM', '12:30 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(id => ({ id }))
 const ACTIVITY_TIMES: Record<string, TimeOption[]> = {
