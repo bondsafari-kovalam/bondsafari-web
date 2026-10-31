@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Phone, X } from 'lucide-react'

@@ -1,3 +1,3 @@
 import { Courses } from '@/components/pages/courses'
-export const metadata = { title: 'PADI Diving, Freediving & Water Sports Courses in Kovalam | Bond Safari', description: 'Every Bond Academy course by sport — scuba diving from Open Water to Instructor, parasports, freediving and technical diving — with prices, durations and requirements.', alternates: { canonical: '/courses' } }
+export const metadata = { title: 'Mermaid, Freediving, Technical & Scuba Diving Courses in Kovalam | Bond Safari', description: 'Every Bond Water Sports Academy course in four categories — mermaid, freediving, technical diving and scuba diving, from first level to instructor training.', alternates: { canonical: '/courses' } }
 export default function Page(){return <Courses/>}

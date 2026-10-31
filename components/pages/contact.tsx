@@ -1,13 +1,14 @@
 'use client'
 
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { ArrowDown, ArrowRight, ArrowUpRight, Clock, Mail, MapPin, Phone } from 'lucide-react'
+import { ArrowDown, ArrowRight, Clock, Mail, MapPin, Phone } from 'lucide-react'
 import { useRef, type FormEvent } from 'react'
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
 import { contact, socials } from '@/data/site'
 import { Header } from '@/components/layout/header'
+import { SocialIcon } from '@/components/layout/social-icons'
 import { MapSection } from '@/components/sections/map'
 import { Picker } from '@/components/booking/picker'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
@@ -77,7 +78,7 @@ export function Contact() {
         <m.p className="ab-lead" variants={rise} custom={2}>Tell us what you&apos;d like to try and when you&apos;re visiting Kovalam. Our team will get back to you with times, prices and everything you need to know.</m.p>
         <m.div className="ct-social" variants={rise} custom={3}>
           <p className="eyebrow">Follow along</p>
-          <ul>{socials.map(([label, href]) => <li key={label}><a href={href} target="_blank" rel="noreferrer">{label}<ArrowUpRight /></a></li>)}</ul>
+          <ul>{socials.map(([label, href]) => <li key={label}><a href={href} target="_blank" rel="noreferrer"><SocialIcon label={label} />{label}</a></li>)}</ul>
         </m.div>
       </m.div>
 

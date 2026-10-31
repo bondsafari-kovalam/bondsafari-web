@@ -88,8 +88,9 @@ Paddleboarding, Divemaster, Freediver, PADI Mermaid, Mermaid Diva.
 - [ ] Founder story for About and home (the audit mentions "fisherman's son, 25 years at sea"). Supply approved copy.
 - [ ] The five testimonials on the home page come from the old homepage and have no date or source. Replace them
       with dated Google or TripAdvisor reviews when available.
-- [ ] Confirm the WhatsApp number (`contact.whatsapp`, currently +91 84484 48846), the Instagram handle
-      `bondsafarikovalaam` (double "a", same as the live site) and the X/Twitter account `bskovalam`.
+- [ ] Confirm the WhatsApp number (`contact.whatsapp`, currently +91 84484 48846). Social links (`socials` in
+      `data/site.ts`) were updated to Instagram `bond_safari_kovalam`, Facebook, YouTube `@bondsafarikovalam` and
+      LinkedIn; X/Twitter was removed.
 
 ## 8. Languages
 

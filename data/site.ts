@@ -30,12 +30,11 @@ export const addOns: AddOn[] = []
 export const whatsappLink =(message: string) => `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(message)}`
 
 export const socials = [
-  ['Instagram', 'https://www.instagram.com/bondsafarikovalaam'],
-  ['Facebook', 'https://www.facebook.com/BondSafariKovalam/'],
-  ['YouTube', 'https://www.youtube.com/channel/UCRJzDBotd1kScRQVBX0bumw/about'],
+  ['Instagram', 'https://www.instagram.com/bond_safari_kovalam/'],
+  ['Facebook', 'https://www.facebook.com/share/18i1magx36/'],
+  ['YouTube', 'https://www.youtube.com/@bondsafarikovalam'],
   ['LinkedIn', 'https://www.linkedin.com/company/bondsafari/'],
-  ['Twitter', 'https://www.twitter.com/bskovalam'],
-]
+] as const
 
 // From the old homepage (no date or source). Replace with dated Google / TripAdvisor reviews: source and date show when set
 export type Review = { name: string; title: string; text: string; source?: 'Google' | 'TripAdvisor'; date?: string; url?: string }

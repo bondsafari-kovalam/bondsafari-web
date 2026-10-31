@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import { press } from '@/data/site'
 import { Reveal, Header } from '@/components/layout/header'
 

@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import { ArrowUpRight, MapPin } from 'lucide-react'
 import { muzirisLocations } from '@/data/locations'
 import { Reveal } from '@/components/layout/header'

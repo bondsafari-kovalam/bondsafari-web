@@ -421,6 +421,31 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,b
 @media(max-width:800px){.cp-cats{grid-template-columns:repeat(2,1fr);gap:10px}.cp-cats button{aspect-ratio:1/1;border-radius:16px}.cp-panel{margin-top:40px;padding-top:30px;scroll-margin-top:76px}}
 @media(prefers-reduced-motion:reduce){.cp-cats button,.cp-cats button img{transition:none}}
 @media(max-width:800px){.cp-pick .xp-list-head{margin-bottom:56px}}
+.cp-cats button{display:flex;flex-direction:column;justify-content:flex-end;aspect-ratio:auto;min-height:480px;padding:110px 24px 24px}
+.cp-cats button::after{content:'';position:absolute;inset:0;border-radius:inherit;border:1px solid rgba(255,255,255,.16);pointer-events:none;transition:border-color .4s,border-width .4s}
+.cp-cats button:hover::after{border-color:rgba(255,255,255,.4)}
+.cp-cats button.is-current{outline:0;transform:translateY(-6px);box-shadow:0 30px 50px -28px rgba(8,45,58,.7)}
+.cp-cats button.is-current::after{border:2px solid #f2a93b}
+.cp-cats button.is-current:focus-visible{outline:3px solid var(--teal);outline-offset:4px}
+.cp-cats:has(.is-current) button:not(.is-current){opacity:1}
+.cp-cats:has(.is-current) button:not(.is-current) img{filter:saturate(.8) brightness(.9);transition:transform 1.2s cubic-bezier(.19,1,.22,1),filter .5s}
+.cp-cats:has(.is-current) button:not(.is-current):hover img{filter:none}
+.cp-cats .pg-cat-shade{background:linear-gradient(180deg,rgba(8,45,58,0) 25%,rgba(8,45,58,.45) 55%,rgba(8,45,58,.92))}
+.cp-cats .pg-cat-num{top:22px;left:24px;display:flex;align-items:center;gap:10px;font:italic 400 18px Georgia,serif;letter-spacing:0;opacity:1;color:var(--sand)}
+.cp-cats .pg-cat-num::after{content:'';width:28px;height:1px;background:currentColor;opacity:.6}
+.cp-cats .pg-cat-body{position:static;gap:18px}
+.cp-cats .pg-cat-body b{font:400 clamp(21px,1.95vw,30px)/1.05 Georgia,serif;letter-spacing:-.01em}
+.cp-cats .pg-cat-body b i{display:block;color:rgba(255,255,255,.78)}
+.cp-explore{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid rgba(255,255,255,.22);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:white}
+.cp-explore-icon{display:grid;place-items:center;flex:none;width:38px;height:38px;border:1px solid rgba(255,255,255,.45);border-radius:50%;transition:background .4s,border-color .4s,color .4s}
+.cp-explore svg{width:15px;height:15px;transition:transform .4s cubic-bezier(.19,1,.22,1)}
+.cp-cats button:hover .cp-explore-icon,.cp-cats button.is-current .cp-explore-icon{background:#f2a93b;border-color:#f2a93b;color:var(--ocean)}
+.cp-cats button:hover:not(.is-current) .cp-explore svg{transform:translateX(2px)}
+.cp-cats button.is-current .cp-explore{color:#f2a93b}
+.cp-group{margin-top:80px}
+@media(max-width:1100px){.cp-cats button{min-height:380px}.cp-cats .pg-cat-body b{font-size:30px}}
+@media(max-width:800px){.cp-cats{grid-template-columns:1fr 1fr;gap:10px}.cp-cats button{min-height:250px;padding:60px 14px 14px;border-radius:16px}.cp-cats button.is-current{transform:none}.cp-cats .pg-cat-num{top:14px;left:14px;font-size:15px}.cp-cats .pg-cat-num::after{width:18px}.cp-cats .pg-cat-body{gap:12px}.cp-cats .pg-cat-body b{font-size:19px}.cp-explore{padding-top:10px;font-size:9px;letter-spacing:.1em}.cp-explore-icon{width:30px;height:30px}.cp-explore svg{width:13px;height:13px}.cp-group{margin-top:56px}}
+@media(prefers-reduced-motion:reduce){.cp-explore svg,.cp-explore-icon,.cp-cats button::after{transition:none}}
 
 
 /* Home activities: swipeable full-photo cards, each with its own Book button */
@@ -525,3 +550,5 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,b
 @keyframes in-rise{from{opacity:0;transform:translate(var(--in-x,0),var(--in-y,0))}}
 @keyframes in-mask{from{transform:translateY(var(--in-from,105%))}}
 @media(prefers-reduced-motion:reduce){.in-fade,.in-rise,.in-mask{animation:none}}
+/* Looping decorations hold still while the page scrolls (components/layout/scroll-pause.tsx): they repaint every frame */
+.is-scrolling .book-cta,.is-scrolling .book-cta:before,.is-scrolling .hero-book,.is-scrolling .hero-book svg,.is-scrolling .cb-launcher:before,.is-scrolling .cb-robot-light,.is-scrolling .cb-robot-eyes,.is-scrolling .explore-hint svg,.is-scrolling .ab-scroll svg{animation-play-state:paused}
