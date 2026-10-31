@@ -129,7 +129,10 @@ export const categories: Category[] = [
   ] },
 ]
 
-export const categoryOf = (slug: string) => categories.find(c => c.slug === slug)
+// Parasports has no page of its own: its activities live on the Activities page and the mermaid courses on the
+// Courses page. The category still groups them for levels and related cards. /programmes/parasports redirects
+export const categoryPages = categories.filter(c => c.slug !== 'parasports')
+export const categoryOf = (slug: string) => categoryPages.find(c => c.slug === slug)
 
 // ——— One card shape for activities, existing courses and the programmes above ———
 export type Listing = {
@@ -159,6 +162,13 @@ export function listingOf(slug: string): Listing | undefined {
 
 // The category a page belongs to, for breadcrumbs (the first category that lists it)
 export const homeCategoryOf = (slug: string) => categories.find(c => c.groups.some(g => g.items.includes(slug)))
+// Where a detail page's breadcrumb leads back to: its category page, or for parasports the page that lists it
+export function sectionOf(slug: string): { label: string; href: string } {
+  const cat = homeCategoryOf(slug)
+  if (cat && categoryOf(cat.slug)) return { label: cat.title, href: `/programmes/${cat.slug}` }
+  if (cat?.groups.some(g => g.heading === 'Mermaid' && g.items.includes(slug))) return { label: 'Mermaid Courses', href: '/courses#mermaid' }
+  return listingOf(slug)?.type === 'Activity' ? { label: 'Activities', href: '/activities' } : { label: 'Courses', href: '/courses' }
+}
 // Its group within that category ("Beginner level", "Phase 2 · Open circuit to 50 m"), shown as the level on detail pages
 export const levelOf = (slug: string) => homeCategoryOf(slug)?.groups.find(g => g.items.includes(slug))?.heading
 

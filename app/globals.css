@@ -552,3 +552,6 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,b
 @media(prefers-reduced-motion:reduce){.in-fade,.in-rise,.in-mask{animation:none}}
 /* Looping decorations hold still while the page scrolls (components/layout/scroll-pause.tsx): they repaint every frame */
 .is-scrolling .book-cta,.is-scrolling .book-cta:before,.is-scrolling .hero-book,.is-scrolling .hero-book svg,.is-scrolling .cb-launcher:before,.is-scrolling .cb-robot-light,.is-scrolling .cb-robot-eyes,.is-scrolling .explore-hint svg,.is-scrolling .ab-scroll svg{animation-play-state:paused}
+/* The category strip has three pages (Parasports has none of its own): three across, one per row on phones */
+.pg-cats-wrap .pg-cats{grid-template-columns:repeat(3,1fr)}
+@media(max-width:800px){.pg-cats-wrap .pg-cats{grid-template-columns:1fr}.pg-cats-wrap .pg-cats a{aspect-ratio:16/9}}

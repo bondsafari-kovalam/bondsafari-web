@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { courses } from '@/data/courses'
-import { courseNext, homeCategoryOf, levelOf, listingOf, programmeOf, programmes, statusLabel, statusOf, typeOfKind, zeroToHeroStages } from '@/data/programmes'
+import { courseNext, homeCategoryOf, levelOf, listingOf, programmeOf, programmes, sectionOf, statusLabel, statusOf, typeOfKind, zeroToHeroStages } from '@/data/programmes'
 import { Detail, type RelatedItem } from '@/components/pages/detail'
 import { JsonLd, breadcrumbLd, faqLd } from '@/lib/seo'
 
@@ -22,8 +22,7 @@ function relatedFor(slug: string, next?: string): RelatedItem[] {
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const cat = homeCategoryOf(slug)
-  const section = cat ? { label: cat.title, href: `/programmes/${cat.slug}` } : { label: 'Courses', href: '/courses' }
+  const section = sectionOf(slug)
   const crumbs = breadcrumbLd([['Home', '/'], [section.label, section.href]])
   const c = courses.find(x => x.slug === slug)
   if (c) {
