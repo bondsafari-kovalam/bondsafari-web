@@ -20,6 +20,8 @@ const nextConfig = {
     return [
       { source: '/experiences', destination: '/activities', permanent: true },
       { source: '/experiences/:slug', destination: '/activities/:slug', permanent: true },
+      // Parasports no longer has its own page: its activities are on /activities, the mermaid courses on /courses
+      { source: '/programmes/parasports', destination: '/activities', permanent: true },
     ]
   },
 }

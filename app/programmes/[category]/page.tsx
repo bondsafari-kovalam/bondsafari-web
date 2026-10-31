@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation'
-import { categories, categoryOf, type CategorySlug } from '@/data/programmes'
+import { categoryPages, categoryOf, type CategorySlug } from '@/data/programmes'
 import { CategoryPage } from '@/components/pages/programmes'
 import { JsonLd, breadcrumbLd } from '@/lib/seo'
 
-export const generateStaticParams = () => categories.map(c => ({ category: c.slug }))
+export const generateStaticParams = () => categoryPages.map(c => ({ category: c.slug }))
 export const dynamicParams = false
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }) {

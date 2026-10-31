@@ -5,12 +5,11 @@ import Link from 'next/link'
 import { AnimatePresence, m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, ArrowUpRight, Clock, MapPin } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { categories, categoryOf, freediverRoutes, freedivingSafety, listingOf, statusLabel, typeInfo, tecBeforeYouStart, tecInstructorNote, tecInstructorRatings, tecLoggedDives, zeroToHeroNote, zeroToHeroStages, type Category, type CategorySlug, type ItemType, type Listing } from '@/data/programmes'
+import { categoryPages, categoryOf, freediverRoutes, freedivingSafety, listingOf, statusLabel, typeInfo, tecBeforeYouStart, tecInstructorNote, tecInstructorRatings, tecLoggedDives, zeroToHeroNote, zeroToHeroStages, type Category, type CategorySlug, type ItemType, type Listing } from '@/data/programmes'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { Cta, ctaOf } from '@/components/pages/detail'
 import { PadiPathway } from '@/components/sections/pathway'
-import { MuzirisSection } from '@/components/sections/muziris'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
@@ -42,11 +41,11 @@ function Hero({ eyebrow, lines, sub, image, imagePosition, crumbs, title }: { ey
   </section>
 }
 
-// The four categories as tiles; the current one is marked so the strip doubles as navigation between them
+// The category pages as tiles; the current one is marked so the strip doubles as navigation between them
 export function CategoryStrip({ current, heading = true }: { current?: CategorySlug; heading?: boolean }) {
   return <section className="pg-cats-wrap" aria-label="Activities and courses by category">
     {heading && <div className="xp-list-head"><m.div {...inView}><m.p className="eyebrow" variants={rise}>Browse by sport</m.p><m.h2 variants={rise} custom={1}>Choose<br /><i>your sport.</i></m.h2></m.div><m.p className="ab-lead" {...inView} variants={rise} custom={2}>Each sport shows its activities and its courses separately, so you can see at a glance what you can try today and what you can learn.</m.p></div>}
-    <ul className="pg-cats">{categories.map((c, i) => <m.li key={c.slug} {...inView} variants={rise} custom={i}>
+    <ul className="pg-cats">{categoryPages.map((c, i) => <m.li key={c.slug} {...inView} variants={rise} custom={i}>
       <Link href={`/programmes/${c.slug}`} className={c.slug === current ? 'is-current' : ''} aria-current={c.slug === current ? 'page' : undefined}>
         <Image src={c.image} alt="" fill sizes="(max-width: 800px) 50vw, 25vw" style={{ objectPosition: c.imagePosition }} />
         <span className="pg-cat-shade" />
@@ -176,18 +175,17 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
     {slug === 'scuba-diving' && <ScubaExtras />}
     {slug === 'freediving' && <FreedivingExtras />}
     {slug === 'advanced-sports' && <TecExtras />}
-    {slug === 'parasports' && <MuzirisSection />}
   </main>
 }
 
 export function ProgrammesHub() {
   return <main className="xp cs pg">
     <Header />
-    <Hero eyebrow="Activities & courses · Kovalam" lines={['Four ways', 'into the water.']} sub="Scuba diving, parasports, freediving and technical diving — choose a category to see every activity and course in it, from first try to professional." image="/images/underwater-light.webp" />
+    <Hero eyebrow="Activities & courses · Kovalam" lines={['Three ways', 'into the water.']} sub="Scuba diving, freediving and technical diving — choose a category to see every activity and course in it, from first try to professional." image="/images/underwater-light.webp" />
     <section className="pg-info pg-key-wrap"><TypeKey links /></section>
     <CategoryStrip />
     <section className="pg-info">
-      {categories.map((c, i) => <m.div key={c.slug} className="pg-hub-row" {...inView} variants={rise} custom={Math.min(i, 2)}>
+      {categoryPages.map((c, i) => <m.div key={c.slug} className="pg-hub-row" {...inView} variants={rise} custom={Math.min(i, 2)}>
         <div><p className="eyebrow">{String(i + 1).padStart(2, '0')} — {c.eyebrow}</p><h2><Link href={`/programmes/${c.slug}`}>{c.title}</Link></h2><p className="ab-lead">{c.intro}</p></div>
         <ul>{(['Activity', 'Course'] as const).map(t => { const list = itemsOf(c).map(listingOf).filter(l => l?.type === t); return list.length ? <li key={t}><b>{typeInfo[t].plural}</b><span>{list.map(l => l!.title).join(' · ')}</span></li> : null })}</ul>
         <Link className="text-link" href={`/programmes/${c.slug}`}>See {c.title.toLowerCase()} <ArrowRight /></Link>
