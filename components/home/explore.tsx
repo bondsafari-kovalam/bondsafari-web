@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'

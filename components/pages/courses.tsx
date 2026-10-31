@@ -1,12 +1,12 @@
 'use client'
 
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { ArrowRight, Award, Briefcase, GraduationCap, Phone, Ship, ShieldCheck, Sparkles, UserRound } from 'lucide-react'
+import { ArrowDown, ArrowRight, Award, Briefcase, GraduationCap, Phone, Ship, ShieldCheck, Sparkles, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { courses, pathway } from '@/data/courses'
-import { coursesPage, enquiryMessage, listingOf, type Listing } from '@/data/programmes'
+import { coursesPage, coursesPageAliases, enquiryMessage, listingOf, type Listing } from '@/data/programmes'
 import { Card } from '@/components/pages/programmes'
 import { contact, whatsappLink } from '@/data/site'
 import { Header } from '@/components/layout/header'
@@ -15,9 +15,13 @@ import { PadiPathway } from '@/components/sections/pathway'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
-// Courses only: activities live on the Activities page. A section with no courses left is skipped
-const sections = coursesPage.map(g => ({ ...g, list: g.items.map(listingOf).filter((l): l is Listing => l?.type === 'Course') })).filter(g => g.list.length)
-const courseCount = new Set(sections.flatMap(g => g.list.map(l => l.slug))).size
+// The four course categories, each subcategory resolved to its course cards
+const sections = coursesPage.map(g => {
+  const subs = g.subcategories.map(s => ({ ...s, list: s.items.map(listingOf).filter((l): l is Listing => !!l) }))
+  return { ...g, subs, total: subs.reduce((n, s) => n + s.list.length, 0) }
+})
+const courseCount = new Set(sections.flatMap(g => g.subs.flatMap(s => s.items))).size
+const numOf = (i: number) => String(i + 1).padStart(2, '0')
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
 const tel = contact.phones[0].replace(/\s/g, '')
 const bookHref = (title: string) => `/booking?activity=${encodeURIComponent(title)}`
@@ -39,7 +43,7 @@ export function Courses() {
   const current = sections.find(g => g.slug === chosen) ?? sections[0]
   const panel = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    const open = () => { const h = location.hash.slice(1); if (sections.some(g => g.slug === h)) { setChosen(h); document.getElementById('categories')?.scrollIntoView() } }
+    const open = () => { const h = coursesPageAliases[location.hash.slice(1)] ?? location.hash.slice(1); if (sections.some(g => g.slug === h)) { setChosen(h); document.getElementById('categories')?.scrollIntoView() } }
     open()
     addEventListener('hashchange', open)
     return () => removeEventListener('hashchange', open)
@@ -89,31 +93,44 @@ export function Courses() {
           <m.p className="eyebrow" variants={rise}>{courseCount} courses · 4 categories</m.p>
           <m.h2 variants={rise} custom={1}>Choose a<br /><i>category.</i></m.h2>
         </m.div>
-        <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Tap a card to see its courses. Each one opens to the full requirements, training and next level.</m.p>
+        <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Tap a category to see its courses. Each one opens to the full requirements, training and next level.</m.p>
       </div>
 
       {/* The four categories as cards; the chosen one's courses show underneath */}
       <div className="pg-cats cp-cats" role="tablist" aria-label="Course categories">
-        {sections.map((g, i) => <button key={g.slug} type="button" role="tab" id={`tab-${g.slug}`} aria-selected={g.slug === current.slug} aria-controls="category-courses" className={g.slug === current.slug ? 'is-current' : ''} onClick={() => choose(g.slug)}>
-          <Image src={g.list[0].image} alt="" fill sizes="(max-width: 800px) 50vw, 25vw" style={{ objectPosition: g.list[0].imagePosition }} />
-          <span className="pg-cat-shade" />
-          <span className="pg-cat-num">{String(i + 1).padStart(2, '0')}</span>
-          <span className="pg-cat-body"><b>{g.title}</b><span className="pg-cat-desc">{g.subtitle}</span><small>{g.list.length} {g.list.length === 1 ? 'course' : 'courses'}</small></span>
-        </button>)}
+        {sections.map((g, i) => {
+          const here = g.slug === current.slug
+          return <button key={g.slug} type="button" role="tab" id={`tab-${g.slug}`} aria-selected={here} aria-controls="category-courses" className={here ? 'is-current' : ''} onClick={() => choose(g.slug)}>
+            <Image src={g.image} alt="" fill sizes="(max-width: 800px) 100vw, (max-width: 1100px) 50vw, 25vw" style={{ objectPosition: g.imagePosition }} />
+            <span className="pg-cat-shade" />
+            <span className="pg-cat-num">{numOf(i)}</span>
+            <span className="pg-cat-body">
+              <b>{g.title.replace(/ Courses$/, '')} <i>Courses</i></b>
+              <span className="cp-explore"><span>{here ? 'Viewing courses' : 'Explore courses'}</span><span className="cp-explore-icon">{here ? <ArrowDown /> : <ArrowRight />}</span></span>
+            </span>
+          </button>
+        })}
       </div>
 
       <div id="category-courses" ref={panel} className="cp-panel" role="tabpanel" aria-labelledby={`tab-${current.slug}`}>
         <div className="cp-head">
           <div>
-            <p className="cp-num">{String(sections.indexOf(current) + 1).padStart(2, '0')}.</p>
+            <p className="cp-num">{numOf(sections.indexOf(current))}.</p>
             <h2>{current.title}</h2>
-            <p className="cp-sub">{current.subtitle}</p>
+            <p className="cp-sub">{current.subs.length} subcategories · {current.total} courses</p>
           </div>
-          <Link className="text-link" href={`/programmes/${current.slug}`}>Full {current.title.toLowerCase()} guide <ArrowRight /></Link>
+          {current.guide && <Link className="text-link" href={current.guide}>Full {current.title.replace(/ Courses$/, '').toLowerCase()} guide <ArrowRight /></Link>}
         </div>
         <LayoutMotion>
-          {/* Keyed by category so switching swaps the whole grid instead of animating old cards out */}
-          <div key={current.slug} className="xp-grid">{current.list.map((l, n) => <Card key={l.slug} l={l} index={n} />)}</div>
+          {/* Keyed by category so switching swaps the whole grid instead of animating old cards out.
+              Single-course subcategories share one grid; a subcategory of several courses gets its own heading */}
+          <div key={current.slug}>
+            <div className="xp-grid">{current.subs.filter(s => s.list.length === 1).map((s, n) => <Card key={s.title} l={s.list[0]} index={n} />)}</div>
+            {current.subs.filter(s => s.list.length > 1).map(s => <div key={s.title} className="cp-group">
+              <div className="pg-group-head"><h3>{s.title}</h3><p>{s.list.length} courses</p></div>
+              <div className="xp-grid">{s.list.map((l, n) => <Card key={l.slug} l={l} index={n} />)}</div>
+            </div>)}
+          </div>
         </LayoutMotion>
       </div>
     </section>
@@ -162,6 +179,6 @@ export function Courses() {
       </div>
     </section>
 
-    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{courseCount} courses</b><span>Scuba · Parasports · Freediving · Tec</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Enrol</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
+    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{courseCount} courses</b><span>Mermaid · Freediving · Tec · Scuba</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Enrol</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
   </main>
 }

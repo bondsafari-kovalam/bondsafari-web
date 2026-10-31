@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import { ArrowDown, ArrowRight, Backpack, Clock, Compass, Eye, Gauge, Glasses, MapPin, ShieldCheck, Shirt, Store, Target } from 'lucide-react'

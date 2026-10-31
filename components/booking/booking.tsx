@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, Clock, Minus, Phone, Plus, Users, X } from 'lucide-react'
