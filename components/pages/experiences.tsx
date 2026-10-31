@@ -5,41 +5,42 @@ import Link from 'next/link'
 import { AnimatePresence, m, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, ArrowUpRight, CalendarCheck, Clock, Compass, Phone, ShieldCheck, Sparkles, Users } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
-import { experiences, type Experience } from '@/data/experiences'
+import { activityGroups, experiences, groupOf, type Experience } from '@/data/experiences'
 import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { CategoryStrip, TypeKey } from '@/components/pages/programmes'
+import { Cta, ctaOf } from '@/components/pages/detail'
+import { statusOf } from '@/data/programmes'
+import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
 const tel = contact.phones[0].replace(/\s/g, '')
 
 // Activities sort into three moods; the filter chips are built from these
-const groupOf = (e: Experience) => e.category === 'Combo' ? 'Combos' : ['Kayaking', 'Boating', 'Parasailing'].includes(e.category) ? 'On the water' : 'Underwater'
-const groups = ['All', 'Underwater', 'On the water', 'Combos'] as const
+const groups = ['All', ...activityGroups] as const
 const amount = (e: Experience) => Number(e.price?.replace(/[^\d]/g, '') || 0)
 const fromPrice = Math.min(...experiences.map(amount).filter(Boolean)).toLocaleString('en-IN')
-const bookHref = (title: string) => `/booking?activity=${encodeURIComponent(title)}`
 
-function Mask({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  return <span className="mask"><m.span className="mask-inner" initial={{ y: '105%' }} animate={{ y: 0 }} transition={{ duration: 1.6, ease, delay }}>{children}</m.span></span>
-}
+// Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
+const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
 function Card({ e, index, featured }: { e: Experience; index: number; featured: boolean }) {
+  const cta = ctaOf(e.title, statusOf(e.slug))
   return <m.article layout className={`xp-card${featured ? ' is-featured' : ''}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.8, ease, delay: Math.min(index, 6) * 0.06 }}>
     <Link className="xp-card-media" href={`/activities/${e.slug}`} aria-label={`${e.title} — view details`}>
       <Image src={e.image} alt="" fill sizes={featured ? '(max-width: 800px) 100vw, 66vw' : '(max-width: 800px) 100vw, 33vw'} style={{ objectPosition: e.imagePosition }} />
       <span className="xp-card-num">{String(index + 1).padStart(2, '0')}</span>
       {featured && <span className="xp-card-flag"><Sparkles /> Signature activity</span>}
-      <span className="xp-card-price">{e.price ? e.price.replace(' per person', '') : 'Price on request'}{e.price && <small>/ person</small>}</span>
+      <span className="xp-card-price">{e.price ? e.price.replace(' per person', '') : 'Contact for price'}{e.price && <small>/ person</small>}</span>
     </Link>
     <div className="xp-card-body">
       <p className="xp-card-meta"><span>{e.category}</span><span><Clock /> {e.duration}</span></p>
       <h3><Link href={`/activities/${e.slug}`}>{e.title}</Link></h3>
       <p className="xp-card-tag">{e.tagline}</p>
       <div className="xp-card-actions">
-        <Link className="book-cta book-cta-sm" href={bookHref(e.title)}><span className="book-cta-label"><strong>Book now</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+        <Cta cta={cta} className="book-cta book-cta-sm"><span className="book-cta-label"><strong>{cta.label}</strong></span><span className="book-cta-icon"><ArrowRight /></span></Cta>
         <Link className="xp-card-more" href={`/activities/${e.slug}`}>Details <ArrowUpRight /></Link>
       </div>
     </div>
@@ -74,13 +75,13 @@ export function Experiences() {
       <m.div className="xp-hero-media" style={{ scale: heroScale, y: heroY }}><Image src="/images/bond-safari.webp" alt="" fill sizes="100vw" priority /></m.div>
       <div className="xp-hero-shade" />
       <m.div className="xp-hero-content" style={{ opacity: heroFade }}>
-        <m.p className="eyebrow light" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>Activities · Kovalam, Kerala</m.p>
+        <p className={`eyebrow light ${enter({ y: 12, duration: 1, delay: 0.2 }).className}`} style={enter({ y: 12, duration: 1, delay: 0.2 }).style}>Activities · Kovalam, Kerala</p>
         <h1><Mask delay={0.3}>Choose your</Mask><br /><Mask delay={0.45}><i>adventure.</i></Mask></h1>
-        <m.p className="xp-hero-sub" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease, delay: 0.7 }}>Underwater scooters, guided dives, snorkelling, kayaking and coracle rides — for every age and ability, with all equipment included.</m.p>
-        <m.div className="xp-hero-actions" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease, delay: 0.85 }}>
+        <p className={`xp-hero-sub ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>Underwater scooters, guided dives, snorkelling, kayaking and coracle rides — for every age and ability, with all equipment included.</p>
+        <div className={`xp-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.85 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.85 }).style}>
           <Link className="book-cta" href="/booking"><span className="book-cta-label"><strong>Book an adventure</strong><small>From ₹{fromPrice} per person</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
           <a className="text-link light" href="#all-activities">Browse all {experiences.length} <ArrowRight /></a>
-        </m.div>
+        </div>
       </m.div>
     </section>
 

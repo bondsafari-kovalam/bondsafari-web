@@ -6,12 +6,13 @@ import { m, useMotionValueEvent, useReducedMotion, useScroll, useTransform } fro
 import { ArrowRight, Award, Briefcase, GraduationCap, Phone, Ship, ShieldCheck, Sparkles, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { courses, pathway } from '@/data/courses'
-import { coursesPage, listingOf, type Listing } from '@/data/programmes'
+import { coursesPage, enquiryMessage, listingOf, type Listing } from '@/data/programmes'
 import { Card } from '@/components/pages/programmes'
-import { contact } from '@/data/site'
+import { contact, whatsappLink } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { PadiPathway } from '@/components/sections/pathway'
+import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
 // Courses only: activities live on the Activities page. A section with no courses left is skipped
@@ -22,9 +23,8 @@ const tel = contact.phones[0].replace(/\s/g, '')
 const bookHref = (title: string) => `/booking?activity=${encodeURIComponent(title)}`
 const hero = courses.find(c => c.slug === 'zero-to-hero')!
 
-function Mask({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  return <span className="mask"><m.span className="mask-inner" initial={{ y: '105%' }} animate={{ y: 0 }} transition={{ duration: 1.6, ease, delay }}>{children}</m.span></span>
-}
+// Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
+const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
 export function Courses() {
   const reduce = useReducedMotion()
@@ -47,8 +47,8 @@ export function Courses() {
   const choose = (slug: string) => {
     setChosen(slug)
     history.replaceState(null, '', `#${slug}`)
-    // On phones the cards fill the screen, so bring the course list into view
-    if (window.innerWidth < 800) requestAnimationFrame(() => panel.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }))
+    // Bring the chosen category's course list into view (it stops below the sticky header via scroll-margin-top)
+    requestAnimationFrame(() => panel.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }))
   }
   useMotionValueEvent(scrollYProgress, 'change', v => setBarShown(v > 0.75))
 
@@ -66,13 +66,13 @@ export function Courses() {
       <m.div className="xp-hero-media" style={{ scale: heroScale, y: heroY }}><Image src="/images/course-open-water-hd.webp" alt="" fill sizes="100vw" priority style={{ objectPosition: "center 70%" }} /></m.div>
       <div className="xp-hero-shade" />
       <m.div className="xp-hero-content" style={{ opacity: heroFade }}>
-        <m.p className="eyebrow light" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>Bond Academy · PADI 5 Star IDC</m.p>
+        <p className={`eyebrow light ${enter({ y: 12, duration: 1, delay: 0.2 }).className}`} style={enter({ y: 12, duration: 1, delay: 0.2 }).style}>Bond Academy · PADI 5 Star IDC</p>
         <h1><Mask delay={0.3}>Learn to dive.</Mask><br /><Mask delay={0.45}><i>Then lead.</i></Mask></h1>
-        <m.p className="xp-hero-sub" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease, delay: 0.7 }}>Internationally recognised PADI courses in Kovalam — from your very first breath underwater to becoming an instructor.</m.p>
-        <m.div className="xp-hero-actions" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease, delay: 0.85 }}>
+        <p className={`xp-hero-sub ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>Internationally recognised PADI courses in Kovalam — from your very first breath underwater to becoming an instructor.</p>
+        <div className={`xp-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.85 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.85 }).style}>
           <Link className="book-cta" href={bookHref(pathway[0].title)}><span className="book-cta-label"><strong>Start with Open Water</strong><small>{pathway[0].duration} · {pathway[0].price}</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
           <a className="text-link light" href="#pathway">See the pathway <ArrowRight /></a>
-        </m.div>
+        </div>
       </m.div>
     </section>
 
@@ -132,7 +132,7 @@ export function Courses() {
           </ul>
           <div className="cs-feature-foot">
             <div className="cs-feature-price"><small>{hero.duration} · all taxes included</small><b>{hero.price}</b></div>
-            <Link className="book-cta" href={bookHref(hero.title)}><span className="book-cta-label"><strong>Apply now</strong><small>Booking from ₹5,000</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+            <a className="book-cta" href={whatsappLink(enquiryMessage(hero.title))} target="_blank" rel="noopener noreferrer"><span className="book-cta-label"><strong>Apply now</strong><small>Booking from ₹5,000</small></span><span className="book-cta-icon"><ArrowRight /></span></a>
           </div>
         </div>
       </m.div>

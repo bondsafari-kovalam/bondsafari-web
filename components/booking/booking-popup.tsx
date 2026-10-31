@@ -25,6 +25,8 @@ const detailTitle = (path: string) => {
 // Nothing pops up on arrival. On a detail page the popup follows once the visitor has engaged
 // (scrolled a little or stayed a while), preselected, once per page per session.
 const DETAIL_DELAY = 8000
+// How long scrolling must pause before it may open
+const STILL_MS = 700
 const shownKey = (path: string) => `bs-booking-popup:${path}`
 const wasShown = (key: string) => { try { return sessionStorage.getItem(key) === '1' } catch { return true } }
 const markShown = (key: string) => { try { sessionStorage.setItem(key, '1') } catch {} }
@@ -56,11 +58,19 @@ export function BookingPopup() {
     }
     // No popup on arrival: only a detail page offers it, once the visitor has engaged
     if (!preset) return
-    const t = setTimeout(show, DETAIL_DELAY)
+    // It never opens in the middle of a swipe: once it's due, it waits until scrolling has paused
+    let due = false
+    let lastScroll = 0
+    let still: ReturnType<typeof setTimeout> | undefined
+    const showWhenStill = () => { due = true; clearTimeout(still); still = setTimeout(show, Math.max(0, lastScroll + STILL_MS - Date.now())) }
+    const t = setTimeout(showWhenStill, DETAIL_DELAY)
     // On detail pages, scrolling past the first screen means they're interested: offer to book
-    const onScroll = () => { if (preset && window.scrollY > window.innerHeight * 0.6) show() }
+    const onScroll = () => {
+      lastScroll = Date.now()
+      if (due || window.scrollY > window.innerHeight * 0.6) showWhenStill()
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => { clearTimeout(t); window.removeEventListener('scroll', onScroll) }
+    return () => { clearTimeout(t); clearTimeout(still); window.removeEventListener('scroll', onScroll) }
   }, [pathname, preset])
 
   useEffect(() => {

@@ -126,8 +126,15 @@ Career Playbook, PADI Mermaid Pathways, PADI Technical Diving Career Pathways, O
 - [ ] Tec phase 2 gates: written chamber + evacuation plan, oxygen-clean blending, Tec Deep Instructor, insurer
       confirmation. Phase 3 (Trimix, CCR, Cave) is shown as referred to partner centres.
 - [ ] Photos: no freediving, mermaid-level or technical diving images exist; those pages reuse underwater/scuba photos.
-- [ ] Canoeing and stand-up paddleboarding are named for Parasports but have no approved product data — not shown.
-- [ ] Locations: the brief asks for Muziris (Kottapuram, North Paravur – Thattukadavu Jetty) priority and Kovalam/Poovar
-      only when confirmed. The site has no Muziris products, and every live product runs at Kovalam, so pages show
-      Kovalam / Freshwater quarry / Lakshadweep as the source data says. Confirm before changing.
+- [ ] Canoeing and stand-up paddleboarding are listed under Parasports as "Enquire" with no price, duration or location.
+      Logout.world has a stand-up paddleboarding product; confirm whether it is a lesson or a rental and its price.
+- [ ] PADI Mermaid sits under Parasports, not Freediving (client instruction). What can be booked online is decided in
+      one place, `heldBack` / `statusOf` in `data/programmes.ts`: Zero to Hero, IDC and Divemaster are "Apply", Advanced
+      Mermaid is "Enquire" until the pool agreement and child-safety policy are in place, and the Bond Safari scooter is
+      "Paused". Remove an entry there to open online booking again.
+- [x] Muziris website URLs: the "Explore our Muziris locations" section (home page and Parasports) links each card's
+      Explore More button to its page on bondpaddlesports.com (`website` in `data/locations.ts`), which handles details
+      and booking.
+- [ ] Kottapuram's meeting point is not confirmed and is not shown.
+- [ ] Course and activity locations still show Kovalam / Freshwater quarry / Lakshadweep as the source data says.
 - [ ] Freshwater quarry location (Discover Scuba in Freshwater, Monsoon Combo, Kayaking) — name the site.

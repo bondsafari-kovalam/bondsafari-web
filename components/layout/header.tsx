@@ -17,18 +17,22 @@ const isActive = (path: string, href: string) => href === '/' ? path === '/' : p
 export function Header() {
   const [open, setOpen] = useState(false)
   const path = usePathname()
-  // Pinned header with a solid backdrop once the page scrolls. It slides away while the visitor is
-  // scrolling and comes back as soon as they stop (always shown near the top, with the menu open, or
-  // while something in it has keyboard focus).
+  // Pinned header with a solid backdrop once the page scrolls. It slides away while the visitor scrolls
+  // down, and comes back the moment they scroll up or stop (always shown near the top, with the menu open,
+  // or while something in it has keyboard focus).
   const [scrolled, setScrolled] = useState(false)
   const [moving, setMoving] = useState(false)
   const box = useRef<HTMLElement>(null)
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined
+    let lastY = window.scrollY
     const onScroll = () => {
       const y = window.scrollY
+      const up = y < lastY
+      lastY = y
       setScrolled(y > 40)
-      if (y < 120 || box.current?.contains(document.activeElement)) { setMoving(false); return }
+      // Scrolling up means they're looking for it: show it straight away, without waiting for the scroll to stop
+      if (y < 120 || up || box.current?.contains(document.activeElement)) { clearTimeout(timer); setMoving(false); return }
       setMoving(true)
       clearTimeout(timer)
       timer = setTimeout(() => setMoving(false), 250)
@@ -43,7 +47,7 @@ export function Header() {
     document.documentElement.toggleAttribute('data-header-hidden', hidden)
     return () => document.documentElement.removeAttribute('data-header-hidden')
   }, [hidden])
-  return <header ref={box} className={`site-header${scrolled || open ? ' is-scrolled' : ''}${hidden ? ' is-hidden' : ''}`}><Link className="brand brand-logo" href="/" aria-label="Bond Safari home"><Image src="/images/logo.webp" alt="Bond Safari" width={447} height={320} priority /></Link><nav className="desktop-nav" aria-label="Main">{nav.map(([label, href]) => <Link key={href} href={href} className={isActive(path, href) ? 'is-active' : undefined} aria-current={isActive(path, href) ? 'page' : undefined}>{label}</Link>)}</nav><div className="header-actions"><Link className="pill pill-light" href="/booking">Book now <ArrowRight /></Link><button className="menu-button" onClick={() => setOpen(!open)} aria-label={open ? 'Close menu' : 'Open menu'}>{open ? <X /> : <Menu />}</button></div><AnimatePresence>{open && <m.nav className="mobile-nav" initial={{opacity:0,y:-10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>{nav.map(([label, href]) => <Link onClick={() => setOpen(false)} key={href} href={href} className={isActive(path, href) ? 'is-active' : undefined} aria-current={isActive(path, href) ? 'page' : undefined}>{label}<ArrowRight /></Link>)}<Link className="pill pill-dark" href="/booking">Book your adventure <ArrowRight /></Link></m.nav>}</AnimatePresence></header>
+  return <header ref={box} className={`site-header${scrolled || open ? ' is-scrolled' : ''}${hidden ? ' is-hidden' : ''}`}><Link className="brand brand-logo" href="/" aria-label="Bond Safari home"><Image src="/images/logo.webp" alt="Bond Safari" width={447} height={320} sizes="101px" priority /></Link><nav className="desktop-nav" aria-label="Main">{nav.map(([label, href]) => <Link key={href} href={href} className={isActive(path, href) ? 'is-active' : undefined} aria-current={isActive(path, href) ? 'page' : undefined}>{label}</Link>)}</nav><div className="header-actions"><Link className="pill pill-light" href="/booking">Book now <ArrowRight /></Link><button className="menu-button" onClick={() => setOpen(!open)} aria-label={open ? 'Close menu' : 'Open menu'}>{open ? <X /> : <Menu />}</button></div><AnimatePresence>{open && <m.nav className="mobile-nav" initial={{opacity:0,y:-10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>{nav.map(([label, href]) => <Link onClick={() => setOpen(false)} key={href} href={href} className={isActive(path, href) ? 'is-active' : undefined} aria-current={isActive(path, href) ? 'page' : undefined}>{label}<ArrowRight /></Link>)}<Link className="pill pill-dark" href="/booking">Book your adventure <ArrowRight /></Link></m.nav>}</AnimatePresence></header>
 }
 
 export function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <m.div className={className} initial={{opacity:0,y:28}} whileInView={{opacity:1,y:0}} viewport={{once:true, margin:'-80px'}} transition={{duration:.7, ease:[.22,1,.36,1]}}>{children}</m.div> }

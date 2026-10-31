@@ -9,5 +9,6 @@ import { PressSection } from '@/components/home/press'
 import { TeamSection } from '@/components/home/team'
 import { HomeBar } from '@/components/home/home-bar'
 import { MapSection } from '@/components/sections/map'
+import { MuzirisSection } from '@/components/sections/muziris'
 
-export default function Home() { return <main><Hero /><div className="home-body"><TrustStrip /><ExperienceStack /><NextStep /><ExploreCarousel /><PadiPathway eyebrow="Learn with Bond Academy" more /><Reviews /><PressSection /><TeamSection /><MapSection eyebrow="Plan your visit" /><HomeBar /></div></main> }
+export default function Home() { return <main><Hero /><div className="home-body"><TrustStrip /><ExperienceStack /><NextStep /><ExploreCarousel /><PadiPathway eyebrow="Learn with Bond Academy" more /><Reviews /><PressSection /><TeamSection /><MuzirisSection /><MapSection eyebrow="Plan your visit" /><HomeBar /></div></main> }

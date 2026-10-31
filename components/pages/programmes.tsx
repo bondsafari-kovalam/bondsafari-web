@@ -10,6 +10,8 @@ import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { Cta, ctaOf } from '@/components/pages/detail'
 import { PadiPathway } from '@/components/sections/pathway'
+import { MuzirisSection } from '@/components/sections/muziris'
+import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
@@ -18,9 +20,8 @@ const itemsOf = (c: Category) => [...new Set(c.groups.flatMap(g => g.items))]
 // "3 activities · 9 courses" — says what the numbers are instead of a bare count
 const countsOf = (c: Category) => (['Activity', 'Course'] as const).map(t => { const n = itemsOf(c).filter(s => listingOf(s)?.type === t).length; return n ? `${n} ${n === 1 ? t.toLowerCase() : typeInfo[t].plural.toLowerCase()}` : '' }).filter(Boolean).join(' · ')
 
-function Mask({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  return <span className="mask"><m.span className="mask-inner" initial={{ y: '105%' }} animate={{ y: 0 }} transition={{ duration: 1.6, ease, delay }}>{children}</m.span></span>
-}
+// Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
+const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
 function Hero({ eyebrow, lines, sub, image, imagePosition, crumbs, title }: { eyebrow: string; lines: [string, string]; sub: string; image: string; imagePosition?: string; crumbs?: [string, string][]; title?: string }) {
   const reduce = useReducedMotion()
@@ -34,9 +35,9 @@ function Hero({ eyebrow, lines, sub, image, imagePosition, crumbs, title }: { ey
     <div className="xp-hero-shade" />
     <m.div className="xp-hero-content" style={{ opacity: fade }}>
       {crumbs && <nav className="dt-crumbs" aria-label="Breadcrumb">{crumbs.map(([label, href], i) => <span key={href}>{i > 0 && <span>/</span>}<Link href={href}>{label}</Link></span>)}<span>/</span><b>{title}</b></nav>}
-      <m.p className="eyebrow light" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>{eyebrow}</m.p>
+      <p className={`eyebrow light ${enter({ y: 12, duration: 1, delay: 0.2 }).className}`} style={enter({ y: 12, duration: 1, delay: 0.2 }).style}>{eyebrow}</p>
       <h1><Mask delay={0.3}>{lines[0]}</Mask><br /><Mask delay={0.45}><i>{lines[1]}</i></Mask></h1>
-      <m.p className="xp-hero-sub" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease, delay: 0.7 }}>{sub}</m.p>
+      <p className={`xp-hero-sub ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>{sub}</p>
     </m.div>
   </section>
 }
@@ -63,7 +64,7 @@ export function Card({ l, index }: { l: Listing; index: number }) {
       <Image src={l.image} alt="" fill sizes="(max-width: 800px) 100vw, 33vw" style={{ objectPosition: l.imagePosition }} />
       <span className="pg-type" data-type={l.type}>{l.type}</span>
       {l.status !== 'bookable' && <span className="cs-level pg-status" data-status={l.status}>{statusLabel[l.status]}</span>}
-      <span className="xp-card-price">{l.price ?? (l.status === 'bookable' ? 'Price on request' : 'Ask us')}</span>
+      <span className="xp-card-price">{l.price ?? 'Contact for price'}</span>
     </Link>
     <div className="xp-card-body">
       <p className="xp-card-meta"><span>{l.type === 'Activity' ? 'No certificate needed' : l.kind === 'Professional rating' ? 'Professional rating' : l.kind === 'Programme' ? 'Lessons' : 'Certification'}</span>{l.duration && <span><Clock /> {l.duration}</span>}</p>
@@ -175,6 +176,7 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
     {slug === 'scuba-diving' && <ScubaExtras />}
     {slug === 'freediving' && <FreedivingExtras />}
     {slug === 'advanced-sports' && <TecExtras />}
+    {slug === 'parasports' && <MuzirisSection />}
   </main>
 }
 

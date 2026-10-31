@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { courses } from '@/data/courses'
-import { courseNext, homeCategoryOf, listingOf, programmeOf, programmes, statusLabel, typeOfKind } from '@/data/programmes'
+import { courseNext, homeCategoryOf, levelOf, listingOf, programmeOf, programmes, statusLabel, statusOf, typeOfKind, zeroToHeroStages } from '@/data/programmes'
 import { Detail, type RelatedItem } from '@/components/pages/detail'
 import { JsonLd, breadcrumbLd, faqLd } from '@/lib/seo'
 
@@ -29,13 +29,15 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (c) {
     const next = courseNext[slug] ? listingOf(courseNext[slug]) : undefined
     const requirements = [...(c.minAge ? [['Minimum age', c.minAge] as [string, string]] : []), ['Prerequisite', c.prerequisite] as [string, string]]
-    return <><JsonLd data={crumbs} /><Detail item={{ ...c, type: 'Course', category: c.level, eyebrow: c.minAge ? `Min. age ${c.minAge}` : c.eyebrow, location: 'Kovalam', requirements, next: next && { title: next.title, href: next.href }, section }} related={relatedFor(slug, courseNext[slug])} /></>
+    // Zero to Hero is a programme of five stages: list them on its own page as well as on the Scuba page
+    const training = slug === 'zero-to-hero' ? zeroToHeroStages.map(s => ({ title: listingOf(s.slug)!.title, text: s.text })) : undefined
+    return <><JsonLd data={crumbs} /><Detail item={{ ...c, type: 'Course', status: statusOf(slug), level: levelOf(slug), category: c.level, eyebrow: c.minAge ? `Min. age ${c.minAge}` : c.eyebrow, location: 'Kovalam', requirements, training, next: next && { title: next.title, href: next.href }, section }} related={relatedFor(slug, courseNext[slug])} /></>
   }
   const p = programmeOf(slug)
   if (!p) notFound()
   const next = p.next ? listingOf(p.next) : undefined
   return <>
     <JsonLd data={p.faqs?.length ? [crumbs, faqLd(p.faqs)] : crumbs} />
-    <Detail item={{ ...p, type: typeOfKind(p.kind), category: p.kind, duration: p.duration ?? 'Ask us', eyebrow: statusLabel[p.status], next: next && { title: next.title, href: next.href }, section }} related={relatedFor(slug, p.next)} />
+    <Detail item={{ ...p, type: typeOfKind(p.kind), level: levelOf(slug), category: p.kind, duration: p.duration ?? 'Schedule varies', eyebrow: statusLabel[p.status], next: next && { title: next.title, href: next.href }, section }} related={relatedFor(slug, p.next)} />
   </>
 }

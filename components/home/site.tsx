@@ -10,9 +10,11 @@ import { Header, Reveal } from '@/components/layout/header'
 import { experiences } from '@/data/experiences'
 import { whatsappLink } from '@/data/site'
 import { WhatsAppIcon } from '@/components/layout/whatsapp'
+import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 
-// Small local posters (the first thing painted) and a lighter video for phones
+// Small local posters (the first thing painted) and a lighter video for phones. Each size comes as VP9 WebM (about 45%
+// smaller) with the H.264 MP4 after it: the browser plays the first source it supports and downloads only that one
 const posterSrcSet = '/images/hero-poster-mobile.webp 800w, /images/hero-poster.webp 1280w'
 
 // Skip the video on data saver, slow connections and reduced motion: the poster stays instead
@@ -24,7 +26,8 @@ const videoAllowed = () => {
 
 const ease = [0.19, 1, 0.22, 1] as const
 
-function Mask({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) { return <span className={`mask ${className}`}><m.span className="mask-inner" initial={{ y: '101%' }} animate={{ y: 0 }} transition={{ duration: 2, ease, delay }}>{children}</m.span></span> }
+// Hero title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
+const Mask = (props: { children: React.ReactNode; delay?: number; className?: string }) => <CssMask from="101%" duration={2} {...props} />
 
 export function Hero() {
   const reduce = useReducedMotion()
@@ -45,23 +48,23 @@ export function Hero() {
   }, [])
   useEffect(() => { const v = video.current; if (!v) return; if (covered) v.pause(); else v.play().catch(() => {}) }, [covered, playVideo])
   return <section ref={scene} className={covered ? 'hero-scene is-covered' : 'hero-scene'}><div className="hero">
-    <m.div className="hero-media" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 3, ease }}><div className="hero-media-inner">
+    <div className={`hero-media ${enter({ duration: 3 }).className}`} style={enter({ duration: 3 }).style}><div className="hero-media-inner">
       <img className="hero-poster" src="/images/hero-poster.webp" srcSet={posterSrcSet} sizes="100vw" alt="" fetchPriority="high" decoding="async" />
-      {playVideo && <video ref={video} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source media="(max-width: 800px)" src="/videos/scuba-540.mp4" type="video/mp4" /><source src="/videos/scuba-720.mp4" type="video/mp4" /></video>}
-    </div></m.div>
+      {playVideo && <video ref={video} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source media="(max-width: 800px)" src="/videos/scuba-540.webm" type='video/webm; codecs="vp9"' /><source media="(max-width: 800px)" src="/videos/scuba-540.mp4" type="video/mp4" /><source src="/videos/scuba-720.webm" type='video/webm; codecs="vp9"' /><source src="/videos/scuba-720.mp4" type="video/mp4" /></video>}
+    </div></div>
     <div className="hero-shade" />
     {/* Fade only: a transform here would trap the fixed header inside the hero */}
-    <m.div className="hero-header" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease, delay: 1.2 }}><Header /></m.div>
+    <div className={`hero-header ${enter({ duration: 1.5, delay: 1.2 }).className}`} style={enter({ duration: 1.5, delay: 1.2 }).style}><Header /></div>
     <div className="hero-center">
-      <m.span className="hero-mark" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 0.4 }}>BS</m.span>
+      <span className={`hero-mark ${enter({ y: 50, duration: 1.5, delay: 0.4 }).className}`} style={enter({ y: 50, duration: 1.5, delay: 0.4 }).style}>BS</span>
       {/* The tagline sits inside the h1 so the heading carries "scuba diving in Kerala" for search, without changing the look */}
       <h1><span className="hero-title"><Mask delay={0.6}>Bond Safari</Mask></span><span className="hero-tagline"><Mask delay={0.85}>Underwater scooter rides &amp; scuba diving in Kerala</Mask></span></h1>
     </div>
     <div className="hero-scroll">
-      <m.span className="hero-ctas" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.5, ease, delay: 1.4 }}>
-        <Link className="pill pill-light hero-book" href="/booking">Book now <ArrowRight /></Link>
+      <span className={`hero-ctas ${enter({ y: 20, duration: 1.5, delay: 1.4 }).className}`} style={enter({ y: 20, duration: 1.5, delay: 1.4 }).style}>
+        <Link className="pill pill-light hero-book" href="/activities">Book now <ArrowRight /></Link>
         <a className="pill pill-sand hero-wa" href={whatsappLink('Hello Bond Safari! I’d like to book an adventure in Kovalam.')} target="_blank" rel="noreferrer"><WhatsAppIcon /> WhatsApp</a>
-      </m.span>
+      </span>
     </div>
   </div></section>
 }

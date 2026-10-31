@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { experiences } from '@/data/experiences'
-import { courseNext, homeCategoryOf, listingOf } from '@/data/programmes'
+import { courseNext, homeCategoryOf, levelOf, listingOf, statusOf } from '@/data/programmes'
 import { Detail, type RelatedItem } from '@/components/pages/detail'
 import { JsonLd, breadcrumbLd } from '@/lib/seo'
 
@@ -25,6 +25,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const next = courseNext[slug] ? listingOf(courseNext[slug]) : undefined
   return <>
     <JsonLd data={breadcrumbLd([['Home', '/'], [section.label, section.href]])} />
-    <Detail item={{ ...e, type: 'Activity', location: listing.location, next: next && { title: next.title, href: next.href }, section }} related={related} />
+    <Detail item={{ ...e, type: 'Activity', status: statusOf(slug), level: levelOf(slug), location: listing.location, next: next && { title: next.title, href: next.href }, section }} related={related} />
   </>
 }

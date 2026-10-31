@@ -7,6 +7,7 @@ import { ArrowDown, ArrowRight, Backpack, Clock, Compass, Eye, Gauge, Glasses, M
 import { useRef } from 'react'
 import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
+import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const teamPhoto = '/images/team.webp'
@@ -30,9 +31,8 @@ const store = [
   { icon: Glasses, title: 'Goggles', text: 'See the marine world clearly' },
 ]
 
-function Mask({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  return <span className="mask"><m.span className="mask-inner" initial={{ y: '105%' }} animate={{ y: 0 }} transition={{ duration: 1.6, ease, delay }}>{children}</m.span></span>
-}
+// Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
+const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
 // Words brighten one by one as the paragraph scrolls through the viewport
 function Word({ word, i, total, progress }: { word: string; i: number; total: number; progress: MotionValue<number> }) {
@@ -73,12 +73,12 @@ export function About() {
       <m.div className="ab-hero-media" style={{ scale: heroScale, y: heroY }}><Image src="/images/dive-safari.webp" alt="" fill sizes="100vw" priority /></m.div>
       <div className="ab-hero-shade" />
       <m.div className="ab-hero-content" style={{ opacity: heroFade }}>
-        <m.p className="eyebrow light" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>Our history · Kovalam, Kerala</m.p>
+        <p className={`eyebrow light ${enter({ y: 12, duration: 1, delay: 0.2 }).className}`} style={enter({ y: 12, duration: 1, delay: 0.2 }).style}>Our history · Kovalam, Kerala</p>
         <h1><Mask delay={0.3}>Born in Kerala.</Mask><br /><Mask delay={0.45}><i>Built for the deep.</i></Mask></h1>
-        <m.div className="ab-hero-foot" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 1 }}>
+        <div className={`ab-hero-foot ${enter({ duration: 1.2, delay: 1 }).className}`} style={enter({ duration: 1.2, delay: 1 }).style}>
           <span className="ab-partner"><b>In partnership with</b>Cool Divers SL · Spain</span>
           <span className="ab-scroll">Scroll <ArrowDown /></span>
-        </m.div>
+        </div>
       </m.div>
     </section>
 

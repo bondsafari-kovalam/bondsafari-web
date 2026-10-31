@@ -1,5 +1,6 @@
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
+import { isBookable } from '@/data/programmes'
 
 // Multi-activity booking rules: pricing, people limits, time clashes and the request message.
 // Pure functions with no UI, so a booking server can re-run exactly the same checks later.
@@ -12,8 +13,9 @@ export type CartItem = { slug: string; people: number; time: string }
 export type Cart = { date: string; group: number; items: CartItem[] }
 
 export const options: Option[] = [
-  ...experiences.map(e => ({ slug: e.slug, title: e.title, kind: 'activity' as const, image: e.image, imagePosition: e.imagePosition, duration: e.duration, price: e.price, minPeople: e.minPeople, maxPeople: e.maxPeople })),
-  ...courses.map(c => ({ slug: c.slug, title: c.title, kind: 'course' as const, image: c.image, imagePosition: c.imagePosition, duration: c.duration, price: c.price, minAge: c.minAge, minPeople: c.minPeople, maxPeople: c.maxPeople })),
+  ...experiences.filter(e => isBookable(e.slug)).map(e => ({ slug: e.slug, title: e.title, kind: 'activity' as const, image: e.image, imagePosition: e.imagePosition, duration: e.duration, price: e.price, minPeople: e.minPeople, maxPeople: e.maxPeople })),
+  // Only what's bookable online: professional programmes, Advanced Mermaid and paused activities go to WhatsApp instead
+  ...courses.filter(c => isBookable(c.slug)).map(c => ({ slug: c.slug, title: c.title, kind: 'course' as const, image: c.image, imagePosition: c.imagePosition, duration: c.duration, price: c.price, minAge: c.minAge, minPeople: c.minPeople, maxPeople: c.maxPeople })),
 ]
 export const optionOf = (slug: string) => options.find(o => o.slug === slug)
 
