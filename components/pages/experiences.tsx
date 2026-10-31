@@ -136,7 +136,7 @@ export function Experiences() {
         <ol className="xp-steps">
           {[
             { icon: Compass, title: 'Pick an activity', text: 'Choose from underwater, on-the-water or combo adventures.' },
-            { icon: CalendarCheck, title: 'Choose date & guests', text: 'Open every day, 9:00 – 19:00 — Sundays too.' },
+            { icon: CalendarCheck, title: 'Choose date & guests', text: 'Open every day, 8:30 AM – 6:30 PM — Sundays too.' },
             { icon: ShieldCheck, title: 'We take care of the rest', text: 'Briefing, gear and certified guides are all included.' },
           ].map((s, i) => <m.li key={s.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i}>
             <span className="xp-step-num">{String(i + 1).padStart(2, '0')}</span>

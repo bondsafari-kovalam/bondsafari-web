@@ -19,7 +19,7 @@ export function localBusinessLd() {
     telephone: contact.phones[0].replace(/\s/g, ''),
     email: contact.email,
     address: { '@type': 'PostalAddress', streetAddress: 'Suseela Tower, Beach Road, VRP XIX/553-A', addressLocality: 'Kovalam', addressRegion: 'Kerala', postalCode: '695527', addressCountry: 'IN' },
-    openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], opens: '09:00', closes: '19:00' }],
+    openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], opens: '08:30', closes: '18:30' }],
     sameAs: socials.map(([, href]) => href),
     ...(business.google ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: business.google.rating, reviewCount: business.google.count } } : {}),
   }

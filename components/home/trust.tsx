@@ -17,7 +17,7 @@ function facts(): Fact[] {
     { icon: Award, value: 'PADI 5★', label: 'Instructor Development Center' },
     !!since && { icon: CalendarCheck, value: `${new Date().getFullYear() - since}+`, label: 'Years at sea' },
     !!guestsServed && { icon: Users, value: guestsServed, label: 'Guests served' },
-    { icon: Clock, value: '7 days', label: 'Open 9:00 – 19:00' },
+    { icon: Clock, value: '7 days', label: 'Open 8:30 AM – 6:30 PM' },
   ]
   const shown = list.filter((f): f is Fact => !!f)
   // Keep the strip full while the business facts are pending
