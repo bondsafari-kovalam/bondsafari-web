@@ -4,6 +4,8 @@ import { ArrowRight } from 'lucide-react'
 import { ageLabel, inr, taxLabel } from '@/data/catalogue'
 import { bySlug, hrefOf, type Product } from '@/data/products'
 import type { Landing } from '@/data/landing'
+import { enquiryMessage, isBookable, statusOf } from '@/data/programmes'
+import { whatsappLink } from '@/data/site'
 import { PageIntro } from '@/components/pages/pages'
 import { Reveal } from '@/components/layout/header'
 
@@ -22,8 +24,10 @@ export function LandingPage({ page }: { page: Landing }) {
           <th scope="row"><Link href={hrefOf(p)}>{p.title}</Link></th>
           <td>{p.duration ?? '—'}</td>
           <td>{ageLabel(p) ?? '—'}</td>
-          <td>{p.amount ? <>₹{inr(p.amount)}{taxLabel(p) && <small> {taxLabel(p)}</small>}</> : 'On request'}</td>
-          <td><Link className="text-link" href={book(p)}>Book <ArrowRight /></Link></td>
+          <td>{p.amount ? <>₹{inr(p.amount)}{taxLabel(p) && <small> {taxLabel(p)}</small>}</> : 'Contact for price'}</td>
+          <td>{isBookable(p.slug)
+            ? <Link className="text-link" href={book(p)}>Book <ArrowRight /></Link>
+            : <a className="text-link" href={whatsappLink(enquiryMessage(p.title))} target="_blank" rel="noopener noreferrer">{statusOf(p.slug) === 'apply' ? 'Apply' : 'Enquire'} <ArrowRight /></a>}</td>
         </tr>)}</tbody>
       </table></Reveal>}
       <div className="cat-grid landing-grid">{items.map(p => <Reveal key={p.slug} className="cat-tile"><Link href={hrefOf(p)}>

@@ -2,16 +2,18 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { m, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion'
+import { m, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import { statusOf } from '@/data/programmes'
+import { ctaOf } from '@/components/pages/detail'
 
 const cards = [
-  { title: 'Bond Safari', kind: 'Activity', bookAs: 'Bond Safari', href: '/activities/bond-safari', image: '/images/bond-safari.webp', text: 'A unique centre for scuba diving in Kerala, open to anyone without the rigours of typical diving. The self-propelled, eco-friendly electric scooter leads you effortlessly underwater so you can enjoy the magnificent marine life. All age groups can explore with BOND — no diving or scuba experience is necessary.', tagline: 'Sit down, submerge & drive off!' },
+  { title: 'Scuba Diving', kind: 'Activity', bookAs: 'Scuba Diving', href: '/activities/scuba-diving', image: '/images/scuba.webp', text: 'Your first breath underwater in the Arabian Sea: a short briefing, shallow-water practice, then an open-sea dive of up to 12 m with a PADI Instructor or Divemaster beside you. No swimming needed.', tagline: 'Discover the unknown world in a day!' },
   { title: 'Sea Life Safari', kind: 'Activity', bookAs: 'Sea Life Safari', href: '/activities/sea-life-safari', image: '/images/sea-life.webp', text: 'This 2.5-hour Sea Life Safari takes you through fantastic moments in the ocean’s aquarium, accompanied by a marine biologist who dives at interesting places, explaining the facts and peculiarities of the mysterious world underwater — with spectacular photo opportunities.', tagline: 'Explore the beauty above and below the sea.' },
   { title: 'Dive Safari', kind: 'Activity', bookAs: 'Dive Safari', href: '/activities/dive-safari', image: '/images/dive-safari.webp', text: 'An adrenaline-pumping way to experience the silence, the tranquillity, the weightlessness and the heart-touching beauty of the marine world. Plunge into the water for an unforgettable tour with safe, high-quality equipment.', tagline: 'Be cool, dive cool!' },
   { title: 'Swimming Course', kind: 'Course', bookAs: 'Swimming Course', href: '/courses/swimming-course', image: '/images/swimming.webp', text: 'Bond Safari Kids and Adults are unique programmes designed by national and international swim coaches. Our coordinators and instructors are trained to international standards, with a background in water safety in Trivandrum. Lessons are divided into six separate levels.', tagline: 'Swim well, live well!' },
-  { title: 'Scuba Diving', kind: 'Activity', bookAs: 'Scuba Diving', href: '/activities/scuba-diving', image: '/images/scuba.webp', text: 'Your first breath underwater in the Arabian Sea: a short briefing, shallow-water practice, then an open-sea dive of up to 12 m with a PADI Instructor or Divemaster beside you. No swimming needed.', tagline: 'Discover the unknown world in a day!' },
+  { title: 'Bond Safari', kind: 'Activity', bookAs: 'Bond Safari', href: '/activities/bond-safari', image: '/images/bond-safari.webp', text: 'A unique centre for scuba diving in Kerala, open to anyone without the rigours of typical diving. The self-propelled, eco-friendly electric scooter leads you effortlessly underwater so you can enjoy the magnificent marine life. All age groups can explore with BOND — no diving or scuba experience is necessary.', tagline: 'Sit down, submerge & drive off!' },
 ]
 
 const n = cards.length
@@ -46,7 +48,7 @@ function Card({ c, i, active, pos, reduce, onSelect }: { c: typeof cards[number]
       <h3><span>{c.title}</span></h3>
       <p className="explore-text">{c.text}</p>
       <p className="explore-tagline">{c.tagline}</p>
-      <div className="explore-actions"><Link className="book-cta book-cta-sm" href={`/booking?activity=${encodeURIComponent(c.bookAs)}`} tabIndex={active ? 0 : -1}><span className="book-cta-label"><strong>Book now</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link><Link className="explore-link" href={c.href} tabIndex={active ? 0 : -1}>Explore <ArrowRight /></Link></div>
+      <div className="explore-actions">{(() => { const cta = ctaOf(c.bookAs, statusOf(c.href.split('/').pop()!)); const body = <><span className="book-cta-label"><strong>{cta.label}</strong></span><span className="book-cta-icon"><ArrowRight /></span></>; return cta.external ? <a className="book-cta book-cta-sm" href={cta.href} target="_blank" rel="noopener noreferrer" tabIndex={active ? 0 : -1}>{body}</a> : <Link className="book-cta book-cta-sm" href={cta.href} tabIndex={active ? 0 : -1}>{body}</Link> })()}<Link className="explore-link" href={c.href} tabIndex={active ? 0 : -1}>Explore <ArrowRight /></Link></div>
     </div>
   </m.li>
 }
@@ -70,12 +72,11 @@ export function ExploreCarousel() {
   // Phones swipe the track sideways (native scroll-snap); larger screens pin the section and scroll it
   const [mobile, setMobile] = useState(false)
   useEffect(() => { const mq = window.matchMedia('(max-width: 800px)'); const update = () => setMobile(mq.matches); update(); mq.addEventListener('change', update); return () => mq.removeEventListener('change', update) }, [])
+  // The cards follow the scroll exactly, frame for frame: no spring, so they never trail behind the finger or drift on
   const { scrollYProgress } = useScroll({ target: scene, offset: ['start start', 'end end'] })
-  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.35 })
-  const progress = reduce ? scrollYProgress : smooth
   // Card position (0 = first card in focus), fed by page scroll on desktop and by the swipe on phones
   const pos = useMotionValue(0)
-  useMotionValueEvent(progress, 'change', v => { if (!mobile) pos.set(v * (n - 1)) })
+  useMotionValueEvent(scrollYProgress, 'change', v => { if (!mobile) pos.set(v * (n - 1)) })
   const onSwipe = () => { const el = track.current; if (el && step) pos.set(Math.max(0, Math.min(n - 1, el.scrollLeft / step))) }
   const x = useTransform(pos, v => -v * step)
 

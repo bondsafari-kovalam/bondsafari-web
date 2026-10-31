@@ -6,7 +6,7 @@ import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, Clock, Minus, Phone, Plus, Users, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { contact, whatsappLink } from '@/data/site'
-import { MAX_GROUP, addItem, clashes, inr, longDate, optionOf, options, peopleRange, priceLabel, problems, timePhrase, timesFor, totals, unitPrice, type Cart, type Option } from '@/lib/booking/cart'
+import { MAX_GROUP, addItem, clashes, inr, longDate, optionOf, options, peopleRange, priceLabel, problems, requestMessage, timePhrase, timesFor, totals, unitPrice, type Cart, type Option } from '@/lib/booking/cart'
 import { Header } from '@/components/layout/header'
 
 const ease = [0.19, 1, 0.22, 1] as const
@@ -113,7 +113,8 @@ export function BookingFlow() {
   const next = () => {
     if (!canNext) { setTried(true); return }
     if (step < 4) return go(step + 1)
-    // Book now: payment is taken here once Razorpay is integrated
+    // Book now sends the request to the team on WhatsApp, who confirm the slots and share how to pay (online payment comes later)
+    window.open(whatsappLink(requestMessage(cart, customer)), '_blank', 'noopener,noreferrer')
   }
 
   // A preselected date may sit off-screen in the chip row: bring it into view

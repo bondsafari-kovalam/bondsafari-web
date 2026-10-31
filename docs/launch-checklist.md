@@ -104,3 +104,37 @@ Gift vouchers, corporate and group pages, guest accounts and Bond Membership pri
 and a staff-editable CMS. Today prices live in two TypeScript files. Moving the catalogue into the booking
 platform or a CMS is the long-term fix for price drift. The `Product` shape in `data/catalogue.ts` is the contract
 to keep.
+
+## Activities & courses by category (`/programmes`)
+
+Content for Freediving, Mermaid and Advanced Sports comes from the Bond Water Sports Academy decks (PADI Freediver
+Career Playbook, PADI Mermaid Pathways, PADI Technical Diving Career Pathways, Oct 2026). All of it lives in
+`data/programmes.ts`. Earnings figures and internal business notes from the decks are deliberately not published.
+
+- [ ] **PADI verification (blocking):** Freediver Instructor first-aid prerequisite — EFR within 24 months vs active
+      EFR Instructor. Flagged on the page until PADI Asia Pacific confirms in writing.
+- [ ] PADI verification: mermaid instructor tier names and routes; "Assistant Instructor" freediving rating; every
+      TecRec standard (read from PADI public pages, not the instructor manual).
+- [ ] Master Freediver constant-weight target (27 m vs 32 m).
+- [ ] **Pool with lane exclusivity** — gates every freediving and mermaid course above Discover. Those show
+      "Coming soon / Register interest" until it is signed.
+- [ ] Child-safety policy (screening, ratios, supervision, photo consent) before any mermaid booking.
+- [ ] Prices and durations for every new programme (all show "Ask us"): Discover Freediving, Skin Diver, freediving
+      levels, mermaid levels, Divemaster (stand-alone), Enriched Air, Deep Diver, Gas Blender, Tec levels.
+- [ ] Which new programmes Bond actually runs today. Marked "Enquire": Discover Freediving, Skin Diver, Divemaster,
+      Enriched Air, Deep Diver. Everything else is "Coming soon", "Via partner centres" or "Earned by teaching".
+- [ ] Tec phase 2 gates: written chamber + evacuation plan, oxygen-clean blending, Tec Deep Instructor, insurer
+      confirmation. Phase 3 (Trimix, CCR, Cave) is shown as referred to partner centres.
+- [ ] Photos: no freediving, mermaid-level or technical diving images exist; those pages reuse underwater/scuba photos.
+- [ ] Canoeing and stand-up paddleboarding are listed under Parasports as "Enquire" with no price, duration or location.
+      Logout.world has a stand-up paddleboarding product; confirm whether it is a lesson or a rental and its price.
+- [ ] PADI Mermaid sits under Parasports, not Freediving (client instruction). What can be booked online is decided in
+      one place, `heldBack` / `statusOf` in `data/programmes.ts`: Zero to Hero, IDC and Divemaster are "Apply", Advanced
+      Mermaid is "Enquire" until the pool agreement and child-safety policy are in place, and the Bond Safari scooter is
+      "Paused". Remove an entry there to open online booking again.
+- [x] Muziris website URLs: the "Explore our Muziris locations" section (home page and Parasports) links each card's
+      Explore More button to its page on bondpaddlesports.com (`website` in `data/locations.ts`), which handles details
+      and booking.
+- [ ] Kottapuram's meeting point is not confirmed and is not shown.
+- [ ] Course and activity locations still show Kovalam / Freshwater quarry / Lakshadweep as the source data says.
+- [ ] Freshwater quarry location (Discover Scuba in Freshwater, Monsoon Combo, Kayaking) — name the site.

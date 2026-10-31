@@ -1,5 +1,6 @@
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
+import { isBookable } from '@/data/programmes'
 
 // Multi-activity booking rules: pricing, people limits, time clashes and the request message.
 // Pure functions with no UI, so a booking server can re-run exactly the same checks later.
@@ -12,8 +13,9 @@ export type CartItem = { slug: string; people: number; time: string }
 export type Cart = { date: string; group: number; items: CartItem[] }
 
 export const options: Option[] = [
-  ...experiences.map(e => ({ slug: e.slug, title: e.title, kind: 'activity' as const, image: e.image, imagePosition: e.imagePosition, duration: e.duration, price: e.price, minPeople: e.minPeople, maxPeople: e.maxPeople })),
-  ...courses.map(c => ({ slug: c.slug, title: c.title, kind: 'course' as const, image: c.image, imagePosition: c.imagePosition, duration: c.duration, price: c.price, minAge: c.minAge, minPeople: c.minPeople, maxPeople: c.maxPeople })),
+  ...experiences.filter(e => isBookable(e.slug)).map(e => ({ slug: e.slug, title: e.title, kind: 'activity' as const, image: e.image, imagePosition: e.imagePosition, duration: e.duration, price: e.price, minPeople: e.minPeople, maxPeople: e.maxPeople })),
+  // Only what's bookable online: professional programmes, Advanced Mermaid and paused activities go to WhatsApp instead
+  ...courses.filter(c => isBookable(c.slug)).map(c => ({ slug: c.slug, title: c.title, kind: 'course' as const, image: c.image, imagePosition: c.imagePosition, duration: c.duration, price: c.price, minAge: c.minAge, minPeople: c.minPeople, maxPeople: c.maxPeople })),
 ]
 export const optionOf = (slug: string) => options.find(o => o.slug === slug)
 
@@ -23,9 +25,13 @@ export const MAX_GROUP = 20
 export type TimeOption = { id: string; hint?: string }
 export const TIMES: TimeOption[] = [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 7' }]
 // Activities with fixed departures or an earlier last slot than the general opening hours
+const DIVE_TIMES = ['8:30 AM', '9:30 AM', '10:30 AM', '11:30 AM', '12:30 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(id => ({ id }))
 const ACTIVITY_TIMES: Record<string, TimeOption[]> = {
-  'scuba-diving': ['8:30 AM', '9:30 AM', '10:30 AM', '11:30 AM', '12:30 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(id => ({ id })),
+  'scuba-diving': DIVE_TIMES,
+  'dive-safari': DIVE_TIMES,
+  'freshwater-scuba': DIVE_TIMES,
   snorkeling: [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 5:30' }],
+  parasailing: [{ id: 'Morning', hint: '9 – 12' }, { id: 'Afternoon', hint: '12 – 4' }, { id: 'Evening', hint: '4 – 5:30' }],
 }
 export const timesFor = (slug: string) => ACTIVITY_TIMES[slug] ?? TIMES
 // Reads naturally after "both": "in the morning" for a window, "at 8:30 AM" for a fixed slot

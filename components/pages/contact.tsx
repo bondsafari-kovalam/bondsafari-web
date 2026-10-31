@@ -10,15 +10,15 @@ import { contact, socials } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { MapSection } from '@/components/sections/map'
 import { Picker } from '@/components/booking/picker'
+import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.12 } }) }
 const tel = (n: string) => `tel:${n.replace(/\s/g, '')}`
 const groups = [{ label: 'Activities', options: experiences.map(e => ({ value: e.title })) }, { label: 'Courses', options: courses.map(c => ({ value: c.title })) }, { label: 'Other', options: [{ value: 'Something else' }] }]
 
-function Mask({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  return <span className="mask"><m.span className="mask-inner" initial={{ y: '105%' }} animate={{ y: 0 }} transition={{ duration: 1.6, ease, delay }}>{children}</m.span></span>
-}
+// Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
+const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
 const cards = [
   { icon: Phone, label: 'Call us', lines: contact.phones.map(n => ({ text: n, href: tel(n) })) },
@@ -51,12 +51,12 @@ export function Contact() {
       <m.div className="ct-hero-media" style={{ scale: heroScale, y: heroY }}><Image src="/images/scuba.webp" alt="" fill sizes="100vw" priority /></m.div>
       <div className="ct-hero-shade" />
       <m.div className="ct-hero-content" style={{ opacity: heroFade }}>
-        <m.p className="eyebrow light" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>Contact us · Kovalam, Kerala</m.p>
+        <p className={`eyebrow light ${enter({ y: 12, duration: 1, delay: 0.2 }).className}`} style={enter({ y: 12, duration: 1, delay: 0.2 }).style}>Contact us · Kovalam, Kerala</p>
         <h1><Mask delay={0.3}>Get in touch</Mask><br /><Mask delay={0.45}><i>with us.</i></Mask></h1>
-        <m.div className="ct-hero-foot" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 1 }}>
+        <div className={`ct-hero-foot ${enter({ duration: 1.2, delay: 1 }).className}`} style={enter({ duration: 1.2, delay: 1 }).style}>
           <p>Please address your queries to our scuba diving centre representative, who is at your service always.</p>
           <span className="ab-scroll">Scroll <ArrowDown /></span>
-        </m.div>
+        </div>
       </m.div>
     </section>
 
