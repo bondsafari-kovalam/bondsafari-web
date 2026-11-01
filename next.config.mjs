@@ -20,8 +20,12 @@ const nextConfig = {
     return [
       { source: '/experiences', destination: '/activities', permanent: true },
       { source: '/experiences/:slug', destination: '/activities/:slug', permanent: true },
-      // Parasports no longer has its own page: its activities are on /activities, the mermaid courses on /courses
-      { source: '/programmes/parasports', destination: '/activities', permanent: true },
+      // The /programmes category pages were removed: send them to the matching section of Activities or Courses
+      { source: '/programmes', destination: '/activities', permanent: true },
+      { source: '/programmes/scuba-diving', destination: '/courses#scuba-diving', permanent: true },
+      { source: '/programmes/freediving', destination: '/courses#freediving', permanent: true },
+      { source: '/programmes/advanced-sports', destination: '/courses#technical-diving', permanent: true },
+      { source: '/programmes/:category', destination: '/activities', permanent: true },
     ]
   },
 }

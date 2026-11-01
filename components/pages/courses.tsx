@@ -119,7 +119,6 @@ export function Courses() {
             <h2>{current.title}</h2>
             <p className="cp-sub">{current.subs.length} subcategories · {current.total} courses</p>
           </div>
-          {current.guide && <Link className="text-link" href={current.guide}>Full {current.title.replace(/ Courses$/, '').toLowerCase()} guide <ArrowRight /></Link>}
         </div>
         <LayoutMotion>
           {/* Keyed by category so switching swaps the whole grid instead of animating old cards out.
