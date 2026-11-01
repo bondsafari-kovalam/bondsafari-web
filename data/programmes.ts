@@ -129,11 +129,6 @@ export const categories: Category[] = [
   ] },
 ]
 
-// Parasports has no page of its own: its activities live on the Activities page and the mermaid courses on the
-// Courses page. The category still groups them for levels and related cards. /programmes/parasports redirects
-export const categoryPages = categories.filter(c => c.slug !== 'parasports')
-export const categoryOf = (slug: string) => categoryPages.find(c => c.slug === slug)
-
 // ——— One card shape for activities, existing courses and the programmes above ———
 export type Listing = {
   slug: string; title: string; href: string; kind: Kind; type: ItemType; status: Status; image: string; imagePosition?: string
@@ -162,12 +157,11 @@ export function listingOf(slug: string): Listing | undefined {
 
 // The category a page belongs to, for breadcrumbs (the first category that lists it)
 export const homeCategoryOf = (slug: string) => categories.find(c => c.groups.some(g => g.items.includes(slug)))
-// Where a detail page's breadcrumb leads back to: its category page, or for parasports the page that lists it
+// Where a detail page's breadcrumb leads back to: the Activities page, or its category on the Courses page
 export function sectionOf(slug: string): { label: string; href: string } {
-  const cat = homeCategoryOf(slug)
-  if (cat && categoryOf(cat.slug)) return { label: cat.title, href: `/programmes/${cat.slug}` }
-  if (cat?.groups.some(g => g.heading === 'Mermaid' && g.items.includes(slug))) return { label: 'Mermaid Courses', href: '/courses#mermaid' }
-  return listingOf(slug)?.type === 'Activity' ? { label: 'Activities', href: '/activities' } : { label: 'Courses', href: '/courses' }
+  if (listingOf(slug)?.type === 'Activity') return { label: 'Activities', href: '/activities' }
+  const section = coursesPage.find(g => g.subcategories.some(s => s.items.includes(slug)))
+  return section ? { label: section.title, href: `/courses#${section.slug}` } : { label: 'Courses', href: '/courses' }
 }
 // Its group within that category ("Beginner level", "Phase 2 · Open circuit to 50 m"), shown as the level on detail pages
 export const levelOf = (slug: string) => homeCategoryOf(slug)?.groups.find(g => g.items.includes(slug))?.heading
@@ -178,21 +172,21 @@ export const courseNext: Record<string, string> = { 'open-water-diver': 'advance
 // ——— The Courses page: the academy's four course categories, in the order the business set out ———
 // Each subcategory points at the course pages it covers; most are one course, CCR, Technical Specialties and Specialty Courses group several
 export type CourseSubcategory = { title: string; items: string[] }
-export type CourseCategory = { slug: string; title: string; image: string; imagePosition?: string; guide?: string; subcategories: CourseSubcategory[] }
+export type CourseCategory = { slug: string; title: string; image: string; imagePosition?: string; subcategories: CourseSubcategory[] }
 const one = (title: string, slug: string): CourseSubcategory => ({ title, items: [slug] })
 export const coursesPage: CourseCategory[] = [
   { slug: 'mermaid', title: 'Mermaid Courses', image: '/images/course-mermaid-hd.webp', imagePosition: '74% center', subcategories: [
     one('Discover Mermaid', 'discover-mermaid'), one('Basic Mermaid', 'basic-mermaid'), one('Mermaid', 'mermaid'), one('Advanced Mermaid', 'advanced-mermaid'), one('Mermaid Instructor Training', 'mermaid-instructor'),
   ] },
-  { slug: 'freediving', title: 'Freediving Courses', image: '/images/course-freediving-hd.webp', imagePosition: '70% center', guide: '/programmes/freediving', subcategories: [
+  { slug: 'freediving', title: 'Freediving Courses', image: '/images/course-freediving-hd.webp', imagePosition: '70% center', subcategories: [
     one('Basic Freediver', 'basic-freediver'), one('Freediver', 'freediver'), one('Advanced Freediver', 'advanced-freediver'), one('Master Freediver', 'master-freediver'), one('Freediver Instructor Training', 'freediver-instructor'),
   ] },
-  { slug: 'technical-diving', title: 'Technical Diving Courses', image: '/images/underwater-light.webp', guide: '/programmes/advanced-sports', subcategories: [
+  { slug: 'technical-diving', title: 'Technical Diving Courses', image: '/images/underwater-light.webp', subcategories: [
     one('Tec 40', 'tec-40'), one('Tec 45', 'tec-45'), one('Tec 50', 'tec-50'), one('Tec Trimix 65', 'tec-trimix-65'), one('Tec Trimix Diver', 'tec-trimix-diver'),
     { title: 'CCR Courses', items: ['tec-40-ccr', 'tec-60-ccr', 'tec-100-ccr'] },
     { title: 'Technical Specialties', items: ['tec-gas-blender', 'tec-sidemount', 'advanced-wreck', 'technical-rescue'] },
   ] },
-  { slug: 'scuba-diving', title: 'Scuba Diving Courses', image: '/images/course-open-water-hd.webp', imagePosition: '62% center', guide: '/programmes/scuba-diving', subcategories: [
+  { slug: 'scuba-diving', title: 'Scuba Diving Courses', image: '/images/course-open-water-hd.webp', imagePosition: '62% center', subcategories: [
     one('Open Water Diver', 'open-water-diver'), one('Advanced Open Water Diver', 'advanced-open-water'), one('Rescue Diver', 'rescue-diver'), one('Divemaster', 'divemaster'), one('Instructor Development', 'instructor-development'),
     { title: 'Specialty Courses', items: ['enriched-air-diver', 'deep-diver'] },
   ] },
