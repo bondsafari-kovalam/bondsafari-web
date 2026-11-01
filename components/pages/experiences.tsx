@@ -9,7 +9,7 @@ import { activityGroups, experiences, groupOf, type Experience } from '@/data/ex
 import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
-import { CategoryStrip, TypeKey } from '@/components/pages/programmes'
+import { TypeKey } from '@/components/pages/programmes'
 import { Cta, ctaOf } from '@/components/pages/detail'
 import { statusOf } from '@/data/programmes'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
@@ -93,7 +93,6 @@ export function Experiences() {
     </section>
 
     <section className="pg-info pg-key-wrap"><TypeKey links current="Activity" /></section>
-    <CategoryStrip />
 
     <section id="all-activities" className="xp-list">
       <div className="xp-list-head">
