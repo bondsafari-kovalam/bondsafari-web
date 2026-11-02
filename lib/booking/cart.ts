@@ -64,13 +64,12 @@ export function clashes(cart: Cart) {
     .map(([time, list]) => ({ time, titles: list.map(i => optionOf(i.slug)?.title ?? i.slug) }))
 }
 
-// A cart holds several activities, or a single course (courses run on their own start dates and deposits)
+// A cart holds several activities, or several courses: courses run on start dates rather than time slots, so the two aren't mixed
 export function addItem(items: CartItem[], slug: string, group: number): CartItem[] {
   const o = optionOf(slug)
   if (!o || items.some(i => i.slug === slug)) return items
   const item = { slug, people: Math.min(group, peopleRange(o, group).max), time: '' }
-  if (o.kind === 'course') return [item]
-  return [...items.filter(i => optionOf(i.slug)?.kind === 'activity'), item]
+  return [...items.filter(i => optionOf(i.slug)?.kind === o.kind), item]
 }
 
 export function problems(cart: Cart, step: number): string[] {
@@ -90,7 +89,7 @@ export { longDate }
 
 export function requestMessage(cart: Cart, customer: { name: string; phone: string; email: string }) {
   const t = totals(cart)
-  const course = t.lines.length === 1 && t.lines[0].option?.kind === 'course'
+  const course = t.lines.length > 0 && t.lines.every(l => l.option?.kind === 'course')
   return [
     `Hello Bond Safari! I’d like to book for ${course ? 'a start date of ' : ''}${longDate(cart.date)}:`,
     `Group: ${cart.group} ${cart.group === 1 ? 'person' : 'people'}`,

@@ -45,7 +45,7 @@ export function BookingFlow() {
   const today = useMemo(() => new Date(), [])
   const days = useMemo(() => Array.from({ length: 14 }, (_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); return iso(d) }), [today])
   const t = totals(cart)
-  const isCourse = cart.items.length === 1 && optionOf(cart.items[0].slug)?.kind === 'course'
+  const isCourse = cart.items.length > 0 && cart.items.every(i => optionOf(i.slug)?.kind === 'course')
 
   // Every new arrival (a Book button, a campaign or WhatsApp link) starts a fresh booking on the first step with just
   // that product. Only a refresh, or coming back with the browser's back button, restores the unfinished booking.
@@ -100,7 +100,7 @@ export function BookingFlow() {
     if (cart.items.some(i => i.slug === o.slug)) { setNote(''); setCart(c => ({ ...c, items: c.items.filter(i => i.slug !== o.slug) })); return }
     const items = addItem(cart.items, o.slug, cart.group)
     const dropped = cart.items.some(i => !items.some(x => x.slug === i.slug))
-    setNote(dropped ? (o.kind === 'course' ? 'Courses are booked on their own, so your activities were removed.' : 'Courses are booked on their own, so the course was removed.') : '')
+    setNote(dropped ? (o.kind === 'course' ? 'Courses are booked separately from activities, so your activities were removed.' : `Courses are booked separately from activities, so your ${cart.items.length > 1 ? 'courses were' : 'course was'} removed.`) : '')
     setCart(c => ({ ...c, items }))
   }
   const update = (slug: string, patch: Partial<{ people: number; time: string }>) => setCart(c => ({ ...c, items: c.items.map(i => i.slug === slug ? { ...i, ...patch } : i) }))
@@ -127,7 +127,7 @@ export function BookingFlow() {
       <strong>{l.unit ? inr(l.subtotal) : 'On request'}</strong>
     </div>)}
     <div className="bk-sum-total">
-      <div><b>Total</b><small><Users /> {people(cart.group)} · {t.places} activity {t.places === 1 ? 'place' : 'places'}</small></div>
+      <div><b>Total</b><small><Users /> {people(cart.group)} · {t.places} {isCourse ? 'course' : 'activity'} {t.places === 1 ? 'place' : 'places'}</small></div>
       <strong>{t.total ? inr(t.total) : 'On request'}</strong>
     </div>
     {t.unpriced.length > 0 && t.total > 0 && <p className="bk-note">{t.unpriced.join(', ')}: price confirmed on WhatsApp, not included in the total.</p>}
@@ -174,7 +174,7 @@ export function BookingFlow() {
 
         {step === 2 && <m.section key="s2" className="bk-step" {...fade}>
           <h2>What would you like to do?</h2>
-          <p className="bk-sub">Add as many activities as you like, and choose how many of your group join each one.</p>
+          <p className="bk-sub">{tab === 'course' ? 'Add as many courses as you like, and choose how many of your group join each one.' : 'Add as many activities as you like, and choose how many of your group join each one.'}</p>
           <div className="bk-tabs" role="tablist">
             {(['activity', 'course'] as const).map(k => <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'is-on' : ''} onClick={() => setTab(k)}>
               {k === 'activity' ? 'Activities' : 'Courses'}<em>{options.filter(o => o.kind === k).length}</em>
@@ -202,7 +202,7 @@ export function BookingFlow() {
         </m.section>}
 
         {step === 3 && <m.section key="s3" className="bk-step" {...fade}>
-          <h2>{isCourse ? 'Check your course' : 'Pick a time for each'}</h2>
+          <h2>{isCourse ? `Check your ${cart.items.length > 1 ? 'courses' : 'course'}` : 'Pick a time for each'}</h2>
           {!isCourse && <p className="bk-sub">Preferred times are optional. We confirm the exact slot on WhatsApp.</p>}
           {!isCourse && <div className="bk-items">
             {t.lines.map(l => <div key={l.item.slug} className="bk-item">
