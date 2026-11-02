@@ -175,22 +175,28 @@ export type CourseSubcategory = { title: string; items: string[] }
 export type CourseCategory = { slug: string; title: string; image: string; imagePosition?: string; subcategories: CourseSubcategory[] }
 const one = (title: string, slug: string): CourseSubcategory => ({ title, items: [slug] })
 export const coursesPage: CourseCategory[] = [
-  { slug: 'mermaid', title: 'Mermaid Courses', image: '/images/course-mermaid-hd.webp', imagePosition: '74% center', subcategories: [
-    one('Discover Mermaid', 'discover-mermaid'), one('Basic Mermaid', 'basic-mermaid'), one('Mermaid', 'mermaid'), one('Advanced Mermaid', 'advanced-mermaid'), one('Mermaid Instructor Training', 'mermaid-instructor'),
+  { slug: 'scuba-diving', title: 'Scuba Diving Courses', image: '/images/course-open-water-hd.webp', imagePosition: '62% center', subcategories: [
+    one('Open Water Diver', 'open-water-diver'), one('Advanced Open Water Diver', 'advanced-open-water'), one('Rescue Diver', 'rescue-diver'), one('Divemaster', 'divemaster'), one('Instructor Development', 'instructor-development'),
+    { title: 'Specialty Courses', items: ['enriched-air-diver', 'deep-diver'] },
   ] },
   { slug: 'freediving', title: 'Freediving Courses', image: '/images/course-freediving-hd.webp', imagePosition: '70% center', subcategories: [
     one('Basic Freediver', 'basic-freediver'), one('Freediver', 'freediver'), one('Advanced Freediver', 'advanced-freediver'), one('Master Freediver', 'master-freediver'), one('Freediver Instructor Training', 'freediver-instructor'),
+  ] },
+  { slug: 'mermaid', title: 'Mermaid Courses', image: '/images/course-mermaid-hd.webp', imagePosition: '74% center', subcategories: [
+    one('Discover Mermaid', 'discover-mermaid'), one('Basic Mermaid', 'basic-mermaid'), one('Mermaid', 'mermaid'), one('Advanced Mermaid', 'advanced-mermaid'), one('Mermaid Instructor Training', 'mermaid-instructor'),
   ] },
   { slug: 'technical-diving', title: 'Technical Diving Courses', image: '/images/underwater-light.webp', subcategories: [
     one('Tec 40', 'tec-40'), one('Tec 45', 'tec-45'), one('Tec 50', 'tec-50'), one('Tec Trimix 65', 'tec-trimix-65'), one('Tec Trimix Diver', 'tec-trimix-diver'),
     { title: 'CCR Courses', items: ['tec-40-ccr', 'tec-60-ccr', 'tec-100-ccr'] },
     { title: 'Technical Specialties', items: ['tec-gas-blender', 'tec-sidemount', 'advanced-wreck', 'technical-rescue'] },
   ] },
-  { slug: 'scuba-diving', title: 'Scuba Diving Courses', image: '/images/course-open-water-hd.webp', imagePosition: '62% center', subcategories: [
-    one('Open Water Diver', 'open-water-diver'), one('Advanced Open Water Diver', 'advanced-open-water'), one('Rescue Diver', 'rescue-diver'), one('Divemaster', 'divemaster'), one('Instructor Development', 'instructor-development'),
-    { title: 'Specialty Courses', items: ['enriched-air-diver', 'deep-diver'] },
-  ] },
 ]
+// Each category's "From zero to instructor" ladder on the Courses page; scuba uses the PADI pathway in data/courses
+export const categoryPathways: Record<string, string[]> = {
+  freediving: ['basic-freediver', 'freediver', 'advanced-freediver', 'master-freediver', 'freediver-instructor'],
+  mermaid: ['discover-mermaid', 'basic-mermaid', 'mermaid', 'advanced-mermaid', 'mermaid-instructor'],
+  'technical-diving': ['tec-40', 'tec-45', 'tec-50', 'tec-trimix-65', 'tec-trimix-diver'],
+}
 // Older links to the Courses page used the previous section names
 export const coursesPageAliases: Record<string, string> = { 'advanced-sports': 'technical-diving', parasports: 'mermaid' }
 
