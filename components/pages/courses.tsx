@@ -3,15 +3,15 @@
 import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { ArrowDown, ArrowRight, Award, Briefcase, GraduationCap, Phone, Ship, ShieldCheck, Sparkles, UserRound } from 'lucide-react'
+import { ArrowDown, ArrowRight, Award, Briefcase, Clock, Gauge, GraduationCap, Phone, Route, Ship, ShieldCheck, Sparkles, UserRound, Waves } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { courses, pathway } from '@/data/courses'
-import { coursesPage, coursesPageAliases, enquiryMessage, listingOf, type Listing } from '@/data/programmes'
+import { categoryPathways, coursesPage, coursesPageAliases, enquiryMessage, levelOf, listingOf, programmeOf, type Listing } from '@/data/programmes'
 import { Card } from '@/components/pages/programmes'
 import { contact, whatsappLink } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
-import { PadiPathway } from '@/components/sections/pathway'
+import { PadiPathway, type PathStep } from '@/components/sections/pathway'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
@@ -26,6 +26,33 @@ const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y:
 const tel = contact.phones[0].replace(/\s/g, '')
 const bookHref = (title: string) => `/booking?activity=${encodeURIComponent(title)}`
 const hero = courses.find(c => c.slug === 'zero-to-hero')!
+const freediverInstructor = programmeOf('freediver-instructor')!
+const mermaidInstructor = programmeOf('mermaid-instructor')!
+const tec50 = programmeOf('tec-50')!
+
+// The go-pro course featured under each category's pathway
+type Feature = { slug: string; image: string; imagePosition?: string; alt: string; flag: string; eyebrow: string; title: string; tagline: string; lead: string; points: { icon: typeof Award; t: string }[]; meta: string; price: string; cta: string; ctaNote: string }
+const features: Record<string, Feature> = {
+  'scuba-diving': { slug: hero.slug, image: hero.image, alt: 'Bond Academy trainees in a confined water session', flag: 'Career programme', eyebrow: 'Scuba · Go pro', title: 'Zero to Hero.', tagline: 'Your career starts here.', lead: hero.description,
+    points: [{ icon: GraduationCap, t: '5 PADI certifications' }, { icon: Sparkles, t: 'Unlimited dives' }, { icon: Briefcase, t: '1-month internship' }, { icon: UserRound, t: '100% placement assistance' }],
+    meta: `${hero.duration} · all taxes included`, price: hero.price!, cta: 'Apply now', ctaNote: 'Booking from ₹5,000' },
+  freediving: { slug: freediverInstructor.slug, image: freediverInstructor.image, imagePosition: freediverInstructor.imagePosition, alt: 'A freediving instructor in the water', flag: 'Career programme', eyebrow: 'Freediving · Go pro', title: 'Freediver Instructor.', tagline: 'From student to teacher.', lead: 'Freediving has no Divemaster stage — you go from student straight to Instructor, the first freediving rating you can be employed on.',
+    points: [{ icon: Clock, t: '4-day instructor course' }, { icon: Route, t: '3 routes in' }, { icon: Award, t: 'Scuba instructor crossover' }, { icon: Briefcase, t: 'First employable rating' }],
+    meta: `${freediverInstructor.duration} · ${freediverInstructor.location}`, price: 'Coming soon', cta: 'Enquire now', ctaNote: 'Ask about the next batch' },
+  mermaid: { slug: mermaidInstructor.slug, image: mermaidInstructor.image, imagePosition: mermaidInstructor.imagePosition, alt: 'A mermaid instructor with a monofin', flag: 'Professional rating', eyebrow: 'Mermaid · Go pro', title: 'Mermaid Instructor.', tagline: 'Teach every level.', lead: 'Teach Discover, Basic, Mermaid and Advanced Mermaid. PADI requires no scuba or freediving rating — Bond instructors hold a freediving certification as well.',
+    points: [{ icon: GraduationCap, t: 'Teach all 4 mermaid levels' }, { icon: ShieldCheck, t: 'No scuba rating needed' }, { icon: Waves, t: 'Freediving-certified at Bond' }, { icon: UserRound, t: 'Minimum age 18' }],
+    meta: mermaidInstructor.location, price: 'Coming soon', cta: 'Enquire now', ctaNote: 'Ask about the next batch' },
+  'technical-diving': { slug: tec50.slug, image: tec50.image, imagePosition: tec50.imagePosition, alt: 'A technical diver underwater', flag: 'Technical programme', eyebrow: 'Technical · Go deeper', title: 'Tec 50.', tagline: 'The gateway to trimix.', lead: tec50.description + ' Both the trimix lane and the Tec Deep Instructor lane start here.',
+    points: [{ icon: Gauge, t: 'Training to 50 m' }, { icon: Sparkles, t: 'Two decompression gases' }, { icon: Waves, t: '4 training dives' }, { icon: Route, t: 'Gateway to Tec Instructor' }],
+    meta: 'Prerequisite: Tec 45 + Rescue Diver', price: 'Coming soon', cta: 'Enquire now', ctaNote: 'Register your interest' },
+}
+// Each category's zero-to-instructor ladder; levels are left off where every step shares one (all of Mermaid is "Mermaid")
+const pathwayOf = (slug: string): PathStep[] | undefined => {
+  const list = categoryPathways[slug]?.map(listingOf).filter((l): l is Listing => !!l)
+  if (!list) return undefined
+  const steps = list.map(l => ({ slug: l.slug, title: l.title, href: l.href, duration: l.duration, price: l.price, level: levelOf(l.slug) }))
+  return new Set(steps.map(s => s.level)).size > 1 ? steps : steps.map(s => ({ ...s, level: undefined }))
+}
 
 // Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
 const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
@@ -41,6 +68,7 @@ export function Courses() {
   // Which category's courses are showing; a link like /courses#freediving opens that one
   const [chosen, setChosen] = useState<string>(sections[0].slug)
   const current = sections.find(g => g.slug === chosen) ?? sections[0]
+  const feature = features[current.slug] ?? features['scuba-diving']
   const panel = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const open = () => { const h = coursesPageAliases[location.hash.slice(1)] ?? location.hash.slice(1); if (sections.some(g => g.slug === h)) { setChosen(h); document.getElementById('categories')?.scrollIntoView() } }
@@ -134,21 +162,21 @@ export function Courses() {
       </div>
     </section>
 
-    <PadiPathway id="pathway" eyebrow="Scuba · The PADI pathway" />
+    <PadiPathway key={current.slug} id="pathway" eyebrow={`${current.title.replace(/ Courses$/, '')} · The PADI pathway`} steps={pathwayOf(current.slug)} />
 
     <section className="cs-hero-course">
-      <m.div className="cs-feature" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={rise}>
-        <div className="cs-feature-media"><Image src={hero.image} alt="Bond Academy trainees in a confined water session" fill sizes="(max-width: 800px) 100vw, 50vw" /><span className="xp-card-flag"><Sparkles /> Career programme</span></div>
+      <m.div key={feature.slug} className="cs-feature" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={rise}>
+        <div className="cs-feature-media"><Image src={feature.image} alt={feature.alt} fill sizes="(max-width: 800px) 100vw, 50vw" style={{ objectPosition: feature.imagePosition }} /><span className="xp-card-flag"><Sparkles /> {feature.flag}</span></div>
         <div className="cs-feature-body">
-          <p className="eyebrow light">Scuba · Go pro</p>
-          <h2>Zero to Hero.<br /><i>Your career starts here.</i></h2>
-          <p className="cs-feature-lead">{hero.description}</p>
+          <p className="eyebrow light">{feature.eyebrow}</p>
+          <h2>{feature.title}<br /><i>{feature.tagline}</i></h2>
+          <p className="cs-feature-lead">{feature.lead}</p>
           <ul className="cs-feature-points">
-            {[{ icon: GraduationCap, t: '5 PADI certifications' }, { icon: Sparkles, t: 'Unlimited dives' }, { icon: Briefcase, t: '1-month internship' }, { icon: UserRound, t: '100% placement assistance' }].map(p => <li key={p.t}><p.icon />{p.t}</li>)}
+            {feature.points.map(p => <li key={p.t}><p.icon />{p.t}</li>)}
           </ul>
           <div className="cs-feature-foot">
-            <div className="cs-feature-price"><small>{hero.duration} · all taxes included</small><b>{hero.price}</b></div>
-            <a className="book-cta" href={whatsappLink(enquiryMessage(hero.title))} target="_blank" rel="noopener noreferrer"><span className="book-cta-label"><strong>Apply now</strong><small>Booking from ₹5,000</small></span><span className="book-cta-icon"><ArrowRight /></span></a>
+            <div className="cs-feature-price"><small>{feature.meta}</small><b>{feature.price}</b></div>
+            <a className="book-cta" href={whatsappLink(enquiryMessage(listingOf(feature.slug)?.title ?? feature.title))} target="_blank" rel="noopener noreferrer"><span className="book-cta-label"><strong>{feature.cta}</strong><small>{feature.ctaNote}</small></span><span className="book-cta-icon"><ArrowRight /></span></a>
           </div>
         </div>
       </m.div>
@@ -178,6 +206,6 @@ export function Courses() {
       </div>
     </section>
 
-    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{courseCount} courses</b><span>Mermaid · Freediving · Tec · Scuba</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Enrol</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
+    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{courseCount} courses</b><span>Scuba · Freediving · Mermaid · Tec</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Enrol</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
   </main>
 }
