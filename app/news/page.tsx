@@ -1,3 +1,3 @@
-import { NewsPage } from '@/components/pages/pages'
-export const metadata = { title: 'News | Bond Safari' }
-export default function Page(){return <NewsPage/>}
+import { redirect } from 'next/navigation'
+// News now lives on the Blog & News page; old links open it on the press coverage
+export default function Page(){redirect('/blog#news')}

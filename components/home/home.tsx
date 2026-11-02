@@ -15,7 +15,7 @@ export function TrustStrip() {
     business.google && { icon: Star, value: `${business.google.rating} ★`, label: `${inr(business.google.count)} Google reviews`, href: business.google.url },
     { icon: Award, value: 'PADI 5★', label: 'Instructor Development Center' },
     { icon: CalendarCheck, value: 'Open daily', label: `${contact.hours.replace('Monday – Sunday · ', '')}, Sundays too` },
-    { icon: Newspaper, value: 'In the news', label: 'Times of India · NDTV · Economic Times', href: '/news' },
+    { icon: Newspaper, value: 'In the news', label: 'Times of India · NDTV · Economic Times', href: '/blog#news' },
     business.registration && { icon: Award, value: 'Registered', label: business.registration },
   ].filter(Boolean) as { icon: typeof Star; value: string; label: string; href?: string }[]
   return <section className="trust-strip" aria-label="Why Bond Safari">
@@ -79,6 +79,6 @@ export function PressStrip() {
   return <section className="press section" aria-labelledby="press-title">
     <Reveal><p className="eyebrow light">Firsts beneath the waves</p><h2 id="press-title">As seen in<br /><i>the news.</i></h2></Reveal>
     <div className="press-grid">{firsts.map(p => <Reveal key={p.title} className="press-card"><p className="eyebrow light">{p.topic}</p><h3>{p.title}</h3><p>{p.outlets.join(' · ')}</p></Reveal>)}</div>
-    <Link className="pill pill-light" href="/news">All press stories <ArrowRight /></Link>
+    <Link className="pill pill-light" href="/blog#news">All press stories <ArrowRight /></Link>
   </section>
 }
