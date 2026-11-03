@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { m } from 'framer-motion'
 import { ArrowRight, Clock, Newspaper } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { news, postDate, posts, type Post } from '@/data/blog'
+import { postDate, storyMonth, type Card, type StoryCard } from '@/data/blog'
 import { PageIntro } from '@/components/pages/pages'
 
 const ease = [0.19, 1, 0.22, 1] as const
@@ -13,7 +13,7 @@ const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y:
 const tabs = [['all', 'All'], ['blog', 'Blog'], ['news', 'In the news']] as const
 type Tab = typeof tabs[number][0]
 
-export function PostCard({ p, i, big = false }: { p: Post; i: number; big?: boolean }) {
+export function PostCard({ p, i, big = false }: { p: Card; i: number; big?: boolean }) {
   return <m.article className={big ? 'bl-card is-big' : 'bl-card'} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i % 3}>
     <Link className="bl-card-media" href={`/blog/${p.slug}`} aria-label={p.title}>
       <Image src={p.image} alt="" fill sizes={big ? '(max-width: 800px) 100vw, 60vw' : '(max-width: 800px) 100vw, 33vw'} style={{ objectPosition: p.imagePosition }} />
@@ -28,8 +28,24 @@ export function PostCard({ p, i, big = false }: { p: Post; i: number; big?: bool
   </m.article>
 }
 
+// A press story card: the outlet stands in for the author, and older clippings may carry no date
+export function StoryCardView({ s, i }: { s: StoryCard; i: number }) {
+  return <m.article className="bl-card" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i % 3}>
+    <Link className="bl-card-media" href={`/news/${s.slug}`} aria-label={s.title}>
+      <Image src={s.image} alt="" fill sizes="(max-width: 800px) 100vw, 33vw" />
+      <span className="bl-topic">{s.topic}</span>
+    </Link>
+    <div className="bl-card-body">
+      <p className="bl-meta"><span><Newspaper /> {s.outlet}</span>{s.month && <time dateTime={s.month}>{storyMonth(s.month)}</time>}</p>
+      <h3><Link href={`/news/${s.slug}`}>{s.title}</Link></h3>
+      <p>{s.excerpt}</p>
+      <Link className="text-link" href={`/news/${s.slug}`}>Read story <ArrowRight /></Link>
+    </div>
+  </m.article>
+}
+
 // Blog articles and press coverage on one page; /news and /blog#news open straight on the coverage
-export function BlogPage() {
+export function BlogPage({ posts, news }: { posts: Card[]; news: StoryCard[] }) {
   const [tab, setTab] = useState<Tab>('all')
   useEffect(() => {
     const open = () => { const h = location.hash.slice(1); if (h === 'news' || h === 'blog') setTab(h) }
@@ -60,13 +76,7 @@ export function BlogPage() {
 
       {tab !== 'blog' && <div id="news" className="bl-section">
         <div className="bl-head"><p className="eyebrow">Bond Safari in the news</p><h2>Firsts beneath <i>the waves.</i></h2></div>
-        <ul className="bl-news">
-          {news.map((n, i) => <m.li key={n.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i % 2} className={i < 2 ? 'is-lead' : ''}>
-            <span className="pr-topic"><Newspaper /> {n.topic}</span>
-            <h3>{n.title}</h3>
-            <p><small>As covered by</small>{n.outlets.join(' · ')}</p>
-          </m.li>)}
-        </ul>
+        <div className="bl-grid">{news.map((s, i) => <StoryCardView key={s.slug} s={s} i={i} />)}</div>
       </div>}
     </section>
   </main>

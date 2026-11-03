@@ -3,7 +3,7 @@
 import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion'
-import { ArrowDown, ArrowRight, Backpack, Clock, Compass, Eye, Gauge, Glasses, MapPin, ShieldCheck, Shirt, Store, Target } from 'lucide-react'
+import { ArrowDown, ArrowRight, Award, Backpack, Clock, Compass, Eye, Gauge, Glasses, MapPin, ShieldCheck, Shirt, Store, Target, Waves } from 'lucide-react'
 import { useRef } from 'react'
 import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
@@ -12,7 +12,32 @@ import { Mask as CssMask, enter } from '@/components/layout/intro'
 const ease = [0.19, 1, 0.22, 1] as const
 const teamPhoto = '/images/team.webp'
 
-const history = 'Bond Safari Kovalam is a team of adventurous and experienced Indian businessmen, partnered with Cool Divers SL from Spain to bring a state-of-the-art scuba diving experience to Kerala, India.'
+const history = 'Bond Safari Kovalam, part of the Bond Group of Companies, is a team of adventurous and experienced Indian businessmen, partnered with Cool Divers SL from Spain to bring a state-of-the-art scuba diving experience to Kerala, India.'
+
+const stats = [
+  { value: '5★', label: 'PADI IDC Dive Resort' },
+  { value: '186', label: 'Countries recognise PADI' },
+  { value: '1M', label: 'Ocean ambassadors — our goal' },
+  { value: '1,000+', label: 'Direct jobs we aim to create' },
+]
+
+const leaderGoals = ['Advancing the UN Sustainable Development Goals', 'Creating one million ocean ambassadors', '1,000 direct & 100,000 indirect jobs']
+
+const milestones = [
+  { date: 'Jan 2017', title: 'India’s first underwater wedding', text: 'A couple said “I do” 4 metres below the surface at Grove Beach, Kovalam.' },
+  { date: 'Apr 2017', title: 'World’s first underwater corporate conference', text: 'Five CEOs dived to 6 metres to meet on the seabed, as part of the Ocean Love campaign.' },
+  { date: 'Ongoing', title: 'India’s first mermaid performances', text: 'Mermaid-themed underwater shows that bring the ocean’s magic to new audiences.' },
+  { date: 'Jun 2026', title: 'Blue Chef Initiative', text: 'A sustainable seafood and ocean conservation programme with UDS Group of Hotels, Planet Ocean Foundation and Ocean Love.' },
+]
+
+const awards = [
+  { title: 'National Adventure Tourism Leadership Award', by: 'Presented by the Chief Minister of Jammu & Kashmir' },
+  { title: 'SATA Award', by: 'Best Water Sports Activity Service Provider in South India' },
+  { title: 'Governor’s Special Award', by: 'From the Governor of Kerala, for support to the Indian Army' },
+  { title: 'Indian Army Civilian Coordination Award', by: 'For a world-record underwater portrait of Captain Vikram Batra' },
+]
+
+const partners = ['Planet Ocean Foundation', 'IODA', 'KATPS', 'Shark Guardian', 'Manta Trust', 'Dive Against Debris']
 
 const pillars = [
   { icon: Target, label: 'Our goal', title: 'State-of-the-art adventure', text: 'To develop state-of-the-art adventure tourism products in India.' },
@@ -85,6 +110,11 @@ export function About() {
     <section className="ab-history section">
       <m.p className="eyebrow" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise}>01 — Our history</m.p>
       <ScrollText text={history} />
+      <div className="ab-stats">
+        {stats.map((s, i) => <m.div key={s.label} className="ab-stat" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={i}>
+          <strong>{s.value}</strong><span>{s.label}</span>
+        </m.div>)}
+      </div>
     </section>
 
     <section className="ab-pillars section">
@@ -126,10 +156,50 @@ export function About() {
       </m.div>
     </section>
 
+    <section className="ab-leader section">
+      <m.div className="ab-leader-card" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
+        <m.div className="ab-leader-photo" variants={rise}><Image src="/images/jackson-peter.jpg" alt="Jackson Peter, Managing Director, Bond Group of Companies" fill sizes="(max-width: 1000px) 100vw, 1000px" /></m.div>
+        <m.p className="eyebrow" variants={rise}>04 — Leadership</m.p>
+        <m.h2 variants={rise} custom={1}>Jackson Peter</m.h2>
+        <m.p className="ab-leader-role" variants={rise} custom={2}>Managing Director, Bond Group of Companies</m.p>
+        <m.p className="ab-lead" variants={rise} custom={3}>An award-winning adventure entrepreneur who has put Kovalam on India’s underwater map — from record-setting dives to ocean conservation campaigns that reach far beyond Kerala.</m.p>
+        <m.ul className="ab-leader-goals" variants={rise} custom={4}>{leaderGoals.map(g => <li key={g}><Waves />{g}</li>)}</m.ul>
+      </m.div>
+    </section>
+
+    <section className="ab-milestones section">
+      <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <m.p className="eyebrow light" variants={rise}>05 — Firsts &amp; milestones</m.p>
+        <m.h2 variants={rise} custom={1}>Making history<br /><i>underwater.</i></m.h2>
+      </m.div>
+      <ol className="ab-timeline">
+        {milestones.map((ms, i) => <m.li key={ms.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={rise} custom={i % 2}>
+          <span className="ab-timeline-date">{ms.date}</span>
+          <div><h3>{ms.title}</h3><p>{ms.text}</p></div>
+        </m.li>)}
+      </ol>
+    </section>
+
+    <section className="ab-awards section">
+      <div className="ab-centre-head">
+        <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
+          <m.p className="eyebrow" variants={rise}>06 — Awards &amp; recognition</m.p>
+          <m.h2 variants={rise} custom={1}>Recognised for<br /><i>going deeper.</i></m.h2>
+        </m.div>
+        <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Safety-first training to PADI standards, real adventure and a commitment to the ocean have earned the Bond Group honours across India.</m.p>
+      </div>
+      <div className="ab-award-grid">
+        {awards.map((a, i) => <m.article key={a.title} className="ab-award" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i % 2}>
+          <span className="ab-store-icon"><Award /></span>
+          <div><h3>{a.title}</h3><p>{a.by}</p></div>
+        </m.article>)}
+      </div>
+    </section>
+
     <section className="ab-centre section">
       <div className="ab-centre-head">
         <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
-          <m.p className="eyebrow" variants={rise}>04 — Visit our scuba diving centre</m.p>
+          <m.p className="eyebrow" variants={rise}>07 — Visit our scuba diving centre</m.p>
           <m.h2 variants={rise} custom={1}>Everything you need,<br /><i>in one place.</i></m.h2>
         </m.div>
         <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Our diving centre has quality rental equipment and a fully stocked retail shop, with just about anything you need for the beautiful tropical waters of Kerala.</m.p>
@@ -147,6 +217,11 @@ export function About() {
           <span><Clock /><span>{contact.hours}</span></span>
         </div>
       </m.div>
+    </section>
+
+    <section className="ab-partners">
+      <p className="eyebrow">Conservation partners</p>
+      <ul>{partners.map(p => <li key={p}>{p}</li>)}</ul>
     </section>
 
     <section className="ab-cta">

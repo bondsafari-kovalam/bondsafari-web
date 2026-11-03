@@ -2,9 +2,10 @@ import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react'
-import { postDate, postOf, posts } from '@/data/blog'
+import { cardOf, postDate, postOf, posts } from '@/data/blog'
 import { Header } from '@/components/layout/header'
 import { PostCard } from '@/components/pages/blog'
+import { ArticleBody } from '@/components/pages/article-body'
 import { JsonLd, abs, breadcrumbLd } from '@/lib/seo'
 
 export const generateStaticParams = () => posts.map(p => ({ slug: p.slug }))
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const p = postOf((await params).slug)
   if (!p) notFound()
-  const others = posts.filter(x => x.slug !== p.slug).slice(0, 3)
+  const others = posts.filter(x => x.slug !== p.slug).slice(0, 3).map(cardOf)
   const article = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: p.title, description: p.excerpt, datePublished: p.date, image: abs(p.image), mainEntityOfPage: abs(`/blog/${p.slug}`), publisher: { '@type': 'Organization', name: 'Bond Safari' } }
   return <main className="bl">
     <JsonLd data={[breadcrumbLd([['Home', '/'], ['Blog & News', '/blog']]), article]} />
@@ -33,7 +34,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     <article className="bl-article">
       <Link className="text-link bl-back" href="/blog"><ArrowLeft /> All stories</Link>
       <p className="bl-lead">{p.excerpt}</p>
-      {p.body.map((b, i) => 'h' in b ? <h2 key={i}>{b.h}</h2> : 'p' in b ? <p key={i}>{b.p}</p> : <ul key={i}>{b.list.map(x => <li key={x}>{x}</li>)}</ul>)}
+      <ArticleBody body={p.body} />
       {p.cta && <Link className="book-cta bl-cta" href={p.cta.href}><span className="book-cta-label"><strong>{p.cta.label}</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>}
     </article>
     {others.length > 0 && <section className="bl-wrap bl-more">
