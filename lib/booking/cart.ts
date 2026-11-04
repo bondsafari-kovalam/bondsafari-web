@@ -8,15 +8,29 @@ import { isBookable } from '@/data/programmes'
 export type Option = {
   slug: string; title: string; kind: 'activity' | 'course'; image: string; imagePosition?: string
   duration: string; price?: string; minAge?: string; minPeople?: number; maxPeople?: number
+  // The catalogue's name for a course the API renames, so older deep links still find it
+  altTitle?: string
 }
 export type CartItem = { slug: string; people: number; time: string }
 export type Cart = { date: string; group: number; items: CartItem[] }
 
-export const options: Option[] = [
+const fallbackOptions: Option[] = [
   ...experiences.filter(e => isBookable(e.slug)).map(e => ({ slug: e.slug, title: e.title, kind: 'activity' as const, image: e.image, imagePosition: e.imagePosition, duration: e.duration, price: e.price, minPeople: e.minPeople, maxPeople: e.maxPeople })),
   // Only what's bookable online: professional programmes, Advanced Mermaid and paused activities go to WhatsApp instead
   ...courses.filter(c => isBookable(c.slug)).map(c => ({ slug: c.slug, title: c.title, kind: 'course' as const, image: c.image, imagePosition: c.imagePosition, duration: c.duration, price: c.price, minAge: c.minAge, minPeople: c.minPeople, maxPeople: c.maxPeople })),
 ]
+export let options: Option[] = fallbackOptions
+export const setActivityOptions = (activities: { slug: string; title: string; image: string; imagePosition?: string; duration: string; price?: string; minPeople?: number; maxPeople?: number }[]) => {
+  const activityOptions = activities.map(e => ({ ...e, kind: 'activity' as const }))
+  options = [...activityOptions, ...options.filter(o => o.kind === 'course')]
+}
+// Only what's bookable here already, plus courses that exist solely in the API; held-back courses stay on WhatsApp
+export const setCourseOptions = (live: { slug: string; title: string; image: string; duration: string; price?: string }[]) => {
+  const known = fallbackOptions.filter(o => o.kind === 'course')
+  const updated = known.map(o => { const c = live.find(x => x.slug === o.slug); return c ? { ...o, title: c.title, altTitle: o.title, image: c.image, imagePosition: undefined, duration: c.duration, price: c.price ?? o.price } : o })
+  const added = live.filter(c => isBookable(c.slug) && !known.some(o => o.slug === c.slug)).map(c => ({ slug: c.slug, title: c.title, kind: 'course' as const, image: c.image, duration: c.duration, price: c.price }))
+  options = [...options.filter(o => o.kind === 'activity'), ...updated, ...added]
+}
 export const optionOf = (slug: string) => options.find(o => o.slug === slug)
 
 // Online requests cover up to this many guests; larger groups are better arranged with the team directly

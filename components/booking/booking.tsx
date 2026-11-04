@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { contact, whatsappLink } from '@/data/site'
 import { MAX_GROUP, addItem, clashes, inr, longDate, optionOf, options, peopleRange, priceLabel, problems, requestMessage, timePhrase, timesFor, totals, unitPrice, type Cart, type Option } from '@/lib/booking/cart'
 import { Header } from '@/components/layout/header'
+import { useEventsStore } from '@/lib/stores/events'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const steps = ['When & who', 'Activities', 'Times & price', 'Your details']
@@ -16,7 +17,7 @@ const LEFT = 'bs-booking-left'
 
 // Deep links name the product by title (?activity=Scuba+Diving) or slug (?activity=scuba-diving)
 const norm = (s: string) => s.trim().toLowerCase().replace(/[+_]/g, ' ').replace(/\s+/g, ' ')
-const findOption = (key: string | null) => key ? options.find(o => o.slug === key.trim().toLowerCase() || norm(o.title) === norm(key)) : undefined
+const findOption = (key: string | null) => key ? options.find(o => o.slug === key.trim().toLowerCase() || norm(o.title) === norm(key) || (o.altTitle && norm(o.altTitle) === norm(key))) : undefined
 
 // Dates are handled as local yyyy-mm-dd so a guest in India never gets the previous day
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -32,6 +33,16 @@ function Stepper({ value, min, max, onChange, label }: { value: number; min: num
 }
 
 export function BookingFlow() {
+  const fetchEvents = useEventsStore(s => s.fetchEvents)
+  const eventsLoaded = useEventsStore(s => s.loaded)
+  useEffect(() => { void fetchEvents() }, [fetchEvents])
+  // Activities that exist only in the events API can't be matched until they load, so the deep link is read again then
+  useEffect(() => {
+    const o = eventsLoaded ? findOption(new URLSearchParams(window.location.search).get('activity')) : undefined
+    if (!o) return
+    setCart(c => c.items.length ? c : { ...c, items: addItem([], o.slug, c.group) })
+    setTab(o.kind)
+  }, [eventsLoaded])
   const reduce = useReducedMotion()
   const top = useRef<HTMLDivElement>(null)
   const [ready, setReady] = useState(false)

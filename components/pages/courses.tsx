@@ -4,7 +4,7 @@ import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowDown, ArrowRight, Award, Briefcase, Clock, Gauge, GraduationCap, Phone, Route, Ship, ShieldCheck, Sparkles, UserRound, Waves } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { courses, pathway } from '@/data/courses'
 import { categoryPathways, coursesPage, coursesPageAliases, enquiryMessage, levelOf, listingOf, programmeOf, type Listing } from '@/data/programmes'
 import { Card } from '@/components/pages/programmes'
@@ -13,14 +13,16 @@ import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { PadiPathway, type PathStep } from '@/components/sections/pathway'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
+import { liveListing, type ApiCourse } from '@/lib/api/courses'
 
 const ease = [0.19, 1, 0.22, 1] as const
-// The four course categories, each subcategory resolved to its course cards
-const sections = coursesPage.map(g => {
-  const subs = g.subcategories.map(s => ({ ...s, list: s.items.map(listingOf).filter((l): l is Listing => !!l) }))
+// The four course categories, each subcategory resolved to its course cards; a course only the API has joins its category as a card of its own
+const listed = new Set(coursesPage.flatMap(g => g.subcategories.flatMap(s => s.items)))
+const sectionsFrom = (live: ApiCourse[]) => coursesPage.map(g => {
+  const added = live.filter(c => c.section === g.slug && !listed.has(c.slug)).map(c => ({ title: c.title, items: [c.slug] }))
+  const subs = [...g.subcategories, ...added].map(s => ({ ...s, list: s.items.map(slug => liveListing(live, slug)).filter((l): l is Listing => !!l) }))
   return { ...g, subs, total: subs.reduce((n, s) => n + s.list.length, 0) }
 })
-const courseCount = new Set(sections.flatMap(g => g.subs.flatMap(s => s.items))).size
 const numOf = (i: number) => String(i + 1).padStart(2, '0')
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
 const tel = contact.phones[0].replace(/\s/g, '')
@@ -47,9 +49,9 @@ const features: Record<string, Feature> = {
     meta: 'Prerequisite: Tec 45 + Rescue Diver', price: 'Coming soon', cta: 'Enquire now', ctaNote: 'Register your interest' },
 }
 // Each category's zero-to-instructor ladder; levels are left off where every step shares one (all of Mermaid is "Mermaid")
-const pathwayOf = (slug: string): PathStep[] | undefined => {
-  const list = categoryPathways[slug]?.map(listingOf).filter((l): l is Listing => !!l)
-  if (!list) return undefined
+const pathwayOf = (slug: string, live: ApiCourse[]): PathStep[] => {
+  const list = categoryPathways[slug]?.map(s => liveListing(live, s)).filter((l): l is Listing => !!l)
+  if (!list) return pathway.map(c => { const l = liveListing(live, c.slug); return { ...c, title: l?.title ?? c.title, duration: l?.duration ?? c.duration, price: l?.price ?? c.price } })
   const steps = list.map(l => ({ slug: l.slug, title: l.title, href: l.href, duration: l.duration, price: l.price, level: levelOf(l.slug) }))
   return new Set(steps.map(s => s.level)).size > 1 ? steps : steps.map(s => ({ ...s, level: undefined }))
 }
@@ -57,7 +59,10 @@ const pathwayOf = (slug: string): PathStep[] | undefined => {
 // Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
 const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
-export function Courses() {
+export function Courses({ live = [] }: { live?: ApiCourse[] }) {
+  const sections = useMemo(() => sectionsFrom(live), [live])
+  const courseCount = new Set(sections.flatMap(g => g.subs.flatMap(s => s.items))).size
+  const start = liveListing(live, pathway[0].slug) ?? pathway[0]
   const reduce = useReducedMotion()
   const top = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: top, offset: ['start start', 'end start'] })
@@ -65,17 +70,20 @@ export function Courses() {
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', reduce ? '0%' : '25%'])
   const heroFade = useTransform(scrollYProgress, [0, 0.7], [1, 0])
   const [barShown, setBarShown] = useState(false)
+  useEffect(() => { console.log('Courses API:', live.length, live) }, [live])
   // Which category's courses are showing; a link like /courses#freediving opens that one
   const [chosen, setChosen] = useState<string>(sections[0].slug)
   const current = sections.find(g => g.slug === chosen) ?? sections[0]
-  const feature = features[current.slug] ?? features['scuba-diving']
+  const featured = features[current.slug] ?? features['scuba-diving']
+  const featuredLive = live.find(c => c.slug === featured.slug)
+  const feature = featuredLive ? { ...featured, image: featuredLive.image, imagePosition: undefined, price: featuredLive.price ?? featured.price } : featured
   const panel = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const open = () => { const h = coursesPageAliases[location.hash.slice(1)] ?? location.hash.slice(1); if (sections.some(g => g.slug === h)) { setChosen(h); document.getElementById('categories')?.scrollIntoView() } }
     open()
     addEventListener('hashchange', open)
     return () => removeEventListener('hashchange', open)
-  }, [])
+  }, [sections])
   const choose = (slug: string) => {
     setChosen(slug)
     history.replaceState(null, '', `#${slug}`)
@@ -102,7 +110,7 @@ export function Courses() {
         <h1><Mask delay={0.3}>Learn to dive.</Mask><br /><Mask delay={0.45}><i>Then lead.</i></Mask></h1>
         <p className={`xp-hero-sub ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>Internationally recognised PADI courses in Kovalam — from your very first breath underwater to becoming an instructor.</p>
         <div className={`xp-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.85 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.85 }).style}>
-          <Link className="book-cta" href={bookHref(pathway[0].title)}><span className="book-cta-label"><strong>Start with Open Water</strong><small>{pathway[0].duration} · {pathway[0].price}</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <Link className="book-cta" href={bookHref(start.title)}><span className="book-cta-label"><strong>Start with Open Water</strong><small>{start.duration} · {start.price}</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
           <a className="text-link light" href="#pathway">See the pathway <ArrowRight /></a>
         </div>
       </m.div>
@@ -162,7 +170,7 @@ export function Courses() {
       </div>
     </section>
 
-    <PadiPathway key={current.slug} id="pathway" eyebrow={`${current.title.replace(/ Courses$/, '')} · The PADI pathway`} steps={pathwayOf(current.slug)} />
+    <PadiPathway key={current.slug} id="pathway" eyebrow={`${current.title.replace(/ Courses$/, '')} · The PADI pathway`} steps={pathwayOf(current.slug, live)} />
 
     <section className="cs-hero-course">
       <m.div key={feature.slug} className="cs-feature" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={rise}>

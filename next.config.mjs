@@ -5,6 +5,9 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     // Our photos are fixed assets, so let the optimised copies stay cached for a month
     minimumCacheTTL: 2678400,
+    remotePatterns: [
+      { protocol: 'https', hostname: 'logout.world', pathname: '/media/**' },
+    ],
   },
   // Hero videos, posters and photos in public/ are otherwise served with max-age=0, so every visit re-checks them.
   // A week is safe for assets that rarely change; replace a file under a new name if it must update at once

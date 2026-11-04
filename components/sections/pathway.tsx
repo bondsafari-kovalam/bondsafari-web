@@ -7,7 +7,7 @@ import { pathway } from '@/data/courses'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
-const short = (t: string) => t.replace('PADI ', '').replace(' (IDC)', '').replace('®', '')
+const short = (t: string) => t.replace('PADI ', '').replace(/\s*\(\s*IDC\s*\)/, '').replace('®', '')
 
 export type PathStep = { slug: string; title: string; level?: string; duration?: string; price?: string; href?: string }
 

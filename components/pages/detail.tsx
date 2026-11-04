@@ -16,7 +16,9 @@ const rise = { hidden: { opacity: 0, y: 36 }, show: (i = 0) => ({ opacity: 1, y:
 
 export type DetailItem = { title: string; category: string; duration: string; price?: string; image: string; imagePosition?: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; brochure?: string; section: { label: string; href: string }
   // Course information: each section shows only when the course has it
-  type?: ItemType; kind?: Kind; level?: string; status?: Status; location?: string; requirements?: Fact[]; performance?: Fact[]; learn?: string[]; training?: Step[]; safety?: string[]; certification?: string; next?: { title: string; href: string }; faqs?: Faq[]; verify?: string }
+  type?: ItemType; kind?: Kind; level?: string; status?: Status; location?: string; requirements?: Fact[]; performance?: Fact[]; learn?: string[]; training?: Step[]; safety?: string[]; certification?: string; next?: { title: string; href: string }; faqs?: Faq[]; verify?: string
+  // Activity information from the events API
+  meetingPoint?: string; mapLink?: string; ageLimit?: string; highlights?: { title?: string; text: string }[]; notes?: { title: string; items: string[] }[]; policies?: { title: string; items: string[] }[] }
 export type RelatedItem = { title: string; category: string; image: string; href: string; imagePosition?: string; price?: string; duration?: string; tagline?: string; status?: Status }
 
 // Bookable items go to the booking flow; anything else opens a WhatsApp message, labelled for what happens next
@@ -62,7 +64,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
   const asked = item.status && item.status !== 'bookable'
   const facts = [['Duration', item.duration], ['Type', item.type ? `${item.type} · ${item.type === 'Activity' ? 'no certificate' : 'certification'}` : item.category], ['Price', item.price ?? 'Contact for price'], item.location ? ['Location', item.location] : ['Good to know', item.eyebrow ?? 'All ages welcome']]
   // At a glance: only what the item records; location, price and duration already lead the page in the hero
-  const age = item.requirements?.find(([k]) => k === 'Minimum age')?.[1]
+  const age = item.requirements?.find(([k]) => k === 'Minimum age')?.[1] ?? item.ageLimit
   const depth = item.performance?.find(([k]) => /depth/i.test(k))
   const glance = ([['Level', item.level ?? item.category], age && ['Minimum age', age], depth, ['Certification', certificationOf(item)], ['Availability', statusLabel[item.status ?? 'bookable']]] as (Fact | undefined | '')[]).filter((f): f is Fact => !!f)
   const block = { initial: 'hidden', whileInView: 'show', viewport: { once: true, margin: '-60px' } } as const
@@ -76,7 +78,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
       <m.div className="dt-hero-content" style={{ opacity: fade }}>
         <nav aria-label="Breadcrumb" className={`dt-crumbs ${enter({ duration: 1, delay: 0.2 }).className}`} style={enter({ duration: 1, delay: 0.2 }).style}><Link href="/">Home</Link><span>/</span><Link href={item.section.href}>{item.section.label}</Link><span>/</span><b>{item.title}</b></nav>
         {item.type && <span data-type={item.type} className={`pg-type dt-type ${enter({ duration: 1, delay: 0.25 }).className}`} style={enter({ duration: 1, delay: 0.25 }).style}>{item.type === 'Activity' ? 'Activity · one session, no certificate' : 'Course · training with certification'}</span>}
-        <h1><Mask delay={0.25}>{item.title}</Mask></h1>
+        <h1 className={item.title.length > 24 ? 'dt-title-long' : undefined}><Mask delay={0.25}>{item.title}</Mask></h1>
         <p className={`dt-tagline ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>{item.tagline ?? item.description}</p>
         <div className={`dt-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.75 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.75 }).style}>
           <Cta cta={cta} className="book-cta"><span className="book-cta-label"><strong>{cta.label}</strong><small>{item.price ?? (asked ? statusLabel[item.status!] : 'Reserve your spot')}</small></span><span className="book-cta-icon"><ArrowRight /></span></Cta>
@@ -99,6 +101,10 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
           <m.p className="eyebrow" variants={rise}>At a glance</m.p>
           <m.div variants={rise} custom={1}><Facts rows={glance} /></m.div>
         </m.div>
+        {item.highlights?.length ? <m.div className="dt-block" {...block}>
+          <m.p className="eyebrow" variants={rise}>Highlights</m.p>
+          <ul className="dt-steps dt-perks">{item.highlights.map((h, i) => <m.li key={h.text} variants={rise} custom={i + 1}><span><Check /></span><div>{h.title && <b>{h.title}</b>}<p>{h.text}</p></div></m.li>)}</ul>
+        </m.div> : null}
         {item.learn?.length ? <m.div className="dt-highlights" {...block}>
           <m.p className="eyebrow" variants={rise}>What you will learn</m.p>
           <ul>{item.learn.map((d, i) => <m.li key={d} variants={rise} custom={i + 1}><span><Check /></span>{d}</m.li>)}</ul>
@@ -111,6 +117,10 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
           <m.p className="eyebrow" variants={rise}>What’s included</m.p>
           <ul>{details.map((d, i) => <m.li key={d} variants={rise} custom={i + 1}><span><Check /></span>{d}</m.li>)}</ul>
         </m.div>}
+        {item.notes?.map(n => <m.div key={n.title} className="dt-highlights" {...block}>
+          <m.p className="eyebrow" variants={rise}>{n.title}</m.p>
+          <ul>{n.items.map((d, i) => <m.li key={d} variants={rise} custom={i + 1}><span><Check /></span>{d}</m.li>)}</ul>
+        </m.div>)}
         {item.requirements?.length ? <m.div className="dt-block" {...block}>
           <m.p className="eyebrow" variants={rise}>Course requirements</m.p>
           <m.div variants={rise} custom={1}><Facts rows={item.requirements} /></m.div>
@@ -133,11 +143,17 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
         <m.div className="dt-block" {...block}>
           <m.p className="eyebrow" variants={rise}>Location & availability</m.p>
           {item.location && <m.p className="dt-copy dt-where" variants={rise} custom={1}><MapPin /> {item.location}</m.p>}
+          {item.meetingPoint && <m.p className="dt-copy" variants={rise} custom={2}>Meet at {item.meetingPoint}.</m.p>}
           <m.p className="dt-copy" variants={rise} custom={2}>{availability[item.status ?? 'bookable']}</m.p>
+          {item.mapLink && <m.a className="text-link" href={item.mapLink} target="_blank" rel="noopener noreferrer" variants={rise} custom={3}>Get directions <ArrowUpRight /></m.a>}
         </m.div>
         {item.faqs?.length ? <m.div className="dt-block" {...block}>
           <m.p className="eyebrow" variants={rise}>Questions</m.p>
           <div className="dt-faq">{item.faqs.map(f => <details key={f.q}><summary>{f.q}</summary><p>{f.a}</p></details>)}</div>
+        </m.div> : null}
+        {item.policies?.length ? <m.div className="dt-block" {...block}>
+          <m.p className="eyebrow" variants={rise}>Before you book</m.p>
+          <div className="dt-faq">{item.policies.map(p => <details key={p.title}><summary>{p.title}</summary><ul>{p.items.map(d => <li key={d}>{d}</li>)}</ul></details>)}</div>
         </m.div> : null}
       </div>
       <aside className="dt-aside">
