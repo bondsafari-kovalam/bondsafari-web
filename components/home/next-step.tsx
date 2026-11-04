@@ -14,7 +14,7 @@ const course = (slug: string) => courses.find(c => c.slug === slug)!
 
 // The upsell path for guests who have dived once: dive again, get certified, or go further
 const steps = [
-  { label: 'Dive again', item: exp('dive-safari'), href: '/activities/dive-safari' },
+  { label: 'Dive again', item: { ...exp('scuba-diving'), title: 'Discover Scuba Dive' }, href: '/activities/scuba-diving' },
   { label: 'Get certified', item: course('open-water-diver'), href: '/courses/open-water-diver' },
   { label: 'Already certified', item: course('advanced-open-water'), href: '/courses/advanced-open-water' },
 ]

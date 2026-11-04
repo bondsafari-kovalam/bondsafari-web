@@ -28,7 +28,7 @@ shown only where the business's own product copy says taxes are included (`gst: 
 - [ ] Confirm the GST treatment for every product. No "incl. GST" is shown yet for: Discover Scuba in Freshwater,
       Scuba in the Rain, Snorkel & Kayak Cove, Monsoon Combo, Coracle Rides, Kayaking, SUP, Advanced Open Water,
       Rescue Diver, Freediver.
-- [ ] **Publish from-prices** for: Bond Safari (underwater scooter, the flagship), Sea Life Safari, Dive Safari,
+- [ ] **Publish from-prices** for: Bond Safari (underwater scooter, the flagship), Sea Life Safari, Introduction to Scuba Diving,
       Swimming (kids/adult, six levels). Until then they can't be paid online, only requested.
 - [ ] Child pricing. Today every guest pays the per-person price.
 - [ ] Booking amounts (`deposit`) came from logout.world: OW, AOW, Mermaid and Advanced Mermaid ₹10,000; EFR,
@@ -41,7 +41,7 @@ shown only where the business's own product copy says taxes are included (`gst: 
 
 - [ ] **Bond Safari minimum age / weight limits.** The live site says "no age limit". Confirm this is operationally
       true for an underwater scooter, and supply any weight or medical limits.
-- [ ] Minimum age for Scuba Diving (sea), Sea Life Safari and Dive Safari. None is published.
+- [ ] Minimum age for PADI Discover Scuba Diving (sea), Sea Life Safari and Introduction to Scuba Diving. None is published.
 - [ ] Approve the wording of the booking declarations (`declarationsFor` in `lib/booking/shared.ts`) and the
       diving medical note on detail pages (`components/detail.tsx`).
 - [ ] Weather and sea-condition rescheduling policy → `business.weatherPolicy` in `data/site.ts`.
@@ -57,7 +57,7 @@ shown only where the business's own product copy says taxes are included (`gst: 
       named, and used within PADI's trademark rules?
 - [ ] "Kerala Govt. training partner (ASAP)", "ASAP skill loan up to ₹1,50,000"
 - [ ] "100% placement assistance" (Zero to Hero)
-- [ ] "No swimming ability needed" (Scuba Diving)
+- [ ] "No swimming ability needed" (PADI Discover Scuba Diving)
 - [ ] "In partnership with Cool Divers SL, Spain" (footer, team section)
 - [ ] PADI Platinum Course Director Mark J Soworka (IDC)
 
@@ -66,7 +66,7 @@ shown only where the business's own product copy says taxes are included (`gst: 
 Listed in `pendingProducts` (`data/products.ts`):
 
 - Second / repeat dive, Fun dives, PADI ReActivate ("Already tried diving?" path). Today it links Open Water,
-  Dive Safari and Advanced Open Water.
+  Introduction to Scuba Diving and Advanced Open Water.
 - **Surfing** (beginner lesson, 3-day course, board rental). Not on the live site at all. The activity group is
   named "Paddle" until these exist.
 - SUP: is the live ₹2,500 product a lesson or a rental?
