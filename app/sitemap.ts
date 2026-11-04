@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 import { products, hrefOf } from '@/data/products'
 import { landingPages } from '@/data/landing'
 import { programmes } from '@/data/programmes'
-import { posts } from '@/data/blog'
+import { posts, stories } from '@/data/blog'
 import { abs } from '@/lib/seo'
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...products.map(p => ({ url: abs(hrefOf(p)), changeFrequency: 'weekly' as const, priority: 0.7, images: [abs(p.image)] })),
     ...programmes.map(p => ({ url: abs(`/courses/${p.slug}`), changeFrequency: 'monthly' as const, priority: p.status === 'referred' || p.status === 'experience' ? 0.4 : 0.6 })),
     ...posts.map(p => ({ url: abs(`/blog/${p.slug}`), lastModified: p.date, changeFrequency: 'monthly' as const, priority: 0.6, images: [abs(p.image)] })),
+    ...stories.map(s => ({ url: abs(`/news/${s.slug}`), changeFrequency: 'yearly' as const, priority: 0.4, images: [abs(s.image)] })),
     ...landingPages.map(l => ({ url: abs(`/${l.slug}`), changeFrequency: 'monthly' as const, priority: 0.7 })),
   ]
 }

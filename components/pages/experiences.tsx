@@ -23,6 +23,11 @@ const groups = ['All', ...activityGroups] as const
 const amount = (e: Experience) => Number(e.price?.replace(/[^\d]/g, '') || 0)
 const fromPrice = Math.min(...experiences.map(amount).filter(Boolean)).toLocaleString('en-IN')
 
+// The All view leads with these, in this order; everything else follows in catalogue order
+const leaders = ['scuba-diving', 'dive-safari', 'parasailing', 'kayaking', 'snorkeling', 'monsoon-combo', 'freshwater-scuba']
+const rank = (e: Experience) => leaders.includes(e.slug) ? leaders.indexOf(e.slug) : leaders.length
+const ordered = [...experiences].sort((a, b) => rank(a) - rank(b))
+
 // Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
 const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
@@ -59,7 +64,7 @@ export function Experiences() {
   const [barShown, setBarShown] = useState(false)
   useMotionValueEvent(scrollYProgress, 'change', v => setBarShown(v > 0.75))
   const counts = useMemo(() => Object.fromEntries(groups.map(g => [g, g === 'All' ? experiences.length : experiences.filter(e => groupOf(e) === g).length])), [])
-  const shown = group === 'All' ? experiences : experiences.filter(e => groupOf(e) === group)
+  const shown = group === 'All' ? ordered : experiences.filter(e => groupOf(e) === group)
 
   const stats = [
     { icon: Compass, value: String(experiences.length), label: 'Activities' },

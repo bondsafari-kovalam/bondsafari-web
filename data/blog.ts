@@ -1,15 +1,17 @@
 import { press } from '@/data/site'
+import imported from '@/data/blog-posts.json'
+import coverage from '@/data/news-stories.json'
 
 // Blog articles and press coverage for the Blog & News page. Article facts come from the course and activity
 // copy elsewhere in data/, so a price or depth changed there should be changed here too.
-export type Block = { h: string } | { p: string } | { list: string[] }
+export type Block = { h: string } | { p: string } | { list: string[] } | { video: string; title: string } | { img: string; alt: string; width: number; height: number }
 export type Post = {
   slug: string; title: string; topic: string; date: string; readMins: number
   excerpt: string; image: string; imagePosition?: string
   body: Block[]; cta?: { label: string; href: string }
 }
 
-export const posts: Post[] = [
+const ours: Post[] = [
   {
     slug: 'your-first-dive-in-kovalam', title: 'Your first dive in Kovalam: what to expect', topic: 'Scuba diving', date: '2026-11-02', readMins: 4,
     excerpt: 'No swimming needed, three hours, and an instructor beside you the whole way. Here’s how a first scuba dive in the Arabian Sea actually goes.',
@@ -59,9 +61,27 @@ export const posts: Post[] = [
     cta: { label: 'Compare the courses', href: '/courses' },
   },
 ]
+
+// Articles from the Bond Adventure Academy blog (bondadventureacademy.com), converted to the same blocks; newest first
+export const posts: Post[] = [...ours, ...(imported as Post[])].sort((a, b) => b.date.localeCompare(a.date))
+// What a post card needs: the article body stays on the server instead of shipping to the browser with the listing
+export type Card = Omit<Post, 'body' | 'cta'>
+export const cardOf = ({ body, cta, ...card }: Post): Card => card
 export const postOf = (slug: string) => posts.find(p => p.slug === slug)
 
-// Press coverage, newest-first order as listed in data/site
+// Press coverage, grouped by event, for the home page highlights
 export const news = press
+
+// Full press stories from the old bondsafarikovalam.com News page, one page each at /news/<slug>. `month` is
+// YYYY-MM, or blank where the clipping carries no date; dated stories come first, newest first
+export type Story = {
+  slug: string; title: string; outlet: string; topic: string; month: string; readMins: number
+  excerpt: string; image: string; body: Block[]
+}
+export const stories: Story[] = [...(coverage as Story[])].sort((a, b) => (b.month || '0').localeCompare(a.month || '0'))
+export type StoryCard = Omit<Story, 'body'>
+export const storyCard = ({ body, ...card }: Story): StoryCard => card
+export const storyOf = (slug: string) => stories.find(s => s.slug === slug)
+export const storyMonth = (m: string) => m ? new Date(`${m}-01T00:00:00`).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : ''
 
 export const postDate = (d: string) => { const [y, m, day] = d.split('-').map(Number); return new Date(y, m - 1, day).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) }

@@ -3,7 +3,7 @@
 import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion'
-import { ArrowDown, ArrowRight, Backpack, Clock, Compass, Eye, Gauge, Glasses, MapPin, ShieldCheck, Shirt, Store, Target } from 'lucide-react'
+import { ArrowDown, ArrowRight, Award, Backpack, Clock, Compass, Eye, Gauge, Glasses, MapPin, Recycle, ShieldCheck, Shirt, Store, Target, Globe, Waves, BriefcaseBusiness, Users, Phone } from 'lucide-react'
 import { useRef } from 'react'
 import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
@@ -12,12 +12,54 @@ import { Mask as CssMask, enter } from '@/components/layout/intro'
 const ease = [0.19, 1, 0.22, 1] as const
 const teamPhoto = '/images/team.webp'
 
-const history = 'Bond Safari Kovalam is a team of adventurous and experienced Indian businessmen, partnered with Cool Divers SL from Spain to bring a state-of-the-art scuba diving experience to Kerala, India.'
+const history = 'Bond Safari Kovalam, part of the Bond Group of Companies, is a team of adventurous and experienced Indian businessmen, partnered with Cool Divers SL from Spain to bring a state-of-the-art scuba diving experience to Kerala, India.'
+
+const historyMore = [
+  { title: 'How it began', text: 'Our name comes from BOND, the Breathing Observatory Nautical Device: a self-propelled underwater scooter built with technology from Majorca, Spain. Riders steer it themselves, with a dive master and guide close by, and no swimming is needed. It gave guests an easy first step into a world most had only seen from the shore.' },
+  { title: 'Where we are today', text: 'For many guests, that first ride was only the beginning, and scuba diving is now at the heart of what we do. From our centre on Beach Road, Kovalam, the team runs sea and freshwater dives, snorkelling, parasailing, kayaking and coracle rides, along with PADI courses through Bond Academy.' },
+]
+
+const stats = [
+  { value: '5★', label: 'PADI IDC Dive Resort' },
+  { value: '186', label: 'Countries recognise PADI' },
+  { value: '1M', label: 'Ocean ambassadors — our goal' },
+  { value: '1,000+', label: 'Direct jobs we aim to create' },
+]
+
+const leaderGoals = [
+  { icon: Globe, label: 'UN SDG goals' },
+  { icon: Waves, label: '1M ocean ambassadors' },
+  { icon: BriefcaseBusiness, label: '1,000 direct jobs' },
+  { icon: Users, label: '100,000 indirect jobs' },
+]
+
+const milestones = [
+  { date: 'Jan 2017', title: 'India’s first underwater wedding', text: 'On 26 January, Bond Safari dive instructor Nikhil Pawar married Eunika Pogran 4 metres below the surface at Grove Beach, Kovalam. The team built an underwater stage from coconut palms, wood and leaves, where the couple exchanged rings and shell garlands and said their vows with placards.' },
+  { date: 'Mar 2017', title: 'India’s first women-only ocean clean-up', text: 'For Women’s Day, we joined Red FM 93.5 for its No Plastic Challenge at Kovalam. Women from public service, medicine, IT and media, including K Vasuki IAS of the Kerala Suchitwa Mission, dived to collect plastic from the sea floor.' },
+  { date: 'Apr 2017', title: 'World’s first underwater corporate conference', text: 'Five business leaders, from companies including TCS and UST Global, dived off Grove Beach to a U-shaped table on the seabed, about 6 metres down. In a 20-minute meeting they pledged to protect marine life, as part of our Ocean Love campaign against marine pollution and global warming.' },
+  { date: 'Ongoing', title: 'India’s first mermaid performances', text: 'Mermaid-themed underwater shows that bring the ocean’s magic to new audiences.' },
+  { date: 'Jun 2026', title: 'Blue Chef Initiative', text: 'A sustainable seafood and ocean conservation programme with UDS Group of Hotels, Planet Ocean Foundation and Ocean Love.' },
+]
+
+const awards = [
+  { title: 'Governor’s Special Award', by: 'Governor of Kerala', text: 'Honoured by the Governor of Kerala for exceptional support to the Indian Army across a range of initiatives.', image: '/images/award-governor-kerala.webp', alt: 'The Governor of Kerala presenting the Governor’s Special Award to the Bond Safari team' },
+  { title: 'Indian Army Civilian Coordination Award', by: 'Indian Army', text: 'For a world-record underwater portrait of Kargil War hero Captain Vikram Batra.', image: '/images/award-indian-army.webp', alt: 'An Indian Army officer presenting medals to Bond Safari divers beside a pool' },
+  { title: 'SATA Award 2023', by: 'South Asian Travel Awards', text: 'Best Water Sports Activity Service Provider in South India.', image: '/images/award-sata-2023.webp', alt: 'Bond Safari receiving the SATA 2023 winner’s plaque on stage' },
+]
+const alsoAward = { title: 'National Adventure Tourism Leadership Award', by: 'Presented by the Chief Minister of Jammu & Kashmir' }
+
+const partners = ['Planet Ocean Foundation', 'IODA', 'KATPS', 'Shark Guardian', 'Manta Trust', 'Dive Against Debris']
 
 const pillars = [
   { icon: Target, label: 'Our goal', title: 'State-of-the-art adventure', text: 'To develop state-of-the-art adventure tourism products in India.' },
   { icon: Eye, label: 'Our vision', title: 'Revolutionise adventure tourism', text: 'To revolutionise the adventure tourism industry in India through innovative and exciting adventure tourism products.' },
   { icon: Compass, label: 'Our mission', title: 'World-class partners', text: 'To partner with companies operating across the world with revolutionary, adrenaline-pumping yet absolutely safe adventure products — and bring them to the right Indian market.' },
+]
+
+const ocean = [
+  { icon: Waves, title: 'The Ocean Love campaign', text: 'Our campaign to clear plastic from the ocean and raise public awareness of marine pollution and global warming.' },
+  { icon: Recycle, title: 'Beach clean-ups', text: 'Most floating trash comes from the shore, so the team collects rubbish on the beach as well as in the water, often with help from guests.' },
+  { icon: Globe, title: 'One million ocean ambassadors', text: 'Our goal is to train one million lifelong ocean ambassadors, in support of the UN Sustainable Development Goals.' },
 ]
 
 const activities = ['Snorkel', 'Dive', 'Swim', 'Sail', 'Get suntanned']
@@ -50,6 +92,18 @@ function ScrollText({ text }: { text: string }) {
 
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.12 } }) }
 
+// Leadership: the photo wipes open from the left while it settles from a slight zoom, then the name rises word by word
+const wipe = { hidden: { clipPath: 'inset(0% 100% 0% 0% round 28px)' }, show: { clipPath: 'inset(0% 0% 0% 0% round 28px)', transition: { duration: 1.4, ease } } }
+const settle = { hidden: { scale: 1.25 }, show: { scale: 1, transition: { duration: 1.8, ease } } }
+const wordUp = { hidden: { y: '110%' }, show: (i = 0) => ({ y: '0%', transition: { duration: 1, ease, delay: 0.35 + i * 0.1 } }) }
+const chipIn = { hidden: { opacity: 0, y: 14, scale: 0.85 }, show: (i = 0) => ({ opacity: 1, y: 0, scale: 1, transition: { duration: 0.7, ease, delay: 0.9 + i * 0.08 } }) }
+const fade = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.6 } } }
+
+// Awards: each photo rises out of its frame and settles from a zoom, a beat after its card arrives
+const awardCard = { hidden: { opacity: 0, y: 60 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1.1, ease, delay: i * 0.15 } }) }
+const awardPhoto = { hidden: { clipPath: 'inset(100% 0% 0% 0%)' }, show: (i = 0) => ({ clipPath: 'inset(0% 0% 0% 0%)', transition: { duration: 1.3, ease, delay: 0.15 + i * 0.15 } }) }
+const awardZoom = { hidden: { scale: 1.3 }, show: (i = 0) => ({ scale: 1, transition: { duration: 1.8, ease, delay: 0.15 + i * 0.15 } }) }
+
 export function About() {
   const reduce = useReducedMotion()
   const hero = useRef<HTMLElement>(null)
@@ -65,6 +119,9 @@ export function About() {
   const { scrollYProgress: bandP } = useScroll({ target: band, offset: ['start end', 'end start'] })
   const bandY = useTransform(bandP, [0, 1], reduce ? ['0%', '0%'] : ['-12%', '12%'])
   const bandClip = useTransform(bandP, [0, 0.45], reduce ? ['inset(0% 0% round 0px)', 'inset(0% 0% round 0px)'] : ['inset(8% 10% round 32px)', 'inset(0% 0% round 0px)'])
+  const leader = useRef<HTMLDivElement>(null)
+  const { scrollYProgress: leaderP } = useScroll({ target: leader, offset: ['start end', 'end start'] })
+  const leaderY = useTransform(leaderP, [0, 1], reduce ? ['0%', '0%'] : ['-6%', '6%'])
 
   return <main className="ab">
     <Header />
@@ -85,6 +142,16 @@ export function About() {
     <section className="ab-history section">
       <m.p className="eyebrow" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise}>01 — Our history</m.p>
       <ScrollText text={history} />
+      <div className="ab-history-more">
+        {historyMore.map((h, i) => <m.div key={h.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={rise} custom={i}>
+          <h3>{h.title}</h3><p>{h.text}</p>
+        </m.div>)}
+      </div>
+      <div className="ab-stats">
+        {stats.map((s, i) => <m.div key={s.label} className="ab-stat" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={i}>
+          <strong>{s.value}</strong><span>{s.label}</span>
+        </m.div>)}
+      </div>
     </section>
 
     <section className="ab-pillars section">
@@ -126,10 +193,64 @@ export function About() {
       </m.div>
     </section>
 
+    <section className="ab-leader section">
+      <m.div ref={leader} className="ab-leader-split" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
+        <m.div className="ab-leader-photo" variants={reduce ? fade : wipe}><m.div className="ab-leader-media" variants={reduce ? fade : settle} style={{ y: leaderY }}><Image src="/images/jackson-peter.jpg" alt="Jackson Peter, Managing Director, Bond Group of Companies, with his quote on training lifelong Ocean Ambassadors" fill sizes="(max-width: 800px) 100vw, 45vw" /></m.div></m.div>
+        <div className="ab-leader-body">
+          <m.p className="eyebrow" variants={reduce ? fade : rise} custom={1}>04 — Leadership</m.p>
+          <h2 aria-label="Jackson Peter">{['Jackson', 'Peter'].map((w, i) => <span key={w} className="ab-leader-word" aria-hidden="true"><m.span variants={reduce ? fade : wordUp} custom={i}>{w}</m.span></span>)}</h2>
+          <m.p className="ab-leader-role" variants={reduce ? fade : rise} custom={4}>Managing Director, Bond Group of Companies</m.p>
+          <m.p className="ab-leader-bio" variants={reduce ? fade : rise} custom={5}>An award-winning adventure entrepreneur who put Kovalam on India’s underwater map. Jackson leads Bond Safari’s work across water sports and marine tourism, from India’s first underwater wedding to the world’s first underwater CEO conference, always with the same aim: safe, sustainable ocean experiences that create jobs on the coast.</m.p>
+          <m.p className="ab-note" variants={reduce ? fade : rise} custom={6}>“The ocean is another world in itself, which includes mountains, caves, plants and different types of animals.”</m.p>
+          <ul className="ab-leader-goals">{leaderGoals.map(({ icon: Icon, label }, i) => <m.li key={label} variants={reduce ? fade : chipIn} custom={i}><Icon />{label}</m.li>)}</ul>
+          <m.div className="ab-leader-actions" variants={reduce ? fade : rise} custom={9}>
+            <a className="pill pill-dark" href="https://www.instagram.com/jackson.peter.aj/" target="_blank" rel="noreferrer">Meet Jackson <ArrowRight /></a>
+            <a className="pill pill-line" href={`tel:${contact.phones[0].replace(/\s/g, '')}`}><Phone />{contact.phones[0]}</a>
+          </m.div>
+        </div>
+      </m.div>
+    </section>
+
+    <section className="ab-milestones section">
+      <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <m.p className="eyebrow light" variants={rise}>05 — Firsts &amp; milestones</m.p>
+        <m.h2 variants={rise} custom={1}>Making history<br /><i>underwater.</i></m.h2>
+      </m.div>
+      <ol className="ab-timeline">
+        {milestones.map((ms, i) => <m.li key={ms.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={rise} custom={i % 2}>
+          <span className="ab-timeline-date">{ms.date}</span>
+          <div><h3>{ms.title}</h3><p>{ms.text}</p></div>
+        </m.li>)}
+      </ol>
+    </section>
+
+    <section className="ab-awards section">
+      <div className="ab-centre-head">
+        <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
+          <m.p className="eyebrow" variants={rise}>06 — Awards &amp; recognition</m.p>
+          <m.h2 variants={rise} custom={1}>Honoured on<br /><i>national stages.</i></m.h2>
+        </m.div>
+        <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>From the Governor of Kerala to the Chief Minister of Jammu &amp; Kashmir, the Bond Group’s work has earned recognition far beyond Kovalam.</m.p>
+      </div>
+      <m.div className="ab-award-grid" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }}>
+        {awards.map((a, i) => <m.article key={a.title} className="ab-award" variants={reduce ? fade : awardCard} custom={i}>
+          <m.div className="ab-award-photo" variants={reduce ? fade : awardPhoto} custom={i}>
+            <m.div className="ab-award-media" variants={reduce ? fade : awardZoom} custom={i}><Image src={a.image} alt={a.alt} fill sizes="(max-width: 800px) 100vw, 33vw" /></m.div>
+            <span className="ab-award-by"><Award />{a.by}</span>
+          </m.div>
+          <div className="ab-award-body"><h3>{a.title}</h3><p>{a.text}</p></div>
+        </m.article>)}
+      </m.div>
+      <m.div className="ab-award-also" initial="hidden" whileInView="show" viewport={{ once: true }} variants={reduce ? fade : rise}>
+        <span className="ab-store-icon"><Award /></span>
+        <div><h3>{alsoAward.title}</h3><p>{alsoAward.by}</p></div>
+      </m.div>
+    </section>
+
     <section className="ab-centre section">
       <div className="ab-centre-head">
         <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
-          <m.p className="eyebrow" variants={rise}>04 — Visit our scuba diving centre</m.p>
+          <m.p className="eyebrow" variants={rise}>07 — Visit our scuba diving centre</m.p>
           <m.h2 variants={rise} custom={1}>Everything you need,<br /><i>in one place.</i></m.h2>
         </m.div>
         <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Our diving centre has quality rental equipment and a fully stocked retail shop, with just about anything you need for the beautiful tropical waters of Kerala.</m.p>
@@ -147,6 +268,27 @@ export function About() {
           <span><Clock /><span>{contact.hours}</span></span>
         </div>
       </m.div>
+    </section>
+
+    <section className="ab-centre section">
+      <div className="ab-centre-head">
+        <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
+          <m.p className="eyebrow" variants={rise}>08 — Ocean Love</m.p>
+          <m.h2 variants={rise} custom={1}>Protecting the sea<br /><i>we dive in.</i></m.h2>
+        </m.div>
+        <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>More than three billion people depend on marine and coastal biodiversity for their livelihoods. Ocean Love is how we turn time in the water into care for it.</m.p>
+      </div>
+      <div className="ab-store">
+        {ocean.map((o, i) => <m.div key={o.title} className="ab-store-item" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i}>
+          <span className="ab-store-icon"><o.icon /></span>
+          <div><h3>{o.title}</h3><p>{o.text}</p></div>
+        </m.div>)}
+      </div>
+    </section>
+
+    <section className="ab-partners">
+      <p className="eyebrow">Conservation partners</p>
+      <ul>{partners.map(p => <li key={p}>{p}</li>)}</ul>
     </section>
 
     <section className="ab-cta">
