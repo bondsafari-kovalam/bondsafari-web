@@ -90,7 +90,7 @@ export function ExperienceStack({ initial = [] }: { initial?: Experience[] }) {
     <LayoutMotion>
       <div className="xp-filter tg-tabs" role="toolbar" aria-label="Filter activities">
         <div className="xp-filter-chips">
-          {tabs.map(t => <button key={t} type="button" aria-pressed={tab === t} className={tab === t ? 'is-on' : ''} onClick={() => setTab(t)}>
+          {tabs.filter(countOf).map(t => <button key={t} type="button" aria-pressed={tab === t} className={tab === t ? 'is-on' : ''} onClick={() => setTab(t)}>
             {tab === t && <m.span layoutId="tg-chip" className="xp-chip-bg" transition={{ duration: 0.5, ease }} />}
             <span>{t}</span><em>{countOf(t)}</em>
           </button>)}

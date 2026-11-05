@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { cache } from 'react'
-import { eventToExperience, type EventRecord, type EventsResponse } from '@/lib/api/events'
+import { activitiesFrom, apiSlugOf, catalogueEvent, eventToExperience, type EventRecord, type EventsResponse } from '@/lib/api/events'
 import { experiences } from '@/data/experiences'
 import { toApiCourse } from '@/lib/api/courses'
 
@@ -30,7 +30,7 @@ async function listAll(catalogue: Catalogue): Promise<EventRecord[]> {
 
 export const listEvents = cache(() => listAll('activities'))
 // What the Activities page lists, so its first render already has the API's photos and prices
-export const listActivities = cache(async () => (await listEvents()).filter(event => event.publish !== false).map(event => eventToExperience(event, experiences.find(item => item.slug === event.slug))))
+export const listActivities = cache(async () => activitiesFrom(await listEvents()))
 export const courseRecords = cache(async () => (await listAll('courses')).filter(event => event.publish !== false))
 export const listCourses = cache(async () => (await courseRecords()).map(toApiCourse))
 
@@ -48,6 +48,9 @@ export const getEventRecord = cache(async (catalogue: Catalogue, slug: string): 
 })
 
 export async function getEvent(slug: string) {
-  const record = await getEventRecord('activities', slug)
-  return record && eventToExperience(record, experiences.find(item => item.slug === slug))
+  const e = experiences.find(item => item.slug === slug)
+  const record = await getEventRecord('activities', apiSlugOf(slug))
+  if (!record) return undefined
+  if (!e) return eventToExperience(record)
+  return record.publish === false ? e : catalogueEvent(e, record)
 }

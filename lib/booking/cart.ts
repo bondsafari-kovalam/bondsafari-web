@@ -21,7 +21,7 @@ const fallbackOptions: Option[] = [
 ]
 export let options: Option[] = fallbackOptions
 export const setActivityOptions = (activities: { slug: string; title: string; image: string; imagePosition?: string; duration: string; price?: string; minPeople?: number; maxPeople?: number }[]) => {
-  const activityOptions = activities.map(e => ({ ...e, kind: 'activity' as const }))
+  const activityOptions = activities.filter(e => isBookable(e.slug)).map(e => ({ ...e, kind: 'activity' as const }))
   options = [...activityOptions, ...options.filter(o => o.kind === 'course')]
 }
 // Only what's bookable here already, plus courses that exist solely in the API; held-back courses stay on WhatsApp

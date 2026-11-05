@@ -26,10 +26,10 @@ export function toApiCourse(event: EventRecord): ApiCourse {
   return { slug: siteSlugOf(event.slug), section: sectionOfName(event.name), title: e.title, image: e.image, price: e.price?.replace(' per person', ''), duration: e.duration, summary: e.tagline }
 }
 
-// The site's own listing with the API's title, price, duration and photo; its status and curated summary stay.
+// The site's own listing with the API's price, duration and photo; its title, status and curated summary stay, so the Courses page reads the same whatever the API calls a course.
 // A course published as Coming soon here stays that way until the team opens it
 export function courseListing(c: ApiCourse): Listing {
   const base = listingOf(c.slug)
-  return { ...(base ?? { href: `/courses/${c.slug}`, kind: 'Certification', type: 'Course', status: 'bookable', location: 'Kovalam' }), slug: c.slug, title: c.title, image: c.image, imagePosition: undefined, summary: base?.summary ?? c.summary, price: c.price ?? base?.price, duration: c.duration }
+  return { ...(base ?? { href: `/courses/${c.slug}`, kind: 'Certification', type: 'Course', status: 'bookable', location: 'Kovalam' }), slug: c.slug, title: base?.title ?? c.title, image: c.image, imagePosition: undefined, summary: base?.summary ?? c.summary, price: c.price ?? base?.price, duration: c.duration }
 }
 export const liveListing = (live: ApiCourse[], slug: string) => { const c = live.find(x => x.slug === slug); return c ? courseListing(c) : listingOf(slug) }

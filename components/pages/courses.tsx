@@ -16,13 +16,16 @@ import { Mask as CssMask, enter } from '@/components/layout/intro'
 import { liveListing, type ApiCourse } from '@/lib/api/courses'
 
 const ease = [0.19, 1, 0.22, 1] as const
-// The four course categories, each subcategory resolved to its course cards; a course only the API has joins its category as a card of its own
-const listed = new Set(coursesPage.flatMap(g => g.subcategories.flatMap(s => s.items)))
+// The course categories, each subcategory resolved to its course cards; a course only the API has joins its category as a card of its own.
+// Pathway courses (EFR, Zero to Hero) already have their place in the pathway and feature below, so they don't get a card too
+// Only what the API publishes is listed, in the order below, and a category left empty drops out. Without the API the whole catalogue stands in
+const isLive = (live: ApiCourse[], slug: string) => !live.length || live.some(c => c.slug === slug)
+const listed = new Set([...coursesPage.flatMap(g => g.subcategories.flatMap(s => s.items)), ...pathway.map(c => c.slug)])
 const sectionsFrom = (live: ApiCourse[]) => coursesPage.map(g => {
   const added = live.filter(c => c.section === g.slug && !listed.has(c.slug)).map(c => ({ title: c.title, items: [c.slug] }))
-  const subs = [...g.subcategories, ...added].map(s => ({ ...s, list: s.items.map(slug => liveListing(live, slug)).filter((l): l is Listing => !!l) }))
+  const subs = [...g.subcategories, ...added].map(s => { const items = s.items.filter(slug => isLive(live, slug)); return { ...s, items, list: items.map(slug => liveListing(live, slug)).filter((l): l is Listing => !!l) } }).filter(s => s.list.length)
   return { ...g, subs, total: subs.reduce((n, s) => n + s.list.length, 0) }
-})
+}).filter(g => g.total)
 const numOf = (i: number) => String(i + 1).padStart(2, '0')
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
 const tel = contact.phones[0].replace(/\s/g, '')
@@ -50,8 +53,8 @@ const features: Record<string, Feature> = {
 }
 // Each category's zero-to-instructor ladder; levels are left off where every step shares one (all of Mermaid is "Mermaid")
 const pathwayOf = (slug: string, live: ApiCourse[]): PathStep[] => {
-  const list = categoryPathways[slug]?.map(s => liveListing(live, s)).filter((l): l is Listing => !!l)
-  if (!list) return pathway.map(c => { const l = liveListing(live, c.slug); return { ...c, title: l?.title ?? c.title, duration: l?.duration ?? c.duration, price: l?.price ?? c.price } })
+  const list = categoryPathways[slug]?.filter(s => isLive(live, s)).map(s => liveListing(live, s)).filter((l): l is Listing => !!l)
+  if (!list) return pathway.filter(c => isLive(live, c.slug)).map(c => { const l = liveListing(live, c.slug); return { ...c, title: l?.title ?? c.title, duration: l?.duration ?? c.duration, price: l?.price ?? c.price } })
   const steps = list.map(l => ({ slug: l.slug, title: l.title, href: l.href, duration: l.duration, price: l.price, level: levelOf(l.slug) }))
   return new Set(steps.map(s => s.level)).size > 1 ? steps : steps.map(s => ({ ...s, level: undefined }))
 }
@@ -75,6 +78,7 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
   const [chosen, setChosen] = useState<string>(sections[0].slug)
   const current = sections.find(g => g.slug === chosen) ?? sections[0]
   const featured = features[current.slug] ?? features['scuba-diving']
+  const steps = pathwayOf(current.slug, live)
   const featuredLive = live.find(c => c.slug === featured.slug)
   const feature = featuredLive ? { ...featured, image: featuredLive.image, imagePosition: undefined, price: featuredLive.price ?? featured.price } : featured
   const panel = useRef<HTMLDivElement>(null)
@@ -126,7 +130,7 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
     <section id="categories" className="xp-list cp-pick">
       <div className="xp-list-head">
         <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
-          <m.p className="eyebrow" variants={rise}>{courseCount} courses · 4 categories</m.p>
+          <m.p className="eyebrow" variants={rise}>{courseCount} courses · {sections.length} categories</m.p>
           <m.h2 variants={rise} custom={1}>Choose a<br /><i>category.</i></m.h2>
         </m.div>
         <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Tap a category to see its courses. Each one opens to the full requirements, training and next level.</m.p>
@@ -170,9 +174,9 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
       </div>
     </section>
 
-    <PadiPathway key={current.slug} id="pathway" eyebrow={`${current.title.replace(/ Courses$/, '')} · The PADI pathway`} steps={pathwayOf(current.slug, live)} />
+    {steps.length > 1 && <PadiPathway key={current.slug} id="pathway" eyebrow={`${current.title.replace(/ Courses$/, '')} · The PADI pathway`} steps={steps} />}
 
-    <section className="cs-hero-course">
+    {isLive(live, featured.slug) && <section className="cs-hero-course">
       <m.div key={feature.slug} className="cs-feature" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={rise}>
         <div className="cs-feature-media"><Image src={feature.image} alt={feature.alt} fill sizes="(max-width: 800px) 100vw, 50vw" style={{ objectPosition: feature.imagePosition }} /><span className="xp-card-flag"><Sparkles /> {feature.flag}</span></div>
         <div className="cs-feature-body">
@@ -188,7 +192,7 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
           </div>
         </div>
       </m.div>
-    </section>
+    </section>}
 
     <section className="xp-book">
       <div className="xp-book-inner">
@@ -214,6 +218,6 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
       </div>
     </section>
 
-    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{courseCount} courses</b><span>Scuba · Freediving · Mermaid · Tec</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Enrol</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
+    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{courseCount} courses</b><span>{sections.map(g => g.title.replace(/( Diving)? Courses$/, '')).join(' · ')}</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Enrol</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
   </main>
 }

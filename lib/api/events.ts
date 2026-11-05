@@ -1,4 +1,4 @@
-import type { Experience } from '@/data/experiences'
+import { experiences, type Experience } from '@/data/experiences'
 
 export type EventRecord = {
   id: number
@@ -87,7 +87,8 @@ const eventSlugs: Record<string, string> = {
 }
 const coverOf = (event?: EventRecord) => mediaUrl(event?.cover_pic || event?.list_pic)
 // The API's photo for a catalogue activity, when it has one
-export const coverIn = (events: EventRecord[], slug: string) => coverOf(events.find(event => event.slug === (eventSlugs[slug] ?? slug)))
+export const apiSlugOf = (slug: string) => eventSlugs[slug] ?? slug
+export const coverIn = (events: EventRecord[], slug: string) => coverOf(events.find(event => event.slug === apiSlugOf(slug)))
 
 export function eventToExperience(event: EventRecord, fallback?: Experience): Experience {
   const about = blocks(event.About_Tour)
@@ -102,7 +103,7 @@ export function eventToExperience(event: EventRecord, fallback?: Experience): Ex
     category: fallback?.category ?? 'Adventure',
     description,
     tagline: stripHtml(event.sub_heading) || fallback?.tagline || opener || firstSentence(description),
-    duration: event.duration ? String(event.duration) : fallback?.duration || countOf(event.number_of_days, 'day') || countOf(event.number_of_hours, 'hour') || 'Contact us for duration',
+    duration: event.duration ? String(event.duration) : countOf(event.number_of_days, 'day') || countOf(event.number_of_hours, 'hour') || fallback?.duration || 'Contact us for duration',
     image: coverOf(event) || fallback?.image || '/images/bond-safari.webp',
     imagePosition: coverOf(event) ? undefined : fallback?.imagePosition,
     location: event.event_location ? tidyCaps(event.event_location) : fallback?.location || 'Kovalam',
@@ -121,4 +122,16 @@ export function eventToExperience(event: EventRecord, fallback?: Experience): Ex
     minPeople: fallback?.minPeople,
     maxPeople: Number(event.group_size) || fallback?.maxPeople,
   }
+}
+
+// A catalogue activity with its API event's price, duration, photo and policies; its URL, name, tagline and location stay the site's
+export const catalogueEvent = (e: Experience, event: EventRecord): Experience => ({ ...eventToExperience(event, e), slug: e.slug, title: e.title, tagline: e.tagline, location: e.location })
+// What the site lists: the catalogue's activities, in its order, that have a published API event. Without the API the whole catalogue stands in
+export const activitiesFrom = (events: EventRecord[]) => {
+  const published = events.filter(x => x.publish !== false)
+  if (!published.length) return experiences
+  return experiences.flatMap(e => {
+    const event = published.find(x => x.slug === apiSlugOf(e.slug))
+    return event ? [catalogueEvent(e, event)] : []
+  })
 }

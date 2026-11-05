@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 import { apiClient } from '@/lib/api/client'
-import { eventToExperience, type EventRecord, type EventsResponse } from '@/lib/api/events'
+import { activitiesFrom, type EventRecord, type EventsResponse } from '@/lib/api/events'
 import { experiences, type Experience } from '@/data/experiences'
 import { setActivityOptions, setCourseOptions } from '@/lib/booking/cart'
 import type { ApiCourse } from '@/lib/api/courses'
@@ -30,7 +30,7 @@ export const useEventsStore = create<EventsState>((set, get) => ({
       const first = (await apiClient.get<EventsResponse>('/events', { params: { page: 1 } })).data
       const pages = await Promise.all(Array.from({ length: Math.max(0, first.total_pages - 1) }, (_, i) => apiClient.get<EventsResponse>('/events', { params: { page: i + 2 } }).then(r => r.data)))
       const records = [first, ...pages].flatMap(page => page.results).filter(event => event.publish !== false)
-      const mapped = records.map(event => eventToExperience(event, experiences.find(item => item.slug === event.slug)))
+      const mapped = activitiesFrom(records)
       setActivityOptions(mapped)
       setCourseOptions(await liveCourses)
       set({ events: records, activities: mapped, loading: false, loaded: true })

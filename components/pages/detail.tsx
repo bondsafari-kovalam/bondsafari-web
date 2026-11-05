@@ -4,10 +4,11 @@ import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { AlertCircle, ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, Clock, FileDown, MapPin, Phone, ShieldCheck } from 'lucide-react'
+import { AlertCircle, ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, Clock, MapPin, Phone, ShieldCheck } from 'lucide-react'
 import { useRef } from 'react'
 import { contact, whatsappLink } from '@/data/site'
 import { enquiryMessage, statusLabel, type Fact, type Faq, type ItemType, type Kind, type Status, type Step } from '@/data/programmes'
+import { Brochure } from '@/components/pages/brochure'
 import { Header } from '@/components/layout/header'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
 
@@ -40,7 +41,8 @@ const availability: Record<Status, string> = {
   experience: 'Not a course you enrol on: this rating is awarded once the teaching record is met.',
 }
 // What is earned at the end, in plain words
-const certificationOf = (item: DetailItem) => item.type === 'Activity' ? 'None — an experience, no card issued' : item.kind === 'Professional rating' ? 'Professional rating' : item.title === 'Swimming Course' ? 'Lessons' : 'Certification'
+// Every certificate is PADI's; swimming is lessons only, and activities don't show this row at all
+const certificationOf = (item: DetailItem) => item.kind === 'Professional rating' ? 'PADI professional rating' : item.title === 'Swimming Course' ? 'Lessons' : 'PADI certification'
 const Facts = ({ rows }: { rows: Fact[] }) => <dl className="dt-facts-list">{rows.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
 
 // Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
@@ -62,11 +64,11 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
   const details = item.details ?? []
   const cta = ctaOf(item.title, item.status)
   const asked = item.status && item.status !== 'bookable'
-  const facts = [['Duration', item.duration], ['Type', item.type ? `${item.type} · ${item.type === 'Activity' ? 'no certificate' : 'certification'}` : item.category], ['Price', item.price ?? 'Contact for price'], item.location ? ['Location', item.location] : ['Good to know', item.eyebrow ?? 'All ages welcome']]
+  const facts = [['Duration', item.duration], ['Type', item.type ? (item.type === 'Activity' ? 'Activity' : `${item.type} · certification`) : item.category], ['Price', item.price ?? 'Contact for price'], item.location ? ['Location', item.location] : ['Good to know', item.eyebrow ?? 'All ages welcome']]
   // At a glance: only what the item records; location, price and duration already lead the page in the hero
   const age = item.requirements?.find(([k]) => k === 'Minimum age')?.[1] ?? item.ageLimit
   const depth = item.performance?.find(([k]) => /depth/i.test(k))
-  const glance = ([['Level', item.level ?? item.category], age && ['Minimum age', age], depth, ['Certification', certificationOf(item)], ['Availability', statusLabel[item.status ?? 'bookable']]] as (Fact | undefined | '')[]).filter((f): f is Fact => !!f)
+  const glance = ([['Level', item.level ?? item.category], age && ['Minimum age', age], depth, item.type === 'Activity' ? undefined : ['Certification', certificationOf(item)], ['Availability', statusLabel[item.status ?? 'bookable']]] as (Fact | undefined | '')[]).filter((f): f is Fact => !!f)
   const block = { initial: 'hidden', whileInView: 'show', viewport: { once: true, margin: '-60px' } } as const
 
   return <main className="dt">
@@ -77,7 +79,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
       <button type="button" onClick={goBack} className={`dt-back ${enter({ x: -16, duration: 1, delay: 0.15 }).className}`} style={enter({ x: -16, duration: 1, delay: 0.15 }).style}><span><ArrowLeft /></span>Back</button>
       <m.div className="dt-hero-content" style={{ opacity: fade }}>
         <nav aria-label="Breadcrumb" className={`dt-crumbs ${enter({ duration: 1, delay: 0.2 }).className}`} style={enter({ duration: 1, delay: 0.2 }).style}><Link href="/">Home</Link><span>/</span><Link href={item.section.href}>{item.section.label}</Link><span>/</span><b>{item.title}</b></nav>
-        {item.type && <span data-type={item.type} className={`pg-type dt-type ${enter({ duration: 1, delay: 0.25 }).className}`} style={enter({ duration: 1, delay: 0.25 }).style}>{item.type === 'Activity' ? 'Activity · one session, no certificate' : 'Course · training with certification'}</span>}
+        {item.type && <span data-type={item.type} className={`pg-type dt-type ${enter({ duration: 1, delay: 0.25 }).className}`} style={enter({ duration: 1, delay: 0.25 }).style}>{item.type === 'Activity' ? 'Activity · one session' : 'Course · training with certification'}</span>}
         <h1 className={item.title.length > 24 ? 'dt-title-long' : undefined}><Mask delay={0.25}>{item.title}</Mask></h1>
         <p className={`dt-tagline ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>{item.tagline ?? item.description}</p>
         <div className={`dt-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.75 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.75 }).style}>
@@ -164,10 +166,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
           <p className="dt-card-price">{item.price ?? 'Contact for price'}</p>
           <ul className="dt-card-meta"><li><Clock /> {item.duration}</li>{item.location && <li><MapPin /> {item.location}</li>}{item.eyebrow && <li><Check /> {item.eyebrow}</li>}</ul>
           <Cta cta={cta} className="book-cta dt-card-cta"><span className="book-cta-label"><strong>{cta.label}</strong></span><span className="book-cta-icon"><ArrowRight /></span></Cta>
-          {/* Downloads the PDF once one is placed in public/brochures and named in the catalogue; until then it asks for it on WhatsApp */}
-          {item.brochure
-            ? <a className="dt-card-brochure" href={item.brochure} target="_blank" rel="noreferrer" download><FileDown /> Download brochure <small>PDF</small></a>
-            : <a className="dt-card-brochure" href={whatsappLink(`Hello Bond Safari! Please send me the brochure (PDF) for ${item.title}.`)} target="_blank" rel="noreferrer"><FileDown /> Get brochure <small>PDF</small></a>}
+          <Brochure item={item} />
           <div className="dt-card-call"><p>Prefer to talk? We’re open {contact.hours.replace('Monday – Sunday · ', 'daily, ')}.</p>{contact.phones.map(n => <a key={n} href={`tel:${n.replace(/\s/g, '')}`}><Phone /> {n}</a>)}</div>
         </m.div>
       </aside>

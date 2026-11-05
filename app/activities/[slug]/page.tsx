@@ -3,8 +3,8 @@ import { experiences } from '@/data/experiences'
 import { courseNext, homeCategoryOf, levelOf, listingOf, sectionOf, statusOf } from '@/data/programmes'
 import { Detail, type RelatedItem } from '@/components/pages/detail'
 import { JsonLd, breadcrumbLd } from '@/lib/seo'
-import { getEvent, listEvents } from '@/lib/api/events-server'
-import { coverIn, eventToExperience } from '@/lib/api/events'
+import { getEvent, listActivities, listEvents } from '@/lib/api/events-server'
+import { coverIn } from '@/lib/api/events'
 
 export const dynamic = 'force-dynamic'
 export const generateStaticParams = () => experiences.map(e => ({ slug: e.slug }))
@@ -28,7 +28,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   // The same published events the Activities page lists; the catalogue only stands in when the API is unavailable
   const events = await listEvents()
   const cover = coverIn(events, slug)
-  const fromApi: RelatedItem[] = events.filter(x => x.publish !== false && x.slug !== slug).map(x => eventToExperience(x, experiences.find(item => item.slug === x.slug))).map(a => ({ title: a.title, category: `Activity · ${a.difficulty ?? a.category}`, image: a.image, price: a.price, duration: a.duration, tagline: a.tagline, href: `/activities/${a.slug}` }))
+  const fromApi: RelatedItem[] = (await listActivities()).filter(a => a.slug !== slug).map(a => ({ title: a.title, category: `Activity · ${a.difficulty ?? a.category}`, image: a.image, price: a.price, duration: a.duration, tagline: a.tagline, href: `/activities/${a.slug}` }))
   const related = fromApi.length ? fromApi : fromCatalogue
   const listing = listingOf(slug) ?? { location: e.location ?? 'Kovalam', level: e.category }
   const next = courseNext[slug] ? listingOf(courseNext[slug]) : undefined
