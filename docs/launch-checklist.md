@@ -120,9 +120,9 @@ Career Playbook, PADI Mermaid Pathways, PADI Technical Diving Career Pathways, O
 - [ ] **Pool with lane exclusivity** — gates every freediving and mermaid course above Discover. Those show
       "Coming soon / Register interest" until it is signed.
 - [ ] Child-safety policy (screening, ratios, supervision, photo consent) before any mermaid booking.
-- [ ] Prices and durations for every new programme (all show "Ask us"): Discover Freediving, Skin Diver, freediving
+- [ ] Prices and durations for every new programme (all show "Ask us"): Skin Diver, freediving
       levels, mermaid levels, Divemaster (stand-alone), Enriched Air, Deep Diver, Gas Blender, Tec levels.
-- [ ] Which new programmes Bond actually runs today. Marked "Enquire": Discover Freediving, Skin Diver, Divemaster,
+- [ ] Which new programmes Bond actually runs today. Marked "Enquire": Skin Diver, Divemaster,
       Enriched Air, Deep Diver. Everything else is "Coming soon", "Via partner centres" or "Earned by teaching".
 - [ ] Tec phase 2 gates: written chamber + evacuation plan, oxygen-clean blending, Tec Deep Instructor, insurer
       confirmation. Phase 3 (Trimix, CCR, Cave) is shown as referred to partner centres.
