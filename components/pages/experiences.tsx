@@ -4,8 +4,8 @@ import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { AnimatePresence, m, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, ArrowUpRight, CalendarCheck, Clock, Compass, Phone, ShieldCheck, Sparkles, Users } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
-import { activityGroups, experiences, groupOf, type Experience } from '@/data/experiences'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { activityGroups, groupOf, type Experience } from '@/data/experiences'
 import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
@@ -13,6 +13,7 @@ import { TypeKey } from '@/components/pages/programmes'
 import { Cta, ctaOf } from '@/components/pages/detail'
 import { statusOf } from '@/data/programmes'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
+import { useEventsStore } from '@/lib/stores/events'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
@@ -21,12 +22,10 @@ const tel = contact.phones[0].replace(/\s/g, '')
 // Activities sort into three moods; the filter chips are built from these
 const groups = ['All', ...activityGroups] as const
 const amount = (e: Experience) => Number(e.price?.replace(/[^\d]/g, '') || 0)
-const fromPrice = Math.min(...experiences.map(amount).filter(Boolean)).toLocaleString('en-IN')
 
 // The All view leads with these, in this order; everything else follows in catalogue order
 const leaders = ['scuba-diving', 'dive-safari', 'parasailing', 'kayaking', 'snorkeling', 'monsoon-combo', 'freshwater-scuba']
 const rank = (e: Experience) => leaders.includes(e.slug) ? leaders.indexOf(e.slug) : leaders.length
-const ordered = [...experiences].sort((a, b) => rank(a) - rank(b))
 
 // Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
 const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
@@ -52,7 +51,13 @@ function Card({ e, index, featured }: { e: Experience; index: number; featured: 
   </m.article>
 }
 
-export function Experiences() {
+export function Experiences({ initial = [] }: { initial?: Experience[] }) {
+  const stored = useEventsStore(s => s.activities)
+  const loaded = useEventsStore(s => s.loaded)
+  const activities = loaded || !initial.length ? stored : initial
+  const fetchEvents = useEventsStore(s => s.fetchEvents)
+  const loading = useEventsStore(s => s.loading)
+  useEffect(() => { void fetchEvents() }, [fetchEvents])
   const reduce = useReducedMotion()
   const hero = useRef<HTMLElement>(null)
   const [group, setGroup] = useState<typeof groups[number]>('All')
@@ -63,11 +68,14 @@ export function Experiences() {
   // The sticky mobile booking bar waits until the hero's own Book button has scrolled away
   const [barShown, setBarShown] = useState(false)
   useMotionValueEvent(scrollYProgress, 'change', v => setBarShown(v > 0.75))
-  const counts = useMemo(() => Object.fromEntries(groups.map(g => [g, g === 'All' ? experiences.length : experiences.filter(e => groupOf(e) === g).length])), [])
-  const shown = group === 'All' ? ordered : experiences.filter(e => groupOf(e) === group)
+  const currentOrdered = useMemo(() => [...activities].sort((a, b) => rank(a) - rank(b)), [activities])
+  const counts = useMemo(() => Object.fromEntries(groups.map(g => [g, g === 'All' ? activities.length : activities.filter(e => groupOf(e) === g).length])), [activities])
+  const shown = group === 'All' ? currentOrdered : activities.filter(e => groupOf(e) === group)
+  const fromPrice = Math.min(...activities.map(amount).filter(Boolean)).toLocaleString('en-IN')
+  const experiences = activities
 
   const stats = [
-    { icon: Compass, value: String(experiences.length), label: 'Activities' },
+    { icon: Compass, value: String(activities.length), label: 'Activities' },
     { icon: Sparkles, value: `₹${fromPrice}`, label: 'Starting from' },
     { icon: Users, value: '10+', label: 'Min. age, no experience needed' },
     { icon: ShieldCheck, value: 'PADI', label: 'Certified instructors' },
@@ -85,7 +93,7 @@ export function Experiences() {
         <p className={`xp-hero-sub ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>Underwater scooters, guided dives, snorkelling, kayaking and coracle rides — for every age and ability, with all equipment included.</p>
         <div className={`xp-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.85 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.85 }).style}>
           <Link className="book-cta" href="/booking"><span className="book-cta-label"><strong>Book an adventure</strong><small>From ₹{fromPrice} per person</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
-          <a className="text-link light" href="#all-activities">Browse all {experiences.length} <ArrowRight /></a>
+          <a className="text-link light" href="#all-activities">Browse all {activities.length} <ArrowRight /></a>
         </div>
       </m.div>
     </section>
@@ -116,7 +124,7 @@ export function Experiences() {
             <span>{g}</span><em>{counts[g]}</em>
           </button>)}
         </div>
-        <p className="xp-filter-count" aria-live="polite">Showing <b>{shown.length}</b> of {experiences.length}</p>
+        <p className="xp-filter-count" aria-live="polite">Showing <b>{shown.length}</b> of {activities.length}{loading ? ' · Loading…' : ''}</p>
       </div>
 
       <m.div layout className="xp-grid">

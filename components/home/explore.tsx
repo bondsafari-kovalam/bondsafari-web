@@ -62,7 +62,7 @@ function Segment({ i, pos, active, title, onSelect }: { i: number; pos: MotionVa
   </button>
 }
 
-export function ExploreCarousel() {
+export function ExploreCarousel({ photos = {} }: { photos?: Record<string, string> }) {
   // A tall scene pins the section while vertical scroll drives the track right-to-left
   const scene = useRef<HTMLElement>(null)
   const track = useRef<HTMLUListElement>(null)
@@ -105,7 +105,7 @@ export function ExploreCarousel() {
       </div>
       <div className="explore-viewport">
         <m.ul ref={track} className="explore-track" style={mobile ? undefined : { x }} onScroll={mobile ? onSwipe : undefined}>
-          {cards.map((c, i) => <Card key={c.title} c={c} i={i} active={i === index} pos={pos} reduce={reduce} onSelect={() => goTo(i)} />)}
+          {cards.map((c, i) => <Card key={c.title} c={{ ...c, image: photos[c.href] ?? c.image }} i={i} active={i === index} pos={pos} reduce={reduce} onSelect={() => goTo(i)} />)}
         </m.ul>
       </div>
       <div className="explore-progress">

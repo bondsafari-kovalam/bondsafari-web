@@ -10,6 +10,7 @@ import { listingOf, statusOf } from '@/data/programmes'
 import { timesFor } from '@/lib/booking/cart'
 import { Cta, ctaOf } from '@/components/pages/detail'
 import { LayoutMotion } from '@/components/layout/motion-provider'
+import { useEventsStore } from '@/lib/stores/events'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }
@@ -17,13 +18,10 @@ const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y:
 // The most-booked activities lead and carry a badge; Bond Safari (underwater scooter) is paused, so it goes last
 const bestsellers = ['scuba-diving', 'snorkeling']
 const rank = (e: Experience) => bestsellers.includes(e.slug) ? bestsellers.indexOf(e.slug) - 10 : statusOf(e.slug) === 'paused' ? 10 : 0
-const list = [...experiences].sort((a, b) => rank(a) - rank(b))
 const tabs = ['All', ...activityGroups] as const
 type Tab = typeof tabs[number]
-const countOf = (t: Tab) => t === 'All' ? list.length : list.filter(e => groupOf(e) === t).length
 
 const amount = (e: Experience) => Number(e.price?.replace(/[^\d]/g, '') || 0)
-const fromPrice = Math.min(...experiences.map(amount).filter(Boolean)).toLocaleString('en-IN')
 
 // The next fixed departure for dive activities, from the same schedule the booking flow offers, in Kovalam time.
 // Only a schedule, not a seat count: there is no live availability to claim scarcity from
@@ -54,7 +52,7 @@ function Card({ e, i, now }: { e: Experience; i: number; now?: number }) {
     </div>
     <div className="tg-body">
       <h3><Link href={`/activities/${e.slug}`}>{e.title}</Link></h3>
-      <p className="tg-facts"><span><MapPin /> {listingOf(e.slug)?.location}</span><span><Clock /> {e.duration}</span></p>
+      <p className="tg-facts"><span><MapPin /> {e.location ?? listingOf(e.slug)?.location ?? 'Kovalam'}</span><span><Clock /> {e.duration}</span></p>
       <p className="tg-tag">{e.tagline}</p>
       <div className="tg-foot">
         <p className="tg-price">{e.price ? <><b>{e.price.replace(' per person', '')}</b><small>per person</small></> : <small className="tg-ask">Contact for price</small>}</p>
@@ -64,9 +62,18 @@ function Card({ e, i, now }: { e: Experience; i: number; now?: number }) {
   </m.article>
 }
 
-export function ExperienceStack() {
+export function ExperienceStack({ initial = [] }: { initial?: Experience[] }) {
+  const stored = useEventsStore(s => s.activities)
+  const loaded = useEventsStore(s => s.loaded)
+  const activities = loaded || !initial.length ? stored : initial
+  const fetchEvents = useEventsStore(s => s.fetchEvents)
+  useEffect(() => { void fetchEvents() }, [fetchEvents])
   const [tab, setTab] = useState<Tab>('All')
-  const shown = tab === 'All' ? list : list.filter(e => groupOf(e) === tab)
+  const list = [...activities].sort((a, b) => rank(a) - rank(b))
+  const homeList = list.slice(0, 10)
+  const countOf = (t: Tab) => t === 'All' ? list.length : list.filter(e => groupOf(e) === t).length
+  const shown = tab === 'All' ? homeList : list.filter(e => groupOf(e) === tab).slice(0, 10)
+  const fromPrice = Math.min(...activities.map(amount).filter(Boolean)).toLocaleString('en-IN')
   // Kovalam time, read in the browser (so the server render never disagrees) and refreshed every minute
   const [now, setNow] = useState<number>()
   useEffect(() => { setNow(istMinutes()); const t = setInterval(() => setNow(istMinutes()), 60_000); return () => clearInterval(t) }, [])
@@ -83,7 +90,7 @@ export function ExperienceStack() {
     <LayoutMotion>
       <div className="xp-filter tg-tabs" role="toolbar" aria-label="Filter activities">
         <div className="xp-filter-chips">
-          {tabs.map(t => <button key={t} type="button" aria-pressed={tab === t} className={tab === t ? 'is-on' : ''} onClick={() => setTab(t)}>
+          {tabs.filter(countOf).map(t => <button key={t} type="button" aria-pressed={tab === t} className={tab === t ? 'is-on' : ''} onClick={() => setTab(t)}>
             {tab === t && <m.span layoutId="tg-chip" className="xp-chip-bg" transition={{ duration: 0.5, ease }} />}
             <span>{t}</span><em>{countOf(t)}</em>
           </button>)}

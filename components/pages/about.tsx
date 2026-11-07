@@ -34,11 +34,21 @@ const leaderGoals = [
 ]
 
 const milestones = [
+  { date: 'Jun 2026', title: 'Blue Chef Initiative', text: 'A sustainable seafood and ocean conservation programme with UDS Group of Hotels, Planet Ocean Foundation and Ocean Love.', photos: [
+    { src: '/images/blue-chef-launch.webp', alt: 'Guests on stage holding up the Blue Chef logo at the launch' },
+    { src: '/images/blue-chef-lamp.webp', alt: 'Guests watching the ceremonial lamp being lit at the Blue Chef launch' },
+    { src: '/images/blue-chef-speaker.webp', alt: 'A speaker smiling at the Ocean Love podium during the launch' },
+  ], press: {
+    src: '/images/blue-chef-press-mangalam.webp',
+    alt: 'Mangalam newspaper clipping showing the lamp being lit at the seminar in Kovalam',
+    paper: 'Mangalam',
+    issue: 'Thiruvananthapuram edition · 9 June 2026, page 2',
+    caption: 'D. Venkitesan, Regional Director (South), Union Ministry of Tourism, inaugurating the seminar at Kovalam by lighting the lamp.',
+  } },
   { date: 'Jan 2017', title: 'India’s first underwater wedding', text: 'On 26 January, Bond Safari dive instructor Nikhil Pawar married Eunika Pogran 4 metres below the surface at Grove Beach, Kovalam. The team built an underwater stage from coconut palms, wood and leaves, where the couple exchanged rings and shell garlands and said their vows with placards.' },
   { date: 'Mar 2017', title: 'India’s first women-only ocean clean-up', text: 'For Women’s Day, we joined Red FM 93.5 for its No Plastic Challenge at Kovalam. Women from public service, medicine, IT and media, including K Vasuki IAS of the Kerala Suchitwa Mission, dived to collect plastic from the sea floor.' },
   { date: 'Apr 2017', title: 'World’s first underwater corporate conference', text: 'Five business leaders, from companies including TCS and UST Global, dived off Grove Beach to a U-shaped table on the seabed, about 6 metres down. In a 20-minute meeting they pledged to protect marine life, as part of our Ocean Love campaign against marine pollution and global warming.' },
   { date: 'Ongoing', title: 'India’s first mermaid performances', text: 'Mermaid-themed underwater shows that bring the ocean’s magic to new audiences.' },
-  { date: 'Jun 2026', title: 'Blue Chef Initiative', text: 'A sustainable seafood and ocean conservation programme with UDS Group of Hotels, Planet Ocean Foundation and Ocean Love.' },
 ]
 
 const awards = [
@@ -48,7 +58,27 @@ const awards = [
 ]
 const alsoAward = { title: 'National Adventure Tourism Leadership Award', by: 'Presented by the Chief Minister of Jammu & Kashmir' }
 
-const partners = ['Planet Ocean Foundation', 'IODA', 'KATPS', 'Shark Guardian', 'Manta Trust', 'Dive Against Debris']
+const network = [
+  { title: 'Cristina Zenato, “The Shark Whisperer”', text: 'Bahamas-based shark conservationist and cave diver with 25+ years removing fishing hooks from Caribbean reef sharks.', image: '/images/network-cristina-zenato-hd.webp', alt: 'Cristina Zenato with the Bond team at ADEX' },
+  { title: 'Ahmed Gabr, World Record Diver', text: 'Former Egyptian Army officer who set the Guinness World Record for the deepest scuba dive at 332.35 metres.', image: '/images/network-ahmed-gabr-hd.webp', alt: 'Ahmed Gabr with the Bond team' },
+  { title: 'Michael AW, Ocean Geographic', text: 'Underwater photographer and founder of Ocean Geographic & Asian Geographic magazines.', image: '/images/network-michael-aw-hd.webp', alt: 'Michael AW with the Bond team at his exhibition stand' },
+  { title: 'Director, Deep Dive Dubai', text: 'Founder of the Global Underwater Explorers Foundation.', image: '/images/network-deep-dive-dubai-hd.webp', alt: 'The Director of Deep Dive Dubai with the Bond team' },
+  { title: 'Maldives President', text: 'Direct engagement at the heart of the Maldives’ marine tourism industry.', image: '/images/network-maldives-president-hd.webp', alt: 'The Maldives President meeting the Bond team at their stand' },
+  { title: 'Maldives Vice President', text: 'Strong connections across the Maldivian tourism ecosystem.', image: '/images/network-maldives-vp-hd.webp', alt: 'The Maldives Vice President meeting the Bond team at their stand' },
+  { title: 'Maldives Former President', text: 'Plus key boating associations, resorts and yacht charter companies.', image: '/images/network-maldives-former-president-hd.webp', alt: 'The Maldives Former President meeting the Bond team' },
+  { title: 'PADI Platinum Course Director', text: 'Conducted a full Instructor Development Training Program on-site in Kovalam.', image: '/images/network-padi-course-director-hd.webp', alt: 'A PADI Platinum Course Director training students in Kovalam' },
+  { title: 'With Hydroman', text: 'Met at the Singapore Ocean Week ADEX Ocean Festival 2024.', image: '/images/network-hydroman-hd.webp', alt: 'The Bond team with Hydroman at the ADEX Ocean Festival' },
+]
+
+// `dark` sits logos with white lettering on a deep-ocean card so they stay visible
+const partners = [
+  { name: 'Planet Ocean Foundation', logo: '/images/partner-planet-ocean.webp' },
+  { name: 'IODA', logo: '/images/partner-ioda.webp' },
+  { name: 'KATPS, Kerala Adventure Tourism Promotion Society', logo: '/images/partner-katps.webp' },
+  { name: 'Shark Guardian', logo: '/images/partner-shark-guardian.webp', dark: true },
+  { name: 'Manta Trust', logo: '/images/partner-manta-trust.webp', dark: true },
+  { name: 'PADI', logo: '/images/partner-padi.webp' },
+]
 
 const pillars = [
   { icon: Target, label: 'Our goal', title: 'State-of-the-art adventure', text: 'To develop state-of-the-art adventure tourism products in India.' },
@@ -219,7 +249,14 @@ export function About() {
       <ol className="ab-timeline">
         {milestones.map((ms, i) => <m.li key={ms.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={rise} custom={i % 2}>
           <span className="ab-timeline-date">{ms.date}</span>
-          <div><h3>{ms.title}</h3><p>{ms.text}</p></div>
+          <div>
+            <h3>{ms.title}</h3><p>{ms.text}</p>
+            {ms.photos && <m.div className="ab-timeline-photos" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>{ms.photos.map((p, k) => <m.div key={p.src} className="ab-timeline-photo" variants={reduce ? fade : awardPhoto} custom={k}><m.div className="ab-timeline-media" variants={reduce ? fade : awardZoom} custom={k}><Image src={p.src} alt={p.alt} fill sizes={k === 0 ? '(max-width: 800px) 100vw, 580px' : '(max-width: 800px) 50vw, 290px'} /></m.div></m.div>)}</m.div>}
+            {ms.press && <m.figure className="ab-timeline-press" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={reduce ? fade : rise}>
+              <a href={ms.press.src} target="_blank" rel="noreferrer" aria-label={`Open the ${ms.press.paper} clipping full size`}><Image src={ms.press.src} alt={ms.press.alt} fill sizes="(max-width: 800px) 100vw, 320px" /></a>
+              <figcaption><span>In the press</span><h4>{ms.press.paper}</h4><small>{ms.press.issue}</small><p>{ms.press.caption}</p></figcaption>
+            </m.figure>}
+          </div>
         </m.li>)}
       </ol>
     </section>
@@ -248,9 +285,25 @@ export function About() {
     </section>
 
     <section className="ab-centre section">
+      <div className="ab-centre-head ab-network-head">
+        <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
+          <m.p className="eyebrow" variants={rise}>07 — Global network</m.p>
+          <m.h2 variants={rise} custom={1}>In rooms with the people<br /><i>shaping this industry.</i></m.h2>
+        </m.div>
+        <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Our students train under an academy with real relationships across the global diving and ocean conservation world.</m.p>
+      </div>
+      <div className="ab-network">
+        {network.map((n, i) => <m.article key={n.title} className="ab-network-card" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={reduce ? fade : rise} custom={i % 3}>
+          <div className="ab-network-photo"><Image src={n.image} alt={n.alt} fill sizes="140px" /></div>
+          <div><h3>{n.title}</h3><p>{n.text}</p></div>
+        </m.article>)}
+      </div>
+    </section>
+
+    <section className="ab-centre section">
       <div className="ab-centre-head">
         <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
-          <m.p className="eyebrow" variants={rise}>07 — Visit our scuba diving centre</m.p>
+          <m.p className="eyebrow" variants={rise}>08 — Visit our scuba diving centre</m.p>
           <m.h2 variants={rise} custom={1}>Everything you need,<br /><i>in one place.</i></m.h2>
         </m.div>
         <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>Our diving centre has quality rental equipment and a fully stocked retail shop, with just about anything you need for the beautiful tropical waters of Kerala.</m.p>
@@ -273,7 +326,7 @@ export function About() {
     <section className="ab-centre section">
       <div className="ab-centre-head">
         <m.div initial="hidden" whileInView="show" viewport={{ once: true }}>
-          <m.p className="eyebrow" variants={rise}>08 — Ocean Love</m.p>
+          <m.p className="eyebrow" variants={rise}>09 — Ocean Love</m.p>
           <m.h2 variants={rise} custom={1}>Protecting the sea<br /><i>we dive in.</i></m.h2>
         </m.div>
         <m.p className="ab-lead" initial="hidden" whileInView="show" viewport={{ once: true }} variants={rise} custom={2}>More than three billion people depend on marine and coastal biodiversity for their livelihoods. Ocean Love is how we turn time in the water into care for it.</m.p>
@@ -287,8 +340,15 @@ export function About() {
     </section>
 
     <section className="ab-partners">
-      <p className="eyebrow">Conservation partners</p>
-      <ul>{partners.map(p => <li key={p}>{p}</li>)}</ul>
+      <m.div className="ab-partners-head" initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <m.p className="eyebrow" variants={rise}>10 — Conservation partners</m.p>
+        <m.h2 variants={rise} custom={1}>Stronger together<br /><i>for the ocean.</i></m.h2>
+        <m.p className="ab-lead" variants={rise} custom={2}>The organisations we work alongside to protect the sea.</m.p>
+      </m.div>
+      {/* Four copies keep the strip full on very wide screens; only the first is read out */}
+      <div className="ab-logos"><div className="ab-logos-track">
+        {[0, 1, 2, 3].map(k => <ul key={k} aria-hidden={k > 0 || undefined}>{partners.map(p => <li key={p.name} className={p.dark ? 'dark' : undefined}><span><Image src={p.logo} alt={k ? '' : p.name} fill sizes="180px" /></span></li>)}</ul>)}
+      </div></div>
     </section>
 
     <section className="ab-cta">

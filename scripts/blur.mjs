@@ -7,7 +7,7 @@ const dir = 'public/images'
 // Transparent artwork has no photo to preview
 const skip = new Set(['logo.webp'])
 const rows = []
-for (const file of readdirSync(dir).filter(f => /\.(webp|jpe?g|png)$/i.test(f) && !skip.has(f)).sort()) {
+for (const file of readdirSync(dir).filter(f => /\.(webp|jpe?g|png)$/i.test(f) && !skip.has(f) && !f.startsWith('partner-')).sort()) {
   const buf = await sharp(`${dir}/${file}`).resize(16, 16, { fit: 'inside' }).webp({ quality: 50 }).toBuffer()
   rows.push(`  '/images/${file}': 'data:image/webp;base64,${buf.toString('base64')}',`)
 }
